@@ -1,1 +1,1 @@
-# quantcraft-app
+# smart-waste-management

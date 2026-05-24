@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantCraft — Analytics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;overflow:hidden;}
+
+/* ── SHELL ── */
+.shell{display:flex;flex-direction:column;height:100vh;}
+
+/* ── TOP NAV ── */
+.topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;gap:0;z-index:1000;position:relative;}
+.logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;margin-right:20px;text-decoration:none;}
+.tnav{display:flex;align-items:flex-end;height:100%;gap:0;}
+.tnav-item{padding:0 18px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:#4a6a7a;cursor:pointer;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;text-decoration:none;}
+.tnav-item:hover{color:#c8dde8;}
+.tnav-item.active{color:#00e896;border-bottom-color:#00e896;}
+.search-wrap{margin-left:24px;position:relative;display:flex;align-items:center;}
+.search-wrap input{padding:7px 14px 7px 36px;width:250px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+.search-wrap input::placeholder{color:#3a5a6a;}
+.search-wrap input:focus{border-color:rgba(0,232,150,.4);}
+.search-icon{position:absolute;left:11px;color:#3a5a6a;pointer-events:none;}
+.tnav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.ti-btn{color:#4a6a7a;cursor:pointer;transition:color .2s;background:none;border:none;padding:4px;}
+.ti-btn:hover{color:#00e896;}
+
+/* ── BODY ── */
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;flex-shrink:0;background:#0a1020;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:500;}
+.user-card{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
+.uavatar{width:36px;height:36px;border-radius:9px;background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.uname{font-family:'Share Tech Mono',monospace;font-size:12px;color:#eaf4ff;font-weight:700;}
+.ustatus{font-family:'Share Tech Mono',monospace;font-size:10px;color:#1a5040;margin-top:2px;}
+.snav{flex:1;padding:10px 10px 0;display:flex;flex-direction:column;gap:2px;}
+.ni{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:9px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;color:#3a5a6a;border:none;background:none;font-family:'Rajdhani',sans-serif;width:100%;text-align:left;text-decoration:none;}
+.ni:hover{color:#c8dde8;background:rgba(255,255,255,.04);}
+.ni.active{color:#080e1c;background:#00e896;font-weight:700;}
+.ni.active svg{stroke:#080e1c !important;}
+.ni svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
+.sfooter{padding:10px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:2px;}
+.fi{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#3a5a6a;transition:all .2s;border:none;background:none;font-family:'Rajdhani',sans-serif;width:100%;text-align:left;}
+.fi:hover{color:#c8dde8;background:rgba(255,255,255,.04);}
+.fi.red{color:#e05050;}
+.fi.red:hover{background:rgba(200,50,50,.07);}
+.fi svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+/* ── LIVE STATS BAR in sidebar ── */
+.stats-bar{padding:10px 14px;border-top:1px solid rgba(255,255,255,.05);display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stat-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;text-align:center;}
+.stat-val{font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;}
+.stat-lbl{font-size:11px;color:#3a5a6a;margin-top:2px;}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* PAGE HEADER */
+.page-header{padding:14px 24px 12px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.ph-title{font-family:'Share Tech Mono',monospace;font-size:14px;color:#00e896;letter-spacing:2px;}
+.ph-sub{font-size:12px;color:#4a6a7a;margin-top:3px;}
+.dl-btn{display:flex;align-items:center;gap:8px;padding:9px 18px;background:transparent;border:1.5px solid #00e896;border-radius:8px;color:#00e896;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;}
+.dl-btn:hover{background:rgba(0,232,150,.1);}
+.dl-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:16px;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:#080e1c;}
+::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.kpi-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:15px 16px;transition:border-color .2s;animation:fadeUp .4s ease both;}
+.kpi-card:hover{border-color:rgba(0,232,150,.2);}
+.kpi-card:nth-child(1){animation-delay:.05s;}
+.kpi-card:nth-child(2){animation-delay:.1s;}
+.kpi-card:nth-child(3){animation-delay:.15s;}
+.kpi-card:nth-child(4){animation-delay:.2s;}
+.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.ki-green{background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.15);}
+.ki-cyan{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.15);}
+.ki-amber{background:rgba(255,170,64,.08);border:1px solid rgba(255,170,64,.15);}
+.ki-purple{background:rgba(184,127,255,.08);border:1px solid rgba(184,127,255,.15);}
+.kpi-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;letter-spacing:.3px;}
+.kb-green{background:rgba(0,232,150,.12);color:#00e896;}
+.kb-cyan{background:rgba(0,200,255,.1);color:#00c8ff;}
+.kb-amber{background:rgba(255,170,64,.1);color:#ffaa40;}
+.kb-purple{background:rgba(184,127,255,.1);color:#b87fff;}
+.kpi-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a5a6a;letter-spacing:1.5px;margin-bottom:5px;}
+.kpi-val{font-size:28px;font-weight:700;color:#eaf4ff;line-height:1;display:flex;align-items:baseline;gap:6px;}
+.kpi-val-sub{font-size:12px;font-weight:500;color:#5a7a8a;}
+
+/* ── MID ROW ── */
+.mid-row{display:grid;grid-template-columns:1fr 1fr 300px;gap:12px;animation:fadeUp .4s ease .25s both;}
+
+/* CHART CARD */
+.chart-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px 18px;}
+.cc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.cc-title{font-size:13px;font-weight:700;color:#eaf4ff;}
+.cc-sub{font-size:11px;color:#4a6a7a;margin-top:3px;}
+.live-badge{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#00e896;background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.15);padding:3px 9px;border-radius:20px;letter-spacing:.5px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#00e896;box-shadow:0 0 5px #00e896;animation:blink 1.8s infinite;}
+.chart-wrap{height:160px;position:relative;}
+
+/* DONUT CARD */
+.donut-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px 18px;}
+.donut-wrap{height:160px;display:flex;align-items:center;justify-content:center;position:relative;}
+.donut-center{position:absolute;text-align:center;pointer-events:none;}
+.donut-center-val{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:#eaf4ff;}
+.donut-center-lbl{font-size:10px;color:#4a6a7a;margin-top:2px;}
+.donut-legend{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.dl-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#5a7a8a;}
+.dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dl-pct{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;}
+
+/* COMMUNITY CARD */
+.community-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;}
+.impact-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:11px 12px;display:flex;gap:10px;align-items:flex-start;}
+.ii-icon{width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ii-label{font-size:11px;font-weight:700;color:#c8dde8;margin-bottom:2px;}
+.ii-val{font-family:'Share Tech Mono',monospace;font-size:17px;font-weight:700;color:#eaf4ff;display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.ii-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;}
+.iib-green{background:rgba(0,232,150,.12);color:#00e896;}
+.iib-cyan{background:rgba(0,200,255,.1);color:#00c8ff;}
+.ii-desc{font-size:11px;color:#3a5a6a;line-height:1.4;}
+
+/* ── BOTTOM ROW ── */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;animation:fadeUp .4s ease .35s both;}
+.bottom-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:15px 18px;}
+.bc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.bc-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a5a6a;letter-spacing:1.5px;}
+.bc-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.5px;}
+.bcs-green{color:#00e896;}
+.bcs-cyan{color:#00c8ff;}
+
+/* BIN TABLE */
+.bin-table{display:flex;flex-direction:column;gap:5px;}
+.bin-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(255,255,255,.02);border-radius:7px;border:1px solid rgba(255,255,255,.04);font-size:12px;}
+.bin-row:hover{border-color:rgba(0,232,150,.15);}
+.bin-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.bin-name{flex:1;color:#c8dde8;font-weight:600;}
+.bin-area{color:#4a6a7a;font-size:11px;min-width:80px;}
+.bin-fill-bar{flex:1;height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;}
+.bin-fill-inner{height:100%;border-radius:2px;}
+.bin-pct{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;min-width:34px;text-align:right;}
+
+/* TRUCK TABLE */
+.truck-table{display:flex;flex-direction:column;gap:5px;}
+.truck-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(255,255,255,.02);border-radius:7px;border:1px solid rgba(255,255,255,.04);font-size:12px;}
+.truck-row:hover{border-color:rgba(0,232,150,.15);}
+.truck-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.truck-id{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8a9a;min-width:52px;}
+.truck-stops{flex:1;color:#c8dde8;font-weight:600;}
+.truck-km{font-family:'Share Tech Mono',monospace;font-size:11px;color:#4a6a7a;min-width:44px;}
+.truck-saved{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;color:#00e896;min-width:40px;text-align:right;}
+
+/* STATUS BAR */
+.status-bar{padding:10px 24px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:28px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
+.sb-item{display:flex;flex-direction:column;gap:2px;}
+.sb-lbl{color:#2a4a5a;letter-spacing:1px;font-size:9px;}
+.sb-val{color:#eaf4ff;font-size:12px;}
+.sb-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e896;margin-right:5px;animation:blink 1.8s infinite;}
+.sb-right{margin-left:auto;color:#2a4a5a;font-size:10px;}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:55px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(0,232,150,.2);border-radius:9px;padding:10px 14px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <a href="index.html" class="logo">QuantCraft</a>
+    <div class="tnav">
+      <a class="tnav-item" href="map.html">Map View</a>
+      <a class="tnav-item active" href="analytics.html">Analytics</a>
+      <a class="tnav-item" href="truck.html">Trucks</a>
+      <a class="tnav-item" href="index.html">Home</a>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input type="text" placeholder="Search mission data…"/>
+    </div>
+    <div class="tnav-right">
+      <button class="ti-btn" onclick="toast('No new alerts','info')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <button class="ti-btn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="user-card">
+        <div class="uavatar">
+          <svg width="18" height="18" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div><div class="uname">OPS LEAD</div><div class="ustatus">● ACTIVE</div></div>
+      </div>
+      <div class="snav">
+        <a class="ni" href="map.html">
+          <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map View
+        </a>
+        <a class="ni active" href="analytics.html">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
+        </a>
+        <a class="ni" href="index.html">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
+        </a>
+        <a class="ni" href="truck.html">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trucks
+        </a>
+        <button class="ni" onclick="toast('Settings','info')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+        </button>
+      </div>
+
+      <!-- LIVE SIDEBAR STATS -->
+      <div class="stats-bar">
+        <div class="stat-box"><div class="stat-val" id="sb-full" style="color:#ff6b6b">0</div><div class="stat-lbl">Full Bins</div></div>
+        <div class="stat-box"><div class="stat-val" id="sb-ok" style="color:#00e896">0</div><div class="stat-lbl">OK Bins</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:#00c8ff">4</div><div class="stat-lbl">Routes</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:#c8dde8">12</div><div class="stat-lbl">Total Bins</div></div>
+      </div>
+
+      <div class="sfooter">
+        <button class="fi" onclick="toast('Help docs opening…','info')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>Help
+        </button>
+        <button class="fi red" onclick="toast('Logging out…','warning')">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="page-header">
+        <div>
+          <div class="ph-title">MISSION INTELLIGENCE</div>
+          <div class="ph-sub">Weekly Report · Pathankot Waste Operations · Live Data</div>
+        </div>
+        <button class="dl-btn" onclick="dlToast()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Report
+        </button>
+      </div>
+
+      <div class="content">
+
+        <!-- KPI ROW -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon ki-green">
+                <svg width="17" height="17" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 8 22 12 18 12"/><path d="M20.49 9A9 9 0 1 0 21 12"/></svg>
+              </div>
+              <span class="kpi-badge kb-green">+12 TODAY</span>
+            </div>
+            <div class="kpi-lbl">BINS EMPTIED</div>
+            <div class="kpi-val"><span id="cv1">0</span><span class="kpi-val-sub">visits</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon ki-cyan">
+                <svg width="17" height="17" fill="none" stroke="#00c8ff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+              <span class="kpi-badge kb-cyan">↗ HIGH</span>
+            </div>
+            <div class="kpi-lbl">CLEAN AREAS</div>
+            <div class="kpi-val"><span id="cv2">0</span><span style="font-size:16px;color:#5a7a8a">%</span><span class="kpi-val-sub">this week</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon ki-amber">
+                <svg width="17" height="17" fill="none" stroke="#ffaa40" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 0 0 5.414 17H17m0 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm-12 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0z"/></svg>
+              </div>
+              <span class="kpi-badge kb-amber">OPTIMIZED</span>
+            </div>
+            <div class="kpi-lbl">FUEL SAVED</div>
+            <div class="kpi-val"><span id="cv3">0</span><span class="kpi-val-sub">litres</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon ki-purple">
+                <svg width="17" height="17" fill="none" stroke="#b87fff" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+              </div>
+              <span class="kpi-badge kb-purple">NET POS</span>
+            </div>
+            <div class="kpi-lbl">PLASTIC SAVED</div>
+            <div class="kpi-val"><span id="cv4">0</span><span class="kpi-val-sub">kg</span></div>
+          </div>
+        </div>
+
+        <!-- MID ROW -->
+        <div class="mid-row">
+          <!-- BAR CHART -->
+          <div class="chart-card">
+            <div class="cc-head">
+              <div>
+                <div class="cc-title">Daily Collection Progress</div>
+                <div class="cc-sub">Bins emptied per weekday — Pathankot</div>
+              </div>
+              <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="weekChart"></canvas>
+            </div>
+          </div>
+
+          <!-- DONUT CHART -->
+          <div class="donut-card">
+            <div class="cc-head">
+              <div>
+                <div class="cc-title">Bin Status Breakdown</div>
+                <div class="cc-sub">Current fill distribution</div>
+              </div>
+            </div>
+            <div class="donut-wrap">
+              <canvas id="donutChart" style="max-width:140px;max-height:140px;"></canvas>
+              <div class="donut-center">
+                <div class="donut-center-val" id="donut-pct">0%</div>
+                <div class="donut-center-lbl">URGENT</div>
+              </div>
+            </div>
+            <div class="donut-legend">
+              <div class="dl-row"><span class="dl-dot" style="background:#ff6b6b"></span>Full ≥ 80%<span class="dl-pct" style="color:#ff6b6b" id="dl-full">0</span></div>
+              <div class="dl-row"><span class="dl-dot" style="background:#ffaa40"></span>Half 40–79%<span class="dl-pct" style="color:#ffaa40" id="dl-warn">0</span></div>
+              <div class="dl-row"><span class="dl-dot" style="background:#00e896"></span>OK &lt; 40%<span class="dl-pct" style="color:#00e896" id="dl-ok">0</span></div>
+            </div>
+          </div>
+
+          <!-- COMMUNITY -->
+          <div class="community-card">
+            <div>
+              <div class="cc-title">Community Impact</div>
+              <div class="cc-sub" style="margin-top:2px;">Efficiency outcomes this week</div>
+            </div>
+            <div class="impact-item">
+              <div class="ii-icon">
+                <svg width="16" height="16" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 0 0 5.414 17H17m0 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm-12 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0z"/></svg>
+              </div>
+              <div>
+                <div class="ii-label">Fuel Saved</div>
+                <div class="ii-val">42L <span class="ii-badge iib-green">Optimized</span></div>
+                <div class="ii-desc">Smart routes reduced total truck distance by 31%.</div>
+              </div>
+            </div>
+            <div class="impact-item">
+              <div class="ii-icon">
+                <svg width="16" height="16" fill="none" stroke="#00c8ff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/></svg>
+              </div>
+              <div>
+                <div class="ii-label">CO₂ Reduced</div>
+                <div class="ii-val">120kg <span class="ii-badge iib-cyan">Offset</span></div>
+                <div class="ii-desc">Emission reduction from shorter optimised routes.</div>
+              </div>
+            </div>
+            <div class="impact-item">
+              <div class="ii-icon">
+                <svg width="16" height="16" fill="none" stroke="#ffaa40" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <div>
+                <div class="ii-label">Efficiency Score</div>
+                <div class="ii-val">94% <span class="ii-badge" style="background:rgba(255,170,64,.1);color:#ffaa40;">↑ HIGH</span></div>
+                <div class="ii-desc">Fleet operating at peak performance this week.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM ROW -->
+        <div class="bottom-row">
+          <!-- BIN STATUS TABLE -->
+          <div class="bottom-card">
+            <div class="bc-head">
+              <div class="bc-title">BIN STATUS — ALL 12 BINS</div>
+              <div class="bc-status bcs-green" id="bc-live">● LIVE</div>
+            </div>
+            <div class="bin-table" id="binTable"></div>
+          </div>
+
+          <!-- TRUCK SUMMARY TABLE -->
+          <div class="bottom-card">
+            <div class="bc-head">
+              <div class="bc-title">TRUCK DISPATCH SUMMARY</div>
+              <div class="bc-status bcs-cyan">4 ACTIVE</div>
+            </div>
+            <div class="truck-table" id="truckTable"></div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="sb-item">
+          <div class="sb-lbl">FLEET STATUS</div>
+          <div class="sb-val"><span class="sb-dot"></span>ALL NOMINAL</div>
+        </div>
+        <div class="sb-item">
+          <div class="sb-lbl">SENSOR UPTIME</div>
+          <div class="sb-val">98.2%</div>
+        </div>
+        <div class="sb-item">
+          <div class="sb-lbl">LAST SYNC</div>
+          <div class="sb-val" id="syncTime">--:--:--</div>
+        </div>
+        <div class="sb-right">VER 4.2.0-STABLE</div>
+      </div>
+    </div><!-- /main -->
+  </div><!-- /body -->
+</div><!-- /shell -->
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ===== SHARED BIN DATA ===== */
+const BINS = [
+  {id:'BIN-001', name:'Bus Stand',        area:'Bus Stand',       fill:88, type:'General'},
+  {id:'BIN-002', name:'Railway Station',  area:'Railway Station', fill:42, type:'Recyclable'},
+  {id:'BIN-003', name:'Dalhousie Rd',     area:'Dalhousie Road',  fill:19, type:'Organic'},
+  {id:'BIN-004', name:'Chakki Bank',      area:'Chakki Bank',     fill:73, type:'General'},
+  {id:'BIN-005', name:'Mamun Road',       area:'Mamun',           fill:55, type:'Recyclable'},
+  {id:'BIN-006', name:'Civil Lines',      area:'Civil Lines',     fill:91, type:'General'},
+  {id:'BIN-007', name:'Shahpur Kandi',    area:'Shahpur Kandi',   fill:33, type:'Organic'},
+  {id:'BIN-008', name:'Mirthal Chowk',    area:'Mirthal',         fill:66, type:'General'},
+  {id:'BIN-009', name:'Sujanpur Rd',      area:'Sujanpur',        fill:12, type:'Recyclable'},
+  {id:'BIN-010', name:'Dunera Chowk',     area:'Dunera',          fill:80, type:'Hazardous'},
+  {id:'BIN-011', name:'Fort Area',        area:'Fort',            fill:48, type:'Organic'},
+  {id:'BIN-012', name:'Nurpur Road',      area:'Nurpur Road',     fill:95, type:'General'},
+];
+
+/* ===== TRUCK DATA ===== */
+const TRUCKS = [
+  {id:'TRK-01', color:'#00e896'},
+  {id:'TRK-02', color:'#00c8ff'},
+  {id:'TRK-03', color:'#ffaa40'},
+  {id:'TRK-04', color:'#e86bff'},
+];
+
+function binColor(f){ return f>=80?'#ff6b6b':f>=40?'#ffaa40':'#00e896'; }
+function dist(a,b){ return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2); }
+
+/* Compute truck routes (same logic as truck.html) */
+function computeTrucks(){
+  const DEPOT=[32.2748,75.6530];
+  const binCoords={
+    'BIN-001':[32.2748,75.6520],'BIN-002':[32.2684,75.6443],'BIN-003':[32.2810,75.6478],
+    'BIN-004':[32.2612,75.6571],'BIN-005':[32.2890,75.6340],'BIN-006':[32.2762,75.6598],
+    'BIN-007':[32.2530,75.6420],'BIN-008':[32.3050,75.6250],'BIN-009':[32.2680,75.6670],
+    'BIN-010':[32.2920,75.6600],'BIN-011':[32.2720,75.6380],'BIN-012':[32.2600,75.6490],
+  };
+  function routeKm(start,bins){
+    let total=0,prev=start;
+    bins.forEach(b=>{const c=binCoords[b.id];if(c){total+=dist(prev,c);prev=c;}});
+    return (total*111).toFixed(1);
+  }
+  const needsPickup=BINS.filter(b=>b.fill>=40).sort((a,b)=>b.fill-a.fill);
+  const urgent=needsPickup.filter(b=>b.fill>=80);
+  const warning=needsPickup.filter(b=>b.fill>=40&&b.fill<80);
+  const truckBins=TRUCKS.map(()=>[]);
+  urgent.forEach((b,i)=>truckBins[i%4].push(b));
+  warning.forEach((b,i)=>truckBins[(urgent.length+i)%4].push(b));
+  return TRUCKS.map((t,i)=>{
+    const stops=truckBins[i];
+    const km=stops.length?routeKm(DEPOT,stops):0;
+    const saved=Math.max(0,(12*111*0.06)-km*0.06).toFixed(0);
+    return {truck:t, stops:stops.length, km, saved};
+  });
+}
+
+/* ===== CHARTS ===== */
+const weekCtx=document.getElementById('weekChart').getContext('2d');
+const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const vals=[68,82,95,74,88,45,30];
+const todayIdx=2;
+
+new Chart(weekCtx,{
+  type:'bar',
+  data:{
+    labels:days,
+    datasets:[{
+      data:vals,
+      backgroundColor:vals.map((_,i)=>i===todayIdx?'rgba(0,232,150,.5)':'rgba(255,255,255,.06)'),
+      borderColor:vals.map((_,i)=>i===todayIdx?'#00e896':'rgba(255,255,255,.1)'),
+      borderWidth:1,borderRadius:6,borderSkipped:false,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{
+      backgroundColor:'rgba(8,14,28,.97)',borderColor:'rgba(0,232,150,.3)',borderWidth:1,
+      titleColor:'#00e896',bodyColor:'#c8dde8',
+      titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Rajdhani',size:13},
+    }},
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3a5a6a',font:{family:'Share Tech Mono',size:9},padding:6},border:{display:false}},
+      y:{display:false,max:115},
+    }
+  }
+});
+
+/* Donut chart */
+let donutChart;
+function renderDonut(){
+  const full=BINS.filter(b=>b.fill>=80).length;
+  const warn=BINS.filter(b=>b.fill>=40&&b.fill<80).length;
+  const ok=BINS.filter(b=>b.fill<40).length;
+  document.getElementById('donut-pct').textContent=Math.round(full/12*100)+'%';
+  document.getElementById('dl-full').textContent=full;
+  document.getElementById('dl-warn').textContent=warn;
+  document.getElementById('dl-ok').textContent=ok;
+
+  if(donutChart) donutChart.destroy();
+  const dCtx=document.getElementById('donutChart').getContext('2d');
+  donutChart=new Chart(dCtx,{
+    type:'doughnut',
+    data:{
+      datasets:[{
+        data:[full,warn,ok],
+        backgroundColor:['rgba(255,107,107,.7)','rgba(255,170,64,.6)','rgba(0,232,150,.5)'],
+        borderColor:['#ff6b6b','#ffaa40','#00e896'],
+        borderWidth:1.5,hoverOffset:4,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,cutout:'68%',
+      plugins:{legend:{display:false},tooltip:{
+        backgroundColor:'rgba(8,14,28,.97)',borderColor:'rgba(0,232,150,.3)',borderWidth:1,
+        titleColor:'#00e896',bodyColor:'#c8dde8',
+        titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Rajdhani',size:13},
+      }}
+    }
+  });
+}
+
+/* ===== RENDER FUNCTIONS ===== */
+function renderBinTable(){
+  const sorted=[...BINS].sort((a,b)=>b.fill-a.fill);
+  document.getElementById('binTable').innerHTML=sorted.map(b=>{
+    const c=binColor(b.fill);
+    return `<div class="bin-row">
+      <span class="bin-dot" style="background:${c}"></span>
+      <span class="bin-name">${b.name}</span>
+      <span class="bin-area">${b.type}</span>
+      <div class="bin-fill-bar"><div class="bin-fill-inner" style="width:${b.fill}%;background:${c}"></div></div>
+      <span class="bin-pct" style="color:${c}">${b.fill}%</span>
+    </div>`;
+  }).join('');
+}
+
+function renderTruckTable(){
+  const routes=computeTrucks();
+  document.getElementById('truckTable').innerHTML=routes.map(r=>`
+    <div class="truck-row">
+      <span class="truck-dot" style="background:${r.truck.color}"></span>
+      <span class="truck-id">${r.truck.id}</span>
+      <span class="truck-stops">${r.stops} stops</span>
+      <span class="truck-km">${r.km} km</span>
+      <span class="truck-saved">-${r.saved}L</span>
+    </div>`).join('');
+}
+
+function updateSidebarStats(){
+  document.getElementById('sb-full').textContent=BINS.filter(b=>b.fill>=80).length;
+  document.getElementById('sb-ok').textContent=BINS.filter(b=>b.fill<40).length;
+}
+
+/* ===== COUNTER ANIMATION ===== */
+function animCount(id, target){
+  const el=document.getElementById(id);
+  let v=0;const step=Math.ceil(target/40);
+  const iv=setInterval(()=>{v=Math.min(v+step,target);el.textContent=v;if(v>=target)clearInterval(iv);},28);
+}
+
+/* ===== SYNC TIME ===== */
+function updateSync(){
+  const n=new Date();
+  document.getElementById('syncTime').textContent=
+    String(n.getUTCHours()).padStart(2,'0')+':'+
+    String(n.getUTCMinutes()).padStart(2,'0')+':'+
+    String(n.getUTCSeconds()).padStart(2,'0');
+}
+updateSync();setInterval(updateSync,1000);
+
+/* ===== LIVE SIMULATION (same as map.html & truck.html) ===== */
+setInterval(()=>{
+  BINS.forEach(b=>{if(Math.random()>.7)b.fill=Math.min(100,b.fill+1);});
+  renderDonut();
+  renderBinTable();
+  renderTruckTable();
+  updateSidebarStats();
+},5000);
+
+/* ===== TOAST ===== */
+function toast(msg,type='info'){
+  const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),350);},2500);
+}
+
+function dlToast(){ toast('Preparing report…','info'); }
+
+/* ===== INIT ===== */
+renderDonut();
+renderBinTable();
+renderTruckTable();
+updateSidebarStats();
+setTimeout(()=>{
+  animCount('cv1',142);
+  animCount('cv2',94);
+  animCount('cv3',42);
+  animCount('cv4',850);
+},300);
+</script>
+</body>
+</html>

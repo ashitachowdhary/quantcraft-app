@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantCraft — Green Rewards</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#0f1923;font-family:'Rajdhani',sans-serif;color:#c8dde8;overflow:hidden;}
+.shell{display:flex;flex-direction:column;height:100vh;}
+
+/* TOP NAV */
+.topnav{display:flex;align-items:center;padding:0 28px;height:58px;background:#111c28;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;gap:0;z-index:1000;}
+.logo-wrap{display:flex;flex-direction:column;margin-right:28px;}
+.logo{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#eaf4ff;letter-spacing:.5px;text-decoration:none;}
+.logo-sub{font-family:'Rajdhani',sans-serif;font-size:9px;color:#3a5a6a;letter-spacing:2.5px;margin-top:1px;}
+.tnav{display:flex;align-items:flex-end;height:100%;gap:0;}
+.tnav-item{padding:0 18px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:#5a7a8a;cursor:pointer;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;text-decoration:none;}
+.tnav-item:hover{color:#c8dde8;}
+.tnav-item.active{color:#00e896;border-bottom-color:#00e896;}
+.tnav-right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+.ti-btn{color:#4a6a7a;cursor:pointer;transition:color .2s;background:none;border:none;padding:6px;border-radius:8px;}
+.ti-btn:hover{color:#c8dde8;background:rgba(255,255,255,.05);}
+
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:220px;flex-shrink:0;background:#111c28;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:500;}
+.user-card{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:8px;}
+.uavatar{width:40px;height:40px;border-radius:10px;background:rgba(0,232,150,.12);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.uname{font-family:'Rajdhani',sans-serif;font-size:13px;color:#eaf4ff;font-weight:700;letter-spacing:.3px;}
+.ustatus{font-size:11px;color:#00e896;margin-top:2px;display:flex;align-items:center;gap:5px;}
+.ustatus::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e896;}
+.snav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;}
+.ni{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;color:#5a7a8a;border:none;background:none;font-family:'Rajdhani',sans-serif;width:100%;text-align:left;text-decoration:none;letter-spacing:.2px;}
+.ni:hover{color:#c8dde8;background:rgba(255,255,255,.05);}
+.ni.active{color:#00e896;background:rgba(0,232,150,.12);font-weight:700;}
+.ni svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
+.sfooter{padding:10px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:2px;}
+.fi{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;color:#5a7a8a;transition:all .2s;border:none;background:none;font-family:'Rajdhani',sans-serif;width:100%;text-align:left;}
+.fi:hover{color:#c8dde8;background:rgba(255,255,255,.05);}
+.fi.red{color:#e05050;}
+.fi.red:hover{background:rgba(200,50,50,.07);}
+.fi svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.page-header{padding:18px 28px 16px;background:#111c28;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.ph-left{display:flex;align-items:center;gap:12px;}
+.ph-icon{color:#00e896;}
+.ph-left h2{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#eaf4ff;letter-spacing:.3px;}
+.ph-left p{font-size:13px;color:#5a7a8a;margin-top:3px;}
+.ph-text{}
+.log-btn-primary{padding:11px 24px;background:#00e896;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a1520;cursor:pointer;transition:all .2s;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+.log-btn-primary:hover{background:#00ffaa;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,232,150,.25);}
+.log-btn-primary:active{transform:scale(.98);}
+
+.content{flex:1;overflow-y:auto;padding:20px 28px;display:flex;flex-direction:column;gap:16px;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:#0f1923;}
+::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
+
+/* CITIZEN PROFILE */
+.profile-card{background:#151f2e;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:18px;}
+.profile-avatar{width:52px;height:52px;border-radius:12px;background:#1a2a3a;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.profile-avatar svg{stroke:#5a8a7a;}
+.profile-info{flex:1;}
+.profile-name{font-size:20px;font-weight:700;color:#eaf4ff;letter-spacing:.2px;}
+.profile-id-row{display:flex;align-items:center;gap:12px;margin-top:5px;}
+.profile-id-tag{font-size:12px;color:#eaf4ff;background:#1e2f40;border:1px solid rgba(255,255,255,.08);padding:3px 10px;border-radius:5px;font-family:'Share Tech Mono',monospace;}
+.profile-loc{font-size:13px;color:#5a7a8a;}
+.profile-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.badge{font-size:12px;font-weight:600;padding:4px 12px;border-radius:6px;letter-spacing:.2px;display:flex;align-items:center;gap:5px;}
+.badge-gold{background:rgba(255,180,0,.12);color:#ffb400;border:1px solid rgba(255,180,0,.18);}
+.badge-green{background:rgba(0,232,150,.1);color:#00e896;border:1px solid rgba(0,232,150,.18);}
+.badge-blue{background:rgba(100,150,255,.1);color:#7ab0ff;border:1px solid rgba(100,150,255,.18);}
+.profile-points-wrap{text-align:right;flex-shrink:0;}
+.profile-pts-lbl{font-size:11px;color:#5a7a8a;letter-spacing:1.5px;font-weight:700;margin-bottom:4px;}
+.profile-pts-val{font-family:'Share Tech Mono',monospace;font-size:48px;font-weight:700;color:#eaf4ff;line-height:1;}
+@keyframes ptsBump{0%{transform:scale(1)}30%{transform:scale(1.15);color:#00ffaa}100%{transform:scale(1);color:#eaf4ff}}
+.pts-bump{animation:ptsBump .4s ease;}
+
+/* REWARD JOURNEY */
+.journey-card{background:#151f2e;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px 24px;}
+.journey-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.journey-title{font-size:13px;font-weight:700;color:#eaf4ff;letter-spacing:.5px;}
+.journey-next{font-size:13px;color:#5a7a8a;}
+.journey-next strong{color:#00e896;}
+
+.journey-track{display:flex;align-items:flex-start;position:relative;padding-bottom:24px;}
+.track-line{position:absolute;top:18px;left:0;right:0;height:3px;background:rgba(255,255,255,.06);border-radius:2px;z-index:0;}
+.track-fill{position:absolute;top:18px;left:0;height:3px;background:linear-gradient(90deg,#00e896,#00c8ff);border-radius:2px;z-index:1;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.milestone{display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2;flex:1;}
+.ms-dot{width:38px;height:38px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;background:#151f2e;transition:all .3s;}
+.ms-dot.done{background:#00e896;border-color:#00e896;color:#0a1520;}
+.ms-dot.active{border-color:rgba(255,255,255,.3);color:#eaf4ff;box-shadow:0 0 0 4px rgba(0,232,150,.12);}
+.ms-dot.locked{border-color:rgba(255,255,255,.1);color:#3a5a6a;}
+.ms-dot svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;}
+.ms-label{font-size:12px;font-weight:700;color:#eaf4ff;letter-spacing:.3px;}
+.ms-pts{font-size:13px;font-weight:700;}
+.ms-pts.done{color:#eaf4ff;}
+.ms-pts.active{color:#eaf4ff;}
+.ms-pts.locked{color:#3a5a6a;}
+
+/* MILESTONE NUMBERS BELOW */
+.milestone-nums{display:flex;padding:0;position:relative;}
+.mn-item{flex:1;text-align:center;font-size:13px;font-weight:700;color:#5a7a8a;}
+.mn-item.active{color:#eaf4ff;}
+
+/* ACTION BUTTONS */
+.action-row{display:flex;gap:12px;}
+.act-btn-green{flex:1;padding:16px 20px;background:#00e896;border:none;border-radius:12px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#0a1520;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.act-btn-green:hover{background:#00ffaa;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,232,150,.25);}
+.act-btn-outline{flex:1;padding:16px 20px;background:#151f2e;border:1px solid rgba(255,255,255,.1);border-radius:12px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#c8dde8;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.act-btn-outline:hover{background:#1a2a3a;border-color:rgba(255,255,255,.18);}
+
+/* REWARD TIERS */
+.section-title{font-size:13px;font-weight:700;color:#7a9aaa;letter-spacing:.5px;margin-bottom:12px;}
+.tiers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.tier-card{background:#151f2e;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .25s;}
+.tier-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.14);}
+.tier-card.unlocked{border-color:rgba(0,232,150,.25);}
+.tier-card.current{border-color:rgba(0,232,150,.3);}
+.tier-card.locked{opacity:.7;}
+.tier-icon{font-size:36px;margin-bottom:10px;line-height:1;color:#5a7a8a;}
+.tier-icon svg{width:36px;height:36px;stroke:currentColor;fill:none;stroke-width:1.5;}
+.tier-pts{font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;margin-bottom:7px;}
+.tier-name{font-size:14px;font-weight:700;color:#eaf4ff;margin-bottom:5px;}
+.tier-desc{font-size:12px;color:#5a7a8a;line-height:1.5;margin-bottom:10px;}
+.tier-lock{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:#4a6a7a;background:rgba(255,255,255,.04);border-radius:6px;padding:7px 10px;border:1px solid rgba(255,255,255,.06);}
+.tier-lock svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;}
+.tier-status{margin-top:6px;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.ts-unlocked{background:rgba(0,232,150,.1);color:#00e896;}
+.ts-claim{background:#00e896;color:#0a1520;cursor:pointer;font-weight:700;border-radius:6px;padding:7px 14px;}
+
+/* HOW IT WORKS */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.how-card{background:#151f2e;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;display:flex;gap:16px;align-items:flex-start;}
+.how-icon{width:44px;height:44px;border-radius:10px;background:#1a2a3a;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.how-icon svg{width:20px;height:20px;stroke:#00e896;fill:none;stroke-width:1.8;}
+.how-title{font-size:14px;font-weight:700;color:#eaf4ff;margin-bottom:6px;}
+.how-desc{font-size:12px;color:#5a7a8a;line-height:1.6;}
+
+/* ACTIVITY */
+.activity-list{display:flex;flex-direction:column;gap:8px;}
+.activity-item{background:#151f2e;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:14px;}
+.activity-item-new{animation:slideIn .35s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.ai-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ai-icon-green{background:rgba(0,232,150,.1);}
+.ai-icon-amber{background:rgba(255,170,64,.1);}
+.ai-icon-blue{background:rgba(0,200,255,.1);}
+.ai-info{flex:1;}
+.ai-name{font-size:14px;font-weight:700;color:#c8dde8;}
+.ai-detail{font-size:12px;color:#5a7a8a;margin-top:2px;}
+.ai-pts{font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;color:#00e896;margin-left:auto;}
+.ai-time{font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a5a6a;margin-left:10px;}
+.empty-state{text-align:center;padding:24px;color:#3a5a6a;font-family:'Share Tech Mono',monospace;font-size:11px;}
+
+/* STATUS BAR */
+.status-bar{padding:10px 28px;border-top:1px solid rgba(255,255,255,.05);background:#111c28;display:flex;align-items:center;gap:36px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
+.sb-item{display:flex;flex-direction:column;gap:2px;}
+.sb-lbl{color:#2a4a5a;letter-spacing:1px;font-size:9px;text-transform:uppercase;}
+.sb-val{color:#eaf4ff;font-size:12px;display:flex;align-items:center;gap:6px;}
+.sb-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e896;animation:blink 1.8s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.sb-right{margin-left:auto;color:#2a4a5a;font-size:10px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(5,10,20,.88);z-index:9000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.modal{background:#151f2e;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;width:420px;max-width:90vw;}
+.modal-title{font-size:16px;font-weight:700;color:#eaf4ff;letter-spacing:.3px;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:#5a7a8a;margin-bottom:18px;}
+.modal-bin-types{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.bin-type-btn{padding:16px;border-radius:12px;border:2px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);cursor:pointer;text-align:center;transition:all .2s;font-family:'Rajdhani',sans-serif;}
+.bin-type-btn:hover{border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.05);}
+.bin-type-btn.selected{border-color:#00e896;background:rgba(0,232,150,.08);}
+.btn-icon{font-size:26px;margin-bottom:7px;}
+.btn-label{font-size:13px;font-weight:700;color:#c8dde8;}
+.btn-sub{font-size:11px;color:#5a7a8a;margin-top:2px;}
+.modal-confirm-note{font-size:12px;color:#3a6a5a;background:rgba(0,232,150,.05);border:1px solid rgba(0,232,150,.1);border-radius:8px;padding:11px 14px;margin-bottom:16px;}
+.modal-actions{display:flex;gap:10px;}
+.modal-confirm{flex:1;padding:13px;background:#00e896;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a1520;cursor:pointer;transition:all .2s;}
+.modal-confirm:hover{background:#00ffaa;}
+.modal-cancel{flex:1;padding:13px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:#5a7a8a;cursor:pointer;transition:all .2s;}
+.modal-cancel:hover{color:#c8dde8;border-color:rgba(255,255,255,.2);}
+
+/* CELEBRATION */
+.celebration{position:fixed;inset:0;z-index:9999;pointer-events:none;}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:fall 2s ease-in forwards;}
+@keyframes fall{0%{transform:translateY(-10px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+
+#toast-wrap{position:fixed;bottom:60px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;background:rgba(15,25,35,.97);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 16px;min-width:240px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:opacity .3s;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <div class="logo-wrap">
+      <a href="index.html" class="logo">QuantCraft</a>
+      <span class="logo-sub">ECO-INDUSTRIAL HUB</span>
+    </div>
+    <div class="tnav">
+      <a class="tnav-item" href="map.html">Map View</a>
+      <a class="tnav-item" href="analytics.html">Analytics</a>
+      <a class="tnav-item" href="truck.html">Trucks</a>
+      <a class="tnav-item" href="index.html">Home</a>
+      <a class="tnav-item active" href="reward.html">Rewards</a>
+    </div>
+    <div class="tnav-right">
+      <button class="ti-btn" onclick="toast('No new alerts','info')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <button class="ti-btn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button class="ti-btn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="user-card">
+        <div class="uavatar">
+          <svg width="20" height="20" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="uname">OPS LEAD</div>
+          <div class="ustatus">ACTIVE</div>
+        </div>
+      </div>
+      <div class="snav">
+        <a class="ni" href="map.html">
+          <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map View
+        </a>
+        <a class="ni" href="analytics.html">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
+        </a>
+        <a class="ni" href="index.html">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
+        </a>
+        <a class="ni" href="truck.html">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trucks
+        </a>
+        <a class="ni active" href="reward.html">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Rewards
+        </a>
+        <button class="ni" onclick="toast('Settings','info')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+        </button>
+      </div>
+      <div class="sfooter">
+        <button class="fi" onclick="toast('Help docs opening…','info')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>Help
+        </button>
+        <button class="fi red" onclick="toast('Logging out…','warning')">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="page-header">
+        <div class="ph-left">
+          <div class="ph-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8 2 4 6 4 10c0 4 8 12 8 12s8-8 8-12c0-4-4-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="ph-text">
+            <h2>GREEN REWARDS — PATHANKOT</h2>
+            <p>Segregate waste properly at disposal → earn 2 pts per drop · redeem rewards from 500 pts</p>
+          </div>
+        </div>
+        <button class="log-btn-primary" onclick="openModal()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Log Disposal &amp; Earn Points
+        </button>
+      </div>
+
+      <div class="content">
+
+        <!-- CITIZEN PROFILE -->
+        <div class="profile-card">
+          <div class="profile-avatar">
+            <svg width="26" height="26" fill="none" stroke="#5a8a7a" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">User</div>
+            <div class="profile-id-row">
+              <span class="profile-id-tag">ID: PTK-2024-00148</span>
+              <span class="profile-loc">• Pathankot, Punjab</span>
+            </div>
+            <div class="profile-badges">
+              <span class="badge badge-gold">🏆 Top Segregator</span>
+              <span class="badge badge-green">♻️ Eco Champion</span>
+              <span class="badge badge-blue">🔥 10 Day Streak</span>
+            </div>
+          </div>
+          <div class="profile-points-wrap">
+            <div class="profile-pts-lbl">GREEN POINTS</div>
+            <div class="profile-pts-val" id="pts-display">0</div>
+          </div>
+        </div>
+
+        <!-- REWARD JOURNEY -->
+        <div class="journey-card">
+          <div class="journey-header">
+            <div class="journey-title">REWARD JOURNEY</div>
+            <div class="journey-next">Next: <strong id="next-reward-label">500 pts — Grocery Discount</strong></div>
+          </div>
+          <div class="journey-track">
+            <div class="track-line"></div>
+            <div class="track-fill" id="progress-fill" style="width:0%"></div>
+            <div class="milestone">
+              <div class="ms-dot done" id="m-start">
+                <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+              </div>
+              <div class="ms-label">START</div>
+              <div class="ms-pts done" id="m-start-pts">0</div>
+            </div>
+            <div class="milestone">
+              <div class="ms-dot active" id="m500">
+                <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </div>
+              <div class="ms-label">GROCERY</div>
+              <div class="ms-pts active" id="m500-pts">500 pts</div>
+            </div>
+            <div class="milestone">
+              <div class="ms-dot locked" id="m1000">
+                <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              </div>
+              <div class="ms-label">BUS PASS</div>
+              <div class="ms-pts locked" id="m1000-pts">1000 pts</div>
+            </div>
+            <div class="milestone">
+              <div class="ms-dot locked" id="m1500">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              </div>
+              <div class="ms-label">BILL DISC</div>
+              <div class="ms-pts locked" id="m1500-pts">1500 pts</div>
+            </div>
+          </div>
+          <!-- number row -->
+          <div class="milestone-nums">
+            <div class="mn-item active">0</div>
+            <div class="mn-item" id="mn500">500 pts</div>
+            <div class="mn-item" id="mn1000">1000 pts</div>
+            <div class="mn-item" id="mn1500">1600 pts</div>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-row">
+          <button class="act-btn-green" onclick="openModal()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Log Proper Disposal (+2 pts)
+          </button>
+          <button class="act-btn-outline" onclick="toast('Leaderboard coming soon','info')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            View Leaderboard
+          </button>
+        </div>
+
+        <!-- REWARD TIERS -->
+        <div>
+          <div class="section-title">REWARD TIERS — WHAT YOU CAN UNLOCK</div>
+          <div class="tiers-grid" id="tiersGrid"></div>
+        </div>
+
+        <!-- HOW IT WORKS -->
+        <div>
+          <div class="section-title">HOW IT WORKS</div>
+          <div class="how-grid">
+            <div class="how-card">
+              <div class="how-icon">
+                <svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              </div>
+              <div>
+                <div class="how-title">Segregate Waste</div>
+                <div class="how-desc">Separate your waste into General, Recyclable, Organic, and Hazardous bins at home before disposal.</div>
+              </div>
+            </div>
+            <div class="how-card">
+              <div class="how-icon">
+                <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+              </div>
+              <div>
+                <div class="how-title">Dispose at Bin</div>
+                <div class="how-desc">Drop segregated waste in the correct QuantCraft smart bin. Each proper disposal logs 2 Green Points automatically.</div>
+              </div>
+            </div>
+            <div class="how-card">
+              <div class="how-icon">
+                <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+              </div>
+              <div>
+                <div class="how-title">Redeem Rewards</div>
+                <div class="how-desc">Reach point milestones and claim real rewards — grocery discounts, bus passes, utility bill savings and more.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY -->
+        <div>
+          <div class="section-title">RECENT DISPOSAL ACTIVITY</div>
+          <div class="activity-list" id="activityList">
+            <div class="empty-state">No disposals yet — log your first one above!</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="sb-item">
+          <div class="sb-lbl">TOTAL CITIZENS ENROLLED</div>
+          <div class="sb-val"><span class="sb-dot"></span>3,247 ACTIVE</div>
+        </div>
+        <div class="sb-item">
+          <div class="sb-lbl">POINTS ISSUED TODAY</div>
+          <div class="sb-val" id="sb-today">0 PTS</div>
+        </div>
+        <div class="sb-item">
+          <div class="sb-lbl">YOUR TOTAL DISPOSALS</div>
+          <div class="sb-val" id="sb-disposals">0 DROPS</div>
+        </div>
+        <div class="sb-right">VER 4.2.0-STABLE</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="logModal" style="display:none;">
+  <div class="modal">
+    <div class="modal-title">Log Proper Disposal — +2 Green Points</div>
+    <div class="modal-sub">Select the type of waste you are disposing properly and segregated:</div>
+    <div class="modal-bin-types">
+      <div class="bin-type-btn" onclick="selectBin(this,'General')">
+        <div class="btn-icon">🗑️</div>
+        <div class="btn-label">General Waste</div>
+        <div class="btn-sub">Dry non-recyclable</div>
+      </div>
+      <div class="bin-type-btn" onclick="selectBin(this,'Recyclable')">
+        <div class="btn-icon">♻️</div>
+        <div class="btn-label">Recyclable</div>
+        <div class="btn-sub">Plastic, paper, metal</div>
+      </div>
+      <div class="bin-type-btn" onclick="selectBin(this,'Organic')">
+        <div class="btn-icon">🌿</div>
+        <div class="btn-label">Organic Waste</div>
+        <div class="btn-sub">Food, garden waste</div>
+      </div>
+      <div class="bin-type-btn" onclick="selectBin(this,'Hazardous')">
+        <div class="btn-icon">⚠️</div>
+        <div class="btn-label">Hazardous</div>
+        <div class="btn-sub">Batteries, chemicals</div>
+      </div>
+    </div>
+    <div class="modal-confirm-note">
+      ✅ &nbsp;Proper segregation confirmed — you will earn <strong style="color:#00e896;">+2 Green Points</strong> for this disposal.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmDisposal()">Confirm &amp; Earn Points</button>
+    </div>
+  </div>
+</div>
+
+<div id="celebration" class="celebration" style="display:none;"></div>
+<div id="toast-wrap"></div>
+
+<script>
+/* ========== STATE ========== */
+let points = 0;
+let disposals = 0;
+let todayPts = 0;
+let selectedBinType = '';
+
+const TIERS = [
+  {pts:500,  svgPath:'<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>', name:'Grocery Discount',   desc:'10% off at partner grocery stores in Pathankot',          color:'#00e896', claimed:false},
+  {pts:1000, svgPath:'<rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>', name:'Bus Pass Discount',   desc:'Free 1-week city bus pass for Pathankot municipal routes', color:'#00c8ff', claimed:false},
+  {pts:1500, svgPath:'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>', name:'Utility Bill Saving', desc:'₹200 off your next electricity or water bill',           color:'#ffaa40', claimed:false},
+  {pts:2000, svgPath:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', name:'Tree Plantation Kit', desc:'Free sapling + planting kit with your name on the tree',  color:'#4ade80', claimed:false},
+];
+
+const ACTIVITY_LOG = [];
+
+/* ========== RENDER TIERS ========== */
+function renderTiers(){
+  document.getElementById('tiersGrid').innerHTML = TIERS.map((t,idx)=>{
+    const unlocked = points >= t.pts;
+    let cls = t.claimed ? 'unlocked' : unlocked ? 'current' : 'locked';
+    let statusHtml;
+    if(t.claimed){
+      statusHtml = '<span class="tier-status ts-unlocked">✓ Claimed</span>';
+    } else if(unlocked){
+      statusHtml = '<span class="tier-status ts-claim" data-idx="'+idx+'" onclick="claimReward(event,'+idx+')">Claim Now</span>';
+    } else {
+      statusHtml = '<div class="tier-lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'+t.pts+' pts needed</div>';
+    }
+    return '<div class="tier-card '+cls+'" onclick="tierClick('+t.pts+')">'
+      +'<div class="tier-icon" style="color:'+t.color+'"><svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">'+t.svgPath+'</svg></div>'
+      +'<div class="tier-pts" style="color:'+t.color+'">'+t.pts+' PTS</div>'
+      +'<div class="tier-name">'+t.name+'</div>'
+      +'<div class="tier-desc">'+t.desc+'</div>'
+      +statusHtml
+      +'</div>';
+  }).join('');
+}
+
+/* ========== RENDER ACTIVITY ========== */
+function renderActivity(){
+  const list = document.getElementById('activityList');
+  if(!ACTIVITY_LOG.length){
+    list.innerHTML='<div class="empty-state">No disposals yet — log your first one above!</div>';
+    return;
+  }
+  list.innerHTML = ACTIVITY_LOG.map((a,i)=>`
+    <div class="activity-item ${i===0?'activity-item-new':''}">
+      <div class="ai-icon ${a.iconClass}">${a.icon}</div>
+      <div class="ai-info">
+        <div class="ai-name">${a.name}</div>
+        <div class="ai-detail">${a.detail}</div>
+      </div>
+      <div class="ai-pts">${a.pts} pts</div>
+      <div class="ai-time">${a.time}</div>
+    </div>`).join('');
+}
+
+/* ========== UPDATE UI ========== */
+function updateUI(){
+  const el = document.getElementById('pts-display');
+  el.textContent = points;
+  el.classList.remove('pts-bump');
+  void el.offsetWidth;
+  el.classList.add('pts-bump');
+
+  document.getElementById('sb-today').textContent = todayPts+' PTS';
+  document.getElementById('sb-disposals').textContent = disposals+' DROPS';
+
+  const m500  = document.getElementById('m500');
+  const m1000 = document.getElementById('m1000');
+  const m1500 = document.getElementById('m1500');
+
+  if(points>=500){
+    m500.className='ms-dot done'; m500.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>';
+    document.getElementById('m500-pts').className='ms-pts done';
+  }
+  if(points>=1000){
+    m1000.className='ms-dot done'; m1000.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>';
+    document.getElementById('m1000-pts').className='ms-pts done';
+  } else if(points>=500){
+    m1000.className='ms-dot active';
+    document.getElementById('m1000-pts').className='ms-pts active';
+  }
+  if(points>=1500){
+    m1500.className='ms-dot done'; m1500.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>';
+    document.getElementById('m1500-pts').className='ms-pts done';
+  } else if(points>=1000){
+    m1500.className='ms-dot active';
+    document.getElementById('m1500-pts').className='ms-pts active';
+  }
+
+  document.getElementById('progress-fill').style.width = Math.min(100,(points/1500)*100)+'%';
+
+  const nextTier = TIERS.find(t=>!t.claimed && points<t.pts);
+  if(nextTier){
+    document.getElementById('next-reward-label').textContent = nextTier.pts+' pts — '+nextTier.name;
+  } else {
+    document.getElementById('next-reward-label').textContent = 'All rewards unlocked! 🎉';
+  }
+
+  renderTiers();
+}
+
+/* ========== MODAL ========== */
+function openModal(){
+  selectedBinType = '';
+  document.querySelectorAll('.bin-type-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('logModal').style.display='flex';
+}
+function closeModal(){ document.getElementById('logModal').style.display='none'; }
+
+function selectBin(el, type){
+  document.querySelectorAll('.bin-type-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedBinType = type;
+}
+
+/* ========== CONFIRM DISPOSAL ========== */
+function confirmDisposal(){
+  if(!selectedBinType){ toast('Please select a waste type first','warning'); return; }
+  closeModal();
+
+  const prevPoints = points;
+  points = points + 2;
+  disposals = disposals + 1;
+  todayPts = todayPts + 2;
+
+  const iconMap = {General:'🗑️', Recyclable:'♻️', Organic:'🌿', Hazardous:'⚠️'};
+  const classMap = {General:'ai-icon-green', Recyclable:'ai-icon-blue', Organic:'ai-icon-green', Hazardous:'ai-icon-amber'};
+  const now = new Date();
+  const timeStr = 'Today, '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+
+  ACTIVITY_LOG.unshift({
+    icon: iconMap[selectedBinType],
+    iconClass: classMap[selectedBinType],
+    name: selectedBinType+' Waste',
+    detail: 'Disposed at Pathankot · Properly segregated',
+    pts: '+2',
+    time: timeStr
+  });
+  if(ACTIVITY_LOG.length > 8) ACTIVITY_LOG.pop();
+
+  const hit = TIERS.find(t => !t.claimed && points >= t.pts && prevPoints < t.pts);
+
+  updateUI();
+  renderActivity();
+  celebrate();
+  toast('✅ +2 Green Points earned! Great job segregating '+selectedBinType+' waste.','success');
+
+  if(hit){ setTimeout(()=>toast('🎉 You\'ve reached '+hit.pts+' pts! Claim your '+hit.name+'!','success'),800); }
+}
+
+/* ========== CLAIM ========== */
+function claimReward(event, index){
+  event.stopPropagation();
+  const tier = TIERS[index];
+  if(!tier || tier.claimed) return;
+  if(points < tier.pts){ toast('Not enough points yet!','warning'); return; }
+  tier.claimed = true;
+  updateUI();
+  celebrate();
+  toast('🎁 "'+tier.name+'" reward claimed! Check your registered mobile.','success');
+}
+
+function tierClick(pts){
+  if(points < pts) toast('You need '+pts+' pts to unlock this reward. Keep segregating!','info');
+}
+
+/* ========== CELEBRATION ========== */
+function celebrate(){
+  const cel = document.getElementById('celebration');
+  cel.style.display='block';
+  cel.innerHTML='';
+  const colors=['#00e896','#00c8ff','#ffb400','#ff6b6b','#e86bff','#ffffff'];
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.cssText='left:'+Math.random()*100+'%;top:-10px;background:'+colors[Math.floor(Math.random()*colors.length)]+';width:'+(6+Math.random()*8)+'px;height:'+(6+Math.random()*8)+'px;animation-delay:'+Math.random()*.8+'s;animation-duration:'+(1.5+Math.random())+'s;';
+    cel.appendChild(p);
+  }
+  setTimeout(()=>{ cel.style.display='none'; cel.innerHTML=''; },2800);
+}
+
+/* ========== TOAST ========== */
+function toast(msg,type){
+  type = type || 'info';
+  const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML='<span>'+(icons[type]||'ℹ️')+'</span><span>'+msg+'</span>';
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(function(){el.style.opacity='0';setTimeout(function(){el.remove();},350);},3000);
+}
+
+/* ========== INIT ========== */
+renderTiers();
+renderActivity();
+</script>
+</body>
+</html>

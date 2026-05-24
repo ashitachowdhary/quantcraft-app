@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantCraft — Live Scanner</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;overflow:hidden;}
+
+.shell{display:flex;height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:230px;flex-shrink:0;background:#0a1020;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;padding:0;}
+.sidebar-logo{padding:22px 24px 28px;}
+.logo-name{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:#00e896;letter-spacing:1px;}
+.logo-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:#1a4040;margin-top:3px;letter-spacing:2px;}
+
+.sidebar-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:2px;}
+.nav-item{display:flex;align-items:center;gap:14px;padding:12px 14px;cursor:pointer;transition:all .2s;font-size:15px;font-weight:600;color:#4a6a7a;border-left:3px solid transparent;border-radius:0 8px 8px 0;margin-right:8px;text-decoration:none;}
+.nav-item:hover{color:#c8dde8;background:rgba(255,255,255,.04);}
+.nav-item.active{color:#00e896;background:rgba(0,232,150,.07);border-left-color:#00e896;}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+.sidebar-mid{padding:16px 12px;}
+.export-btn{width:100%;padding:12px 16px;border-radius:10px;background:linear-gradient(135deg,#00e896,#00c87a);border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a1a10;letter-spacing:.3px;transition:all .2s;box-shadow:0 4px 18px rgba(0,232,150,.2);}
+.export-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,232,150,.3);}
+
+.sidebar-footer{padding:8px 12px 20px;display:flex;flex-direction:column;gap:2px;}
+.footer-item{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;cursor:pointer;color:#3a5a6a;font-size:14px;font-weight:600;transition:all .2s;text-decoration:none;}
+.footer-item:hover{color:#c8dde8;background:rgba(255,255,255,.04);}
+.footer-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+.tb-left{display:flex;align-items:center;gap:20px;}
+.tb-logo{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#00e896;letter-spacing:1px;text-decoration:none;}
+.tb-nav{display:flex;align-items:flex-end;height:54px;gap:0;}
+.tb-nav-item{padding:0 16px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:#4a6a7a;cursor:pointer;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;text-decoration:none;}
+.tb-nav-item:hover{color:#c8dde8;}
+.tb-nav-item.active{color:#00e896;border-bottom-color:#00e896;}
+.tb-right{display:flex;align-items:center;gap:14px;}
+.icon-btn{background:none;border:none;cursor:pointer;color:#4a6a7a;padding:4px;transition:color .2s;}
+.icon-btn:hover{color:#00e896;}
+.user-info{text-align:right;}
+.user-name{font-size:13px;font-weight:700;color:#eaf4ff;}
+.user-role{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a5060;letter-spacing:1px;}
+.avatar{width:34px;height:34px;border-radius:8px;background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+
+/* ── CONTENT ── */
+.content{flex:1;display:flex;gap:0;overflow:hidden;}
+
+/* LEFT: SCANNER PANEL */
+.scanner-panel{flex:1;display:flex;flex-direction:column;padding:18px 20px;gap:14px;overflow:hidden;}
+
+.stream-header{display:flex;align-items:center;justify-content:space-between;}
+.stream-badge{display:flex;align-items:center;gap:8px;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#00e896;box-shadow:0 0 8px #00e896;animation:blink 1.4s infinite;}
+.stream-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:#00e896;letter-spacing:1px;}
+.fps-badge{font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a6a5a;background:rgba(0,232,150,.05);border:1px solid rgba(0,232,150,.1);border-radius:5px;padding:3px 8px;}
+.status-pill{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.5px;padding:4px 12px;border-radius:20px;border:1px solid;transition:all .3s;}
+.status-pill.pending{color:#ffaa40;border-color:rgba(255,170,64,.3);background:rgba(255,170,64,.06);}
+.status-pill.analyzing{color:#00c8ff;border-color:rgba(0,200,255,.3);background:rgba(0,200,255,.06);animation:pulse-border 1s infinite;}
+.status-pill.done{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.06);}
+
+/* SCANNER VIEWPORT */
+.viewport{flex:1;position:relative;background:#080e1c;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden;cursor:pointer;min-height:0;}
+.viewport-bg{position:absolute;inset:0;background:linear-gradient(135deg,#080e1c 0%,#0d1828 100%);}
+.viewport-grid{position:absolute;inset:0;opacity:.08;}
+.viewport-grid svg{width:100%;height:100%;}
+
+.corner{position:absolute;width:24px;height:24px;border-color:#00e896;border-style:solid;opacity:.7;}
+.corner-tl{top:12px;left:12px;border-width:2px 0 0 2px;}
+.corner-tr{top:12px;right:12px;border-width:2px 2px 0 0;}
+.corner-bl{bottom:12px;left:12px;border-width:0 0 2px 2px;}
+.corner-br{bottom:12px;right:12px;border-width:0 2px 2px 0;}
+
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00e896,transparent);animation:scan 3s linear infinite;opacity:0;}
+.scan-line.active{opacity:1;}
+
+.upload-zone{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:all .3s;z-index:2;}
+.upload-icon{width:64px;height:64px;border-radius:16px;background:rgba(0,232,150,.07);border:1px solid rgba(0,232,150,.15);display:flex;align-items:center;justify-content:center;transition:all .3s;}
+.upload-zone:hover .upload-icon{background:rgba(0,232,150,.12);border-color:rgba(0,232,150,.3);transform:scale(1.05);}
+.upload-title{font-family:'Share Tech Mono',monospace;font-size:13px;color:#00e896;letter-spacing:1px;}
+.upload-sub{font-size:13px;color:#3a5a6a;text-align:center;}
+.upload-formats{font-family:'Share Tech Mono',monospace;font-size:10px;color:#2a4a5a;letter-spacing:.5px;margin-top:4px;}
+#fileInput{display:none;}
+
+.preview-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;display:none;}
+
+.detection-box{position:absolute;border:1.5px solid #00e896;border-radius:4px;z-index:3;pointer-events:none;display:none;}
+.detection-label{position:absolute;top:-22px;left:0;font-family:'Share Tech Mono',monospace;font-size:10px;color:#00e896;background:rgba(8,14,28,.9);padding:2px 8px;border-radius:3px;white-space:nowrap;letter-spacing:.5px;}
+
+.coord-matrix{position:absolute;bottom:16px;left:16px;z-index:4;font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(200,221,232,.5);line-height:1.6;}
+.coord-matrix strong{color:#00e896;}
+
+.conf-display{position:absolute;bottom:16px;right:16px;z-index:4;text-align:right;}
+.conf-pct{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;color:#00e896;line-height:1;text-shadow:0 0 20px rgba(0,232,150,.4);}
+.conf-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a5a4a;letter-spacing:2px;margin-top:2px;}
+
+.analyzing-overlay{position:absolute;inset:0;background:rgba(8,14,28,.7);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:10;backdrop-filter:blur(4px);}
+.analyzing-overlay.show{display:flex;}
+.spinner-ring{width:56px;height:56px;border:3px solid rgba(0,232,150,.15);border-top-color:#00e896;border-radius:50%;animation:spin .8s linear infinite;}
+.analyzing-text{font-family:'Share Tech Mono',monospace;font-size:12px;color:#00e896;letter-spacing:2px;}
+.analyzing-sub{font-size:13px;color:#3a6a5a;}
+
+/* BOTTOM BUTTONS */
+.action-row{display:flex;gap:12px;flex-shrink:0;}
+.btn-confirm{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border-radius:10px;background:linear-gradient(135deg,#00e896,#00c87a);border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#061210;letter-spacing:.3px;transition:all .2s;box-shadow:0 4px 18px rgba(0,232,150,.2);}
+.btn-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,232,150,.3);}
+.btn-confirm:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-upload{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 22px;border-radius:10px;background:transparent;border:1.5px solid rgba(0,232,150,.3);cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;color:#00e896;letter-spacing:.3px;transition:all .2s;}
+.btn-upload:hover{background:rgba(0,232,150,.08);border-color:rgba(0,232,150,.5);}
+.btn-icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+.tool-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);cursor:pointer;color:#5a7a8a;transition:all .2s;}
+.tool-btn:hover{color:#00e896;border-color:rgba(0,232,150,.3);}
+.tool-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+/* ── RIGHT: ANALYSIS PANEL ── */
+.analysis-panel{width:310px;flex-shrink:0;background:#0a1020;border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;overflow-y:auto;}
+.analysis-panel::-webkit-scrollbar{width:4px;}
+.analysis-panel::-webkit-scrollbar-thumb{background:#1a3a3a;border-radius:2px;}
+
+.ap-section{padding:16px 18px 14px;border-bottom:1px solid rgba(255,255,255,.05);}
+.ap-section:last-child{border-bottom:none;}
+.ap-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a5060;letter-spacing:2px;margin-bottom:10px;}
+
+.result-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.result-title{font-size:20px;font-weight:700;color:#eaf4ff;line-height:1.2;}
+.recycle-icon{width:34px;height:34px;border-radius:8px;background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* WASTE TYPE BADGE — big coloured pill */
+.waste-type-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:10px;letter-spacing:.3px;}
+.wtb-organic{background:rgba(255,170,64,.12);color:#ffaa40;border:1px solid rgba(255,170,64,.25);}
+.wtb-recyclable{background:rgba(0,200,255,.1);color:#00c8ff;border:1px solid rgba(0,200,255,.25);}
+.wtb-hazardous{background:rgba(255,95,95,.1);color:#ff6b6b;border:1px solid rgba(255,95,95,.25);}
+.wtb-general{background:rgba(140,140,180,.1);color:#aab0d0;border:1px solid rgba(140,140,180,.25);}
+.wtb-electronic{background:rgba(180,100,255,.1);color:#c87aff;border:1px solid rgba(180,100,255,.25);}
+
+.data-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.data-row:last-child{border-bottom:none;}
+.data-key{font-size:13px;color:#4a6a7a;font-weight:500;}
+.data-val{font-family:'Share Tech Mono',monospace;font-size:12px;color:#eaf4ff;text-align:right;}
+.data-val.green{color:#00e896;}
+.data-val.pill{background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.2);padding:3px 10px;border-radius:20px;color:#00e896;font-size:11px;}
+
+.purity-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.purity-val{font-family:'Share Tech Mono',monospace;font-size:14px;color:#00e896;font-weight:700;}
+.purity-bar-bg{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.purity-bar-fill{height:100%;background:linear-gradient(90deg,#00e896,#00c87a);border-radius:3px;transition:width .8s ease;}
+
+.routing-list{display:flex;flex-direction:column;gap:8px;}
+.route-step{display:flex;align-items:flex-start;gap:10px;}
+.step-num{width:22px;height:22px;border-radius:6px;background:#142240;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a7a8a;flex-shrink:0;margin-top:1px;}
+.step-num.active{background:rgba(0,232,150,.1);border-color:rgba(0,232,150,.25);color:#00e896;}
+.step-title{font-size:13px;font-weight:600;color:#c8dde8;}
+.step-sub{font-size:11px;color:#3a5a6a;margin-top:2px;line-height:1.4;}
+
+.advisory{background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.15);border-radius:8px;padding:10px 12px;display:flex;gap:10px;}
+.advisory svg{width:16px;height:16px;stroke:#00c8ff;fill:none;stroke-width:1.8;flex-shrink:0;margin-top:1px;}
+.advisory-text{font-size:12px;color:#5a8a9a;line-height:1.5;}
+
+/* REWARD BANNER */
+.reward-banner{display:flex;align-items:center;gap:10px;background:rgba(0,232,150,.07);border:1px solid rgba(0,232,150,.2);border-radius:10px;padding:11px 14px;text-decoration:none;transition:all .2s;cursor:pointer;}
+.reward-banner:hover{background:rgba(0,232,150,.12);border-color:rgba(0,232,150,.35);}
+.rb-icon{font-size:22px;flex-shrink:0;}
+.rb-text{flex:1;}
+.rb-title{font-size:13px;font-weight:700;color:#00e896;}
+.rb-sub{font-size:11px;color:#3a6a5a;margin-top:1px;}
+.rb-arrow{color:#00e896;opacity:.6;}
+.rb-arrow svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+.log-table{width:100%;border-collapse:collapse;}
+.log-table th{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a5060;letter-spacing:1px;padding:0 0 8px;text-align:left;font-weight:normal;}
+.log-table td{font-size:12px;color:#7a9aaa;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.log-table tr:last-child td{border-bottom:none;}
+.log-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;}
+.badge-pet{background:rgba(0,200,255,.1);color:#00c8ff;}
+.badge-hdpe{background:rgba(0,232,150,.1);color:#00e896;}
+.badge-haz{background:rgba(255,95,95,.1);color:#ff6b6b;}
+.badge-org{background:rgba(255,170,64,.1);color:#ffaa40;}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;text-align:center;flex:1;}
+.empty-icon{width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;}
+.empty-title{font-size:14px;font-weight:600;color:#3a5a6a;}
+.empty-sub{font-size:12px;color:#2a4050;line-height:1.5;}
+
+#toast-wrap{position:fixed;bottom:20px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(0,232,150,.2);border-radius:9px;padding:10px 16px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:opacity .3s;}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes scan{0%{top:-2px}100%{top:calc(100% + 2px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse-border{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-name">QuantCraft</div>
+      <div class="logo-sub">MISSION CONTROL</div>
+    </div>
+
+    <div class="sidebar-nav">
+      <a class="nav-item" href="index.html">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
+      </a>
+      <a class="nav-item" href="map.html">
+        <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map
+      </a>
+      <a class="nav-item" href="analytics.html">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
+      </a>
+      <a class="nav-item active" href="scan.html">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><line x1="21" y1="21" x2="21" y2="21"/></svg>Live Scanner
+      </a>
+      <a class="nav-item" href="truck.html">
+        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trucks
+      </a>
+      <a class="nav-item" href="reward.html">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Rewards
+      </a>
+    </div>
+
+    <div class="sidebar-mid">
+      <button class="export-btn" onclick="exportLog()">Export Log</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <a class="footer-item" href="#" onclick="toast('Support docs opening…','info');return false;">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>Support
+      </a>
+      <a class="footer-item" href="#" onclick="toast('All systems nominal','info');return false;">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>System Status
+      </a>
+      <a class="footer-item" href="#" onclick="resetApiKey();return false;">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Reset API Key
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="tb-left">
+        <a href="index.html" class="tb-logo">QuantCraft</a>
+        <div class="tb-nav">
+          <a class="tb-nav-item active" href="scan.html">Live Scanner</a>
+          <a class="tb-nav-item" href="analytics.html">Analytics</a>
+          <a class="tb-nav-item" href="map.html">Map</a>
+          <a class="tb-nav-item" href="index.html">Home</a>
+          <a class="tb-nav-item" href="reward.html">Rewards</a>
+        </div>
+      </div>
+      <div class="tb-right">
+        <button class="icon-btn"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+        <div class="user-info">
+          <div class="user-name">Chief Engineer</div>
+          <div class="user-role">X: 224.450 | Y: 956.255</div>
+        </div>
+        <div class="avatar">
+          <svg width="18" height="18" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- LEFT: SCANNER -->
+      <div class="scanner-panel">
+
+        <div class="stream-header">
+          <div class="stream-badge">
+            <div class="live-dot" id="liveDot"></div>
+            <span class="stream-label">LIVE CAMERA FEED // STREAM_G1</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="fps-badge">FPS: 60.0</span>
+            <span class="status-pill pending" id="statusPill">STATUS: AWAITING INPUT</span>
+          </div>
+        </div>
+
+        <!-- VIEWPORT -->
+        <div class="viewport" id="viewport" onclick="viewportClick()">
+          <div class="viewport-bg"></div>
+          <div class="viewport-grid">
+            <svg viewBox="0 0 800 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <defs><pattern id="g" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00e896" stroke-width=".5"/></pattern></defs>
+              <rect width="800" height="400" fill="url(#g)"/>
+            </svg>
+          </div>
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+          <div class="scan-line" id="scanLine"></div>
+
+          <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">
+              <svg width="28" height="28" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="upload-title">UPLOAD WASTE IMAGE</div>
+            <div class="upload-sub">Click or drag &amp; drop to scan<br/>AI will identify and classify waste</div>
+            <div class="upload-formats">SUPPORTS: JPG · PNG · WEBP · HEIC</div>
+          </div>
+
+          <img class="preview-img" id="previewImg" alt="Scan target"/>
+
+          <div class="detection-box" id="detectionBox">
+            <span class="detection-label" id="detectionLabel">TARGET: —</span>
+          </div>
+
+          <div class="coord-matrix" id="coordMatrix" style="display:none;">
+            <strong>COORDINATE MATRIX</strong><br/>
+            X: 142.029 | Y: 894.211<br/>
+            Z-DEPTH: 44.5mm
+          </div>
+
+          <div class="conf-display" id="confDisplay" style="display:none;">
+            <div class="conf-pct" id="confPct">—%</div>
+            <div class="conf-label">CONFIDENCE SCORE</div>
+          </div>
+
+          <div class="analyzing-overlay" id="analyzingOverlay">
+            <div class="spinner-ring"></div>
+            <div class="analyzing-text">ANALYZING TARGET…</div>
+            <div class="analyzing-sub">Running spectrographic scan</div>
+          </div>
+        </div>
+
+        <!-- Action Row -->
+        <div class="action-row">
+          <button class="btn-confirm" id="confirmBtn" disabled onclick="confirmAndLog()">
+            <svg class="btn-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Confirm &amp; Log
+          </button>
+          <button class="btn-upload" onclick="triggerUpload()">
+            <svg class="btn-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Photo
+          </button>
+          <div class="tool-btn" onclick="resetScan()" title="Reset">
+            <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+          </div>
+          <div class="tool-btn" onclick="toast('Zoom feature coming soon','info')" title="Zoom">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this)"/>
+      </div>
+
+      <!-- RIGHT: ANALYSIS PANEL -->
+      <div class="analysis-panel" id="analysisPanel">
+
+        <!-- RESULT -->
+        <div class="ap-section">
+          <div class="ap-label">ANALYSIS RESULT</div>
+          <div class="empty-state" id="emptyResult">
+            <div class="empty-icon">
+              <svg width="22" height="22" fill="none" stroke="#2a4a5a" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div class="empty-title">No Target Loaded</div>
+            <div class="empty-sub">Upload an image to begin waste identification and classification.</div>
+          </div>
+          <div id="resultBlock" style="display:none;animation:fadeIn .4s ease;">
+            <div class="result-header">
+              <div class="result-title" id="rTitle">—</div>
+              <div class="recycle-icon">
+                <svg width="18" height="18" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+              </div>
+            </div>
+            <!-- Waste category badge -->
+            <div id="rWasteBadge" class="waste-type-badge">—</div>
+            <div class="data-row">
+              <span class="data-key">Material Type</span>
+              <span class="data-val" id="rMaterial">—</span>
+            </div>
+            <div class="data-row">
+              <span class="data-key">Processing</span>
+              <span class="data-val pill" id="rProcessing">—</span>
+            </div>
+            <div class="data-row">
+              <span class="data-key">Weight Estimate</span>
+              <span class="data-val" id="rWeight">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PURITY -->
+        <div class="ap-section" id="puritySection" style="display:none;">
+          <div class="purity-row">
+            <span class="data-key">Purity Level</span>
+            <span class="purity-val" id="rPurity">—</span>
+          </div>
+          <div class="purity-bar-bg">
+            <div class="purity-bar-fill" id="rPurityBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- TECHNICAL SPECTROGRAPH -->
+        <div class="ap-section" id="techSection" style="display:none;">
+          <div class="ap-label">TECHNICAL BREAKDOWN</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a5060;letter-spacing:1.5px;margin-bottom:8px;">SPECTROGRAPH READINGS</div>
+          <div style="display:flex;gap:4px;align-items:flex-end;height:60px;" id="spectroWrap"></div>
+        </div>
+
+        <!-- ROUTING -->
+        <div class="ap-section" id="routingSection" style="display:none;">
+          <div class="ap-label">RECOMMENDED ROUTING</div>
+          <div class="routing-list" id="routingList"></div>
+        </div>
+
+        <!-- ADVISORY -->
+        <div class="ap-section" id="advisorySection" style="display:none;">
+          <div class="advisory">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div class="advisory-text" id="advisoryText">—</div>
+          </div>
+        </div>
+
+        <!-- REWARD LINK BANNER -->
+        <div class="ap-section" id="rewardBannerSection" style="display:none;">
+          <a class="reward-banner" href="reward.html">
+            <span class="rb-icon">🌿</span>
+            <div class="rb-text">
+              <div class="rb-title">Earn Green Points</div>
+              <div class="rb-sub">Log this disposal on Rewards page</div>
+            </div>
+            <div class="rb-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </a>
+        </div>
+
+        <!-- SCAN LOG -->
+        <div class="ap-section">
+          <div class="ap-label">SCAN LOG</div>
+          <table class="log-table">
+            <thead><tr><th>TIME</th><th>ITEM</th><th>TYPE</th></tr></thead>
+            <tbody id="logBody">
+              <tr><td colspan="3" style="color:#2a4050;font-size:11px;padding:12px 0;">No scans logged yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<!-- ========================= -->
+<!-- REPLACE YOUR ENTIRE <script> WITH THIS -->
+<!-- ========================= -->
+
+<script>
+/* ─── STATE ─── */
+let currentResult = null;
+let scanLog = [];
+let imageBase64 = null;
+let imageMimeType = 'image/jpeg';
+
+/* ─── TEACHABLE MACHINE MODEL ─── */
+const TM_URL = "https://teachablemachine.withgoogle.com/models/qpegMDtLZ/";
+
+let tmModel = null;
+let tmMaxPredictions = 0;
+
+async function loadTMModel(){
+  if(tmModel) return;
+
+  const modelURL = TM_URL + "model.json";
+  const metadataURL = TM_URL + "metadata.json";
+
+  tmModel = await tmImage.load(modelURL, metadataURL);
+  tmMaxPredictions = tmModel.getTotalClasses();
+
+  console.log("Teachable Machine model loaded");
+}
+
+async function classifyWithTM(imgElement){
+  await loadTMModel();
+
+  const prediction = await tmModel.predict(imgElement);
+
+  prediction.sort((a,b)=>b.probability-a.probability);
+
+  return prediction[0];
+}
+
+/* ─── FILE UPLOAD ─── */
+function viewportClick(){
+  const img = document.getElementById('previewImg');
+
+  if(!img.src || img.style.display === 'none'){
+    triggerUpload();
+  }
+}
+
+function triggerUpload(){
+  document.getElementById('fileInput').click();
+}
+
+function handleFile(input){
+  const file = input.files[0];
+
+  if(!file) return;
+
+  imageMimeType = file.type || 'image/jpeg';
+
+  const reader = new FileReader();
+
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+
+    imageBase64 = dataUrl.split(',')[1];
+
+    showPreview(dataUrl);
+
+    startAnalysis();
+  };
+
+  reader.readAsDataURL(file);
+}
+
+/* Drag & drop */
+const viewport = document.getElementById('viewport');
+
+viewport.addEventListener('dragover', e => {
+  e.preventDefault();
+  viewport.style.borderColor='rgba(0,232,150,.4)';
+});
+
+viewport.addEventListener('dragleave', () => {
+  viewport.style.borderColor='rgba(255,255,255,.08)';
+});
+
+viewport.addEventListener('drop', e => {
+  e.preventDefault();
+
+  viewport.style.borderColor='rgba(255,255,255,.08)';
+
+  const file = e.dataTransfer.files[0];
+
+  if(file && file.type.startsWith('image/')){
+    imageMimeType = file.type || 'image/jpeg';
+
+    const reader = new FileReader();
+
+    reader.onload = ev => {
+      imageBase64 = ev.target.result.split(',')[1];
+
+      showPreview(ev.target.result);
+
+      startAnalysis();
+    };
+
+    reader.readAsDataURL(file);
+  }
+});
+
+function showPreview(dataUrl){
+  const img = document.getElementById('previewImg');
+
+  img.src = dataUrl;
+  img.style.display = 'block';
+
+  document.getElementById('uploadZone').style.display = 'none';
+}
+
+/* ─── ANALYSIS ─── */
+async function startAnalysis(){
+
+  setStatus('analyzing');
+
+  document.getElementById('analyzingOverlay').classList.add('show');
+
+  document.getElementById('scanLine').classList.add('active');
+
+  document.getElementById('confirmBtn').disabled = true;
+
+  clearResult();
+
+  try {
+
+    const img = document.getElementById('previewImg');
+
+    /* ─── RUN TEACHABLE MACHINE ─── */
+    const tmResult = await classifyWithTM(img);
+
+    const predictedClass = tmResult.className;
+    const predictedConfidence = Math.round(tmResult.probability * 100);
+
+    /* ─── CREATE RESULT OBJECT ─── */
+    const result = {
+      wasteType: predictedClass,
+
+      wasteCategory:
+        predictedClass.toLowerCase().includes('organic') ? 'Organic' :
+        predictedClass.toLowerCase().includes('plastic') ? 'Recyclable' :
+        predictedClass.toLowerCase().includes('glass') ? 'Recyclable' :
+        predictedClass.toLowerCase().includes('metal') ? 'Recyclable' :
+        predictedClass.toLowerCase().includes('battery') ? 'Hazardous' :
+        predictedClass.toLowerCase().includes('electronic') ? 'Electronic' :
+        'General',
+
+      materialType: predictedClass,
+
+      processing:
+        predictedClass.toLowerCase().includes('organic') ? 'Compostable' :
+        predictedClass.toLowerCase().includes('battery') ? 'Hazardous Disposal' :
+        predictedClass.toLowerCase().includes('electronic') ? 'Electronic Recycling' :
+        predictedClass.toLowerCase().includes('plastic') ||
+        predictedClass.toLowerCase().includes('glass') ||
+        predictedClass.toLowerCase().includes('metal')
+          ? 'Standard Recyclable'
+          : 'Landfill',
+
+      weightEstimate:
+        (Math.floor(Math.random()*900)+100) + 'g',
+
+      purity:
+        Math.floor(Math.random()*20)+80,
+
+      confidence:
+        predictedConfidence,
+
+      spectro: [
+        Math.floor(Math.random()*40)+50,
+        Math.floor(Math.random()*40)+50,
+        Math.floor(Math.random()*40)+50,
+        Math.floor(Math.random()*40)+50,
+        Math.floor(Math.random()*40)+50,
+        Math.floor(Math.random()*40)+50,
+        Math.floor(Math.random()*40)+50,
+        Math.floor(Math.random()*40)+50
+      ],
+
+      routing: [
+        {
+          step: "Initial Sorting",
+          desc: "AI classified item using Teachable Machine model."
+        },
+        {
+          step: "Material Processing",
+          desc: "Sending item to appropriate waste stream."
+        },
+        {
+          step: "Final Routing",
+          desc: "Ready for disposal or recycling workflow."
+        }
+      ],
+
+      advisory:
+        "Detected using Teachable Machine AI model with " +
+        predictedConfidence +
+        "% confidence.",
+
+      detectionLabel:
+        "TARGET: " +
+        predictedClass.toUpperCase()
+    };
+
+    showResult(result);
+
+  } catch(err) {
+
+    console.error(err);
+
+    toast(
+      'Analysis failed — ' + (err.message || 'check console'),
+      'error'
+    );
+
+    setStatus('pending');
+
+    document.getElementById('analyzingOverlay').classList.remove('show');
+
+    document.getElementById('scanLine').classList.remove('active');
+  }
+}
+
+function showResult(r){
+  currentResult = r;
+
+  setTimeout(() => {
+
+    document.getElementById('analyzingOverlay').classList.remove('show');
+
+    document.getElementById('scanLine').classList.remove('active');
+
+    /* Detection box */
+    const box = document.getElementById('detectionBox');
+    const vp = document.getElementById('viewport');
+
+    const w = vp.offsetWidth;
+    const h = vp.offsetHeight;
+
+    const bw = Math.min(w * .45, 260);
+    const bh = Math.min(h * .55, 220);
+
+    const bx = (w - bw) / 2;
+    const by = (h - bh) / 2;
+
+    box.style.cssText =
+      `left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px;display:block;`;
+
+    document.getElementById('detectionLabel').textContent =
+      r.detectionLabel ||
+      ('TARGET: ' + (r.wasteType || 'WASTE ITEM').toUpperCase());
+
+    /* Coord matrix */
+    document.getElementById('coordMatrix').style.display = 'block';
+
+    /* Confidence */
+    document.getElementById('confDisplay').style.display = 'block';
+
+    document.getElementById('confPct').textContent =
+      (r.confidence || 98) + '%';
+
+    /* Result block */
+    document.getElementById('emptyResult').style.display = 'none';
+
+    document.getElementById('resultBlock').style.display = 'block';
+
+    document.getElementById('rTitle').textContent =
+      r.wasteType || 'Unknown Waste';
+
+    /* Waste category badge */
+    const badge = document.getElementById('rWasteBadge');
+
+    const cat = (r.wasteCategory || 'General').trim();
+
+    const catIcons = {
+      Organic:'🌿',
+      Recyclable:'♻️',
+      Hazardous:'⚠️',
+      General:'🗑️',
+      Electronic:'💻'
+    };
+
+    const catClasses = {
+      Organic:'wtb-organic',
+      Recyclable:'wtb-recyclable',
+      Hazardous:'wtb-hazardous',
+      General:'wtb-general',
+      Electronic:'wtb-electronic'
+    };
+
+    badge.textContent =
+      (catIcons[cat] || '🗑️') + ' ' + cat;
+
+    badge.className =
+      'waste-type-badge ' + (catClasses[cat] || 'wtb-general');
+
+    document.getElementById('rMaterial').textContent =
+      r.materialType || '—';
+
+    const procEl = document.getElementById('rProcessing');
+
+    procEl.textContent = r.processing || '—';
+
+    const procColors = {
+      'Compostable':
+        'background:rgba(255,170,64,.1);border-color:rgba(255,170,64,.25);color:#ffaa40;',
+
+      'Standard Recyclable':
+        'background:rgba(0,200,255,.1);border-color:rgba(0,200,255,.25);color:#00c8ff;',
+
+      'Hazardous Disposal':
+        'background:rgba(255,95,95,.1);border-color:rgba(255,95,95,.25);color:#ff6b6b;',
+
+      'Electronic Recycling':
+        'background:rgba(180,100,255,.1);border-color:rgba(180,100,255,.25);color:#c87aff;',
+
+      'Landfill':
+        'background:rgba(140,140,180,.1);border-color:rgba(140,140,180,.25);color:#aab0d0;'
+    };
+
+    const procStyle =
+      procColors[r.processing] ||
+      'background:rgba(0,232,150,.1);border-color:rgba(0,232,150,.2);color:#00e896;';
+
+    procEl.style.cssText =
+      'font-family:Share Tech Mono,monospace;font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid;' +
+      procStyle;
+
+    document.getElementById('rWeight').textContent =
+      r.weightEstimate || '—';
+
+    /* Purity */
+    document.getElementById('puritySection').style.display = 'block';
+
+    document.getElementById('rPurity').textContent =
+      (r.purity || 0) + '%';
+
+    setTimeout(() => {
+      document.getElementById('rPurityBar').style.width =
+        (r.purity || 0) + '%';
+    }, 100);
+
+    /* Spectrograph */
+    document.getElementById('techSection').style.display = 'block';
+
+    const spectro =
+      r.spectro || [60,75,40,85,55,70,45,80];
+
+    const sw = document.getElementById('spectroWrap');
+
+    sw.innerHTML = '';
+
+    const colors = [
+      '#00e896','#00c8ff',
+      '#00e896','#00c8ff',
+      '#00e896','#00c8ff',
+      '#00e896','#00c8ff'
+    ];
+
+    spectro.forEach((v,i) => {
+      const col = document.createElement('div');
+
+      col.style.cssText =
+        'flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;';
+
+      col.innerHTML =
+        `<div style="width:100%;height:${v*0.58}px;background:${colors[i%colors.length]};opacity:.5;border-radius:3px 3px 0 0;transition:height .6s ease;"></div>`;
+
+      sw.appendChild(col);
+    });
+
+    /* Routing */
+    document.getElementById('routingSection').style.display = 'block';
+
+    const rl = document.getElementById('routingList');
+
+    rl.innerHTML = '';
+
+    (r.routing || []).forEach((s,i) => {
+      rl.innerHTML += `
+      <div class="route-step">
+        <div class="step-num ${i===0?'active':''}">
+          ${i+1}
+        </div>
+
+        <div>
+          <div class="step-title">${s.step}</div>
+          <div class="step-sub">${s.desc}</div>
+        </div>
+      </div>`;
+    });
+
+    /* Advisory */
+    document.getElementById('advisorySection').style.display = 'block';
+
+    document.getElementById('advisoryText').textContent =
+      'HEURISTIC ADVISORY: ' +
+      (r.advisory || 'Analysis complete.');
+
+    /* Reward banner */
+    document.getElementById('rewardBannerSection').style.display = 'block';
+
+    setStatus('done');
+
+    document.getElementById('confirmBtn').disabled = false;
+
+    toast(
+      'Scan complete — ' +
+      (r.wasteCategory || '') +
+      ': ' +
+      r.wasteType,
+      'success'
+    );
+
+  }, 800);
+}
+
+function clearResult(){
+  document.getElementById('emptyResult').style.display = 'flex';
+  document.getElementById('resultBlock').style.display = 'none';
+  document.getElementById('puritySection').style.display = 'none';
+  document.getElementById('techSection').style.display = 'none';
+  document.getElementById('routingSection').style.display = 'none';
+  document.getElementById('advisorySection').style.display = 'none';
+  document.getElementById('rewardBannerSection').style.display = 'none';
+  document.getElementById('detectionBox').style.display = 'none';
+  document.getElementById('coordMatrix').style.display = 'none';
+  document.getElementById('confDisplay').style.display = 'none';
+  document.getElementById('rPurityBar').style.width = '0%';
+}
+
+/* ─── CONFIRM & LOG ─── */
+function confirmAndLog(){
+
+  if(!currentResult) return;
+
+  const now = new Date();
+
+  const time =
+    String(now.getHours()).padStart(2,'0') +
+    ':' +
+    String(now.getMinutes()).padStart(2,'0');
+
+  const entry = {
+    time,
+    item: currentResult.wasteType,
+    type: currentResult.processing
+  };
+
+  scanLog.unshift(entry);
+
+  const cat = currentResult.wasteCategory || '';
+
+  const typeClass =
+    cat === 'Organic' ? 'badge-org'
+    : cat === 'Recyclable' ? 'badge-pet'
+    : cat === 'Hazardous' ? 'badge-haz'
+    : cat === 'Electronic' ? 'badge-hdpe'
+    : 'badge-hdpe';
+
+  const tb = document.getElementById('logBody');
+
+  if(tb.querySelector('td[colspan]')) tb.innerHTML = '';
+
+  tb.innerHTML =
+    `<tr>
+      <td>${time}</td>
+      <td>${currentResult.wasteType}</td>
+      <td>
+        <span class="log-badge ${typeClass}">
+          ${(currentResult.wasteCategory || currentResult.processing?.split(' ')[0])}
+        </span>
+      </td>
+    </tr>` + tb.innerHTML;
+
+  toast(
+    'Logged: ' +
+    currentResult.wasteType +
+    ' → Go to Rewards to earn points!',
+    'success'
+  );
+
+  document.getElementById('confirmBtn').disabled = true;
+}
+
+/* ─── RESET ─── */
+function resetScan(){
+
+  document.getElementById('previewImg').style.display = 'none';
+
+  document.getElementById('previewImg').src = '';
+
+  document.getElementById('uploadZone').style.display = 'flex';
+
+  document.getElementById('scanLine').classList.remove('active');
+
+  document.getElementById('analyzingOverlay').classList.remove('show');
+
+  document.getElementById('fileInput').value = '';
+
+  clearResult();
+
+  setStatus('pending');
+
+  document.getElementById('confirmBtn').disabled = true;
+
+  currentResult = null;
+
+  imageBase64 = null;
+}
+
+/* ─── STATUS ─── */
+function setStatus(s){
+
+  const pill = document.getElementById('statusPill');
+
+  pill.className = 'status-pill ' + s;
+
+  const labels = {
+    pending:'STATUS: AWAITING INPUT',
+    analyzing:'STATUS: ANALYSIS IN PROGRESS',
+    done:'STATUS: SCAN COMPLETE'
+  };
+
+  pill.textContent = labels[s] || s;
+}
+
+/* ─── EXPORT LOG ─── */
+function exportLog(){
+
+  if(!scanLog.length){
+    toast('No scans to export','info');
+    return;
+  }
+
+  const rows = [
+    'Time,Item,Processing',
+    ...scanLog.map(e => `${e.time},${e.item},${e.type}`)
+  ];
+
+  const blob = new Blob([rows.join('\n')], {type:'text/csv'});
+
+  const a = document.createElement('a');
+
+  a.href = URL.createObjectURL(blob);
+
+  a.download = 'scan-log.csv';
+
+  a.click();
+
+  toast('Log exported','success');
+}
+
+/* ─── TOAST ─── */
+function resetApiKey(){
+  localStorage.removeItem('qc_api_key');
+  toast('API key cleared','info');
+}
+
+function toast(msg, type='info'){
+
+  const icons = {
+    success:'✅',
+    error:'❌',
+    info:'ℹ️',
+    warning:'⚠️'
+  };
+
+  const el = document.createElement('div');
+
+  el.className = 'toast';
+
+  el.innerHTML =
+    `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+
+  document.getElementById('toast-wrap').appendChild(el);
+
+  setTimeout(()=>{
+    el.style.opacity='0';
+
+    setTimeout(()=>el.remove(),300);
+
+  },2500);
+}
+</script>
+</body>
+</html>

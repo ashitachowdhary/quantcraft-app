@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuantCraft — Mission Control</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --green:#00e896; --green-dim:rgba(0,232,150,.12); --green-glow:rgba(0,232,150,.25);
+      --cyan:#00c8ff;  --cyan-dim:rgba(0,200,255,.1);
+      --amber:#ffb400; --amber-dim:rgba(255,180,0,.1);
+      --red:#ff6b6b;   --red-dim:rgba(255,107,107,.1);
+      --violet:#b06bff;--violet-dim:rgba(176,107,255,.1);
+      --bg:#080e1c; --surface:#0d1525; --surface2:#0f1c2e;
+      --border:rgba(255,255,255,.06); --text:#c8dde8; --muted:#4a6a7a; --bright:#eaf4ff;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html,body{height:100%;background:var(--bg);font-family:'Rajdhani',sans-serif;color:var(--text);overflow:hidden;}
+
+    .app-shell{display:flex;height:100vh;}
+
+    /* SIDEBAR */
+    .sidebar{width:230px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 0 0;z-index:100;}
+    .sidebar-logo{padding:0 24px 28px;}
+    .logo-name{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:var(--green);letter-spacing:1px;}
+    .logo-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:#2a5050;margin-top:3px;letter-spacing:2px;}
+
+    .sidebar-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:2px;}
+    .nav-item{display:flex;align-items:center;gap:14px;padding:12px 14px;cursor:pointer;transition:all .2s;font-size:15px;font-weight:600;color:var(--muted);border-left:3px solid transparent;border-radius:0 8px 8px 0;margin-right:8px;text-decoration:none;}
+    .nav-item:hover{color:var(--bright);background:rgba(255,255,255,.04);}
+    .nav-item.active{color:var(--green);background:var(--green-dim);border-left-color:var(--green);}
+    .nav-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
+    .nav-badge{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(255,180,0,.15);color:var(--amber);border:1px solid rgba(255,180,0,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
+    .nav-badge-violet{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(176,107,255,.15);color:var(--violet);border:1px solid rgba(176,107,255,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
+
+    .sidebar-mid{padding:16px 12px;}
+    .gen-btn{width:100%;padding:13px 16px;border-radius:10px;background:linear-gradient(135deg,var(--green),#00c87a);border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a1a10;letter-spacing:.3px;transition:all .2s;box-shadow:0 4px 18px var(--green-glow);}
+    .gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,232,150,.35);}
+
+    .sidebar-footer{padding:8px 12px 20px;display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--border);margin-top:4px;}
+    .footer-item{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;cursor:pointer;color:#3a5a6a;font-size:14px;font-weight:600;transition:all .2s;text-decoration:none;}
+    .footer-item:hover{color:var(--bright);background:rgba(255,255,255,.04);}
+    .footer-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+    /* MAIN */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+    .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;}
+    .top-nav{display:flex;align-items:center;gap:4px;}
+    .top-nav-item{padding:8px 16px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:8px;transition:all .2s;border-bottom:2px solid transparent;background:none;border:none;font-family:'Rajdhani',sans-serif;text-decoration:none;letter-spacing:.2px;display:inline-flex;align-items:center;}
+    .top-nav-item:hover{color:var(--bright);}
+    .top-nav-item.active{color:var(--green);border-bottom:2px solid var(--green);}
+    .search-wrap{position:relative;margin-left:8px;}
+    .search-wrap input{padding:8px 16px 8px 36px;width:210px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.08);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+    .search-wrap input::placeholder{color:#3a5a6a;}
+    .search-wrap input:focus{border-bottom-color:rgba(0,232,150,.4);}
+    .search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#3a5a6a;}
+    .topbar-right{display:flex;align-items:center;gap:16px;}
+    .ti{color:#5a7a8a;cursor:pointer;transition:color .2s;background:none;border:none;padding:4px;}
+    .ti:hover{color:var(--green);}
+    .admin-info{text-align:right;}
+    .admin-name{font-size:13px;font-weight:700;color:var(--bright);}
+    .admin-role{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6070;letter-spacing:1px;}
+    .avatar{width:36px;height:36px;border-radius:50%;background:#1a2a3a;border:2px solid rgba(0,232,150,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;}
+
+    /* CONTENT */
+    .content{flex:1;overflow-y:auto;}
+    ::-webkit-scrollbar{width:5px;}
+    ::-webkit-scrollbar-track{background:var(--bg);}
+    ::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
+
+    /* HERO */
+    .hero{padding:36px 40px 28px;position:relative;overflow:hidden;}
+    .hero-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+    .hero-ring{position:absolute;border-radius:50%;border:1px solid;opacity:.07;animation:spin-slow linear infinite;}
+    .hero-tag{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green);letter-spacing:3px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .hero-tag::before{content:'';display:inline-block;width:20px;height:1px;background:var(--green);}
+    .hero h1{font-family:'Rajdhani',sans-serif;font-size:46px;font-weight:800;color:var(--bright);line-height:1.08;margin-bottom:14px;}
+    .hero h1 .accent{color:var(--green);}
+    .hero h1 .line2{display:block;font-size:38px;font-weight:600;color:var(--muted);}
+    .hero-desc{font-size:15px;color:#6a8a9a;max-width:580px;line-height:1.7;margin-bottom:22px;}
+    .hero-stats{display:flex;gap:28px;}
+    .hstat{display:flex;flex-direction:column;gap:3px;}
+    .hstat-val{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:var(--bright);}
+    .hstat-val span{font-size:13px;font-weight:400;color:var(--green);}
+    .hstat-lbl{font-size:11px;color:var(--muted);letter-spacing:.3px;}
+    .hstat-div{width:1px;background:var(--border);align-self:stretch;margin:4px 0;}
+
+    /* FEATURE CARDS */
+    .section-wrap{padding:0 40px 20px;}
+    .section-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2.5px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+    .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    .cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    .feat-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:22px;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;gap:14px;text-decoration:none;position:relative;overflow:hidden;}
+    .feat-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;pointer-events:none;}
+    .feat-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4);}
+    .feat-card:hover::before{opacity:1;}
+
+    .card-green{border-color:rgba(0,232,150,.1);}
+    .card-green:hover{border-color:rgba(0,232,150,.3);}
+    .card-green::before{background:radial-gradient(ellipse at top left,rgba(0,232,150,.06),transparent 60%);}
+    .card-cyan{border-color:rgba(0,200,255,.1);}
+    .card-cyan:hover{border-color:rgba(0,200,255,.3);}
+    .card-cyan::before{background:radial-gradient(ellipse at top left,rgba(0,200,255,.06),transparent 60%);}
+    .card-amber{border-color:rgba(255,180,0,.1);}
+    .card-amber:hover{border-color:rgba(255,180,0,.3);}
+    .card-amber::before{background:radial-gradient(ellipse at top left,rgba(255,180,0,.07),transparent 60%);}
+    .card-violet{border-color:rgba(176,107,255,.1);}
+    .card-violet:hover{border-color:rgba(176,107,255,.3);}
+    .card-violet::before{background:radial-gradient(ellipse at top left,rgba(176,107,255,.06),transparent 60%);}
+    .card-red{border-color:rgba(255,107,107,.1);}
+    .card-red:hover{border-color:rgba(255,107,107,.3);}
+    .card-red::before{background:radial-gradient(ellipse at top left,rgba(255,107,107,.06),transparent 60%);}
+
+    .feat-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .feat-header{display:flex;align-items:flex-start;justify-content:space-between;}
+    .feat-arrow{color:var(--muted);font-size:18px;transition:transform .2s;}
+    .feat-card:hover .feat-arrow{transform:translate(3px,-3px);}
+    .feat-title{font-size:18px;font-weight:700;color:var(--bright);margin-bottom:5px;}
+    .feat-desc{font-size:13px;color:#5a7a8a;line-height:1.6;flex:1;}
+    .feat-link{font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-decoration:none;display:flex;align-items:center;gap:6px;margin-top:4px;}
+    .feat-link::after{content:'→';transition:margin .2s;}
+    .feat-card:hover .feat-link::after{margin-left:4px;}
+
+    /* HOW IT WORKS */
+    .how-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+    .how-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;display:flex;flex-direction:column;gap:10px;position:relative;}
+    .how-num{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:rgba(0,232,150,.1);line-height:1;position:absolute;top:12px;right:14px;}
+    .how-icon{font-size:22px;}
+    .how-title{font-size:14px;font-weight:700;color:var(--bright);}
+    .how-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+    .how-pts{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green);margin-top:4px;letter-spacing:.5px;}
+
+    /* MINI MAP */
+    .map-strip{background:#0d1828;border:1px solid var(--border);border-radius:14px;height:110px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .2s;}
+    .map-strip:hover{border-color:rgba(0,232,150,.2);}
+    .map-strip-label{position:absolute;bottom:10px;right:16px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(0,232,150,.6);letter-spacing:1px;}
+    .map-strip-badge{position:absolute;top:10px;left:14px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--green);background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.15);padding:4px 10px;border-radius:6px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+    .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.8s infinite;}
+    canvas#miniMap{position:absolute;inset:0;width:100%;height:100%;}
+
+    /* BOTTOM ROW */
+    .bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .conn-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:20px;}
+    .conn-big{font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:800;color:var(--bright);line-height:1;}
+    .conn-big sup{font-size:22px;color:var(--muted);}
+    .conn-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:5px;}
+    .conn-sub{font-size:13px;color:var(--muted);}
+
+    .reward-preview{background:linear-gradient(135deg,rgba(255,180,0,.06),rgba(0,232,150,.04));border:1px solid rgba(255,180,0,.15);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:20px;cursor:pointer;text-decoration:none;transition:all .25s;}
+    .reward-preview:hover{border-color:rgba(255,180,0,.3);transform:translateY(-2px);}
+    .rp-icon{font-size:40px;flex-shrink:0;}
+    .rp-body{flex:1;}
+    .rp-title{font-size:17px;font-weight:700;color:var(--bright);margin-bottom:5px;}
+    .rp-desc{font-size:13px;color:var(--muted);line-height:1.5;}
+    .rp-pts{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+    .rp-tier{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid;}
+    .rp-right{text-align:right;flex-shrink:0;}
+    .rp-big{font-family:'Share Tech Mono',monospace;font-size:28px;font-weight:700;color:var(--amber);}
+    .rp-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+
+    /* STATUS BAR */
+    .status-bar{padding:10px 40px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:32px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:11px;}
+    .stat-item{display:flex;flex-direction:column;gap:3px;}
+    .stat-lbl{color:#3a6070;letter-spacing:1.5px;font-size:9px;}
+    .stat-val{color:var(--bright);font-weight:700;font-size:12px;}
+    .stat-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;animation:blink 1.8s infinite;}
+    .status-right{margin-left:auto;display:flex;gap:24px;color:#3a5a6a;font-size:10px;letter-spacing:1px;align-items:center;}
+
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes spin-slow{to{transform:rotate(360deg)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .fadein{animation:fadeUp .5s ease both;}
+    .fadein-1{animation-delay:.05s;}
+    .fadein-2{animation-delay:.12s;}
+    .fadein-3{animation-delay:.19s;}
+    .fadein-4{animation-delay:.26s;}
+    .fadein-5{animation-delay:.33s;}
+
+    #toast-container{position:fixed;bottom:70px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-name">QuantCraft</div>
+      <div class="logo-sub">MISSION CONTROL</div>
+    </div>
+
+    <div class="sidebar-nav">
+      <a class="nav-item active" href="index.html">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        Home
+      </a>
+      <a class="nav-item" href="map.html">
+        <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        Map View
+      </a>
+      <a class="nav-item" href="analytics.html">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </a>
+      <a class="nav-item" href="truck.html">
+        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Trucks
+      </a>
+      <a class="nav-item" href="scan.html">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><line x1="21" y1="21" x2="21" y2="21"/></svg>
+        Live Scanner
+      </a>
+      <a class="nav-item" href="reward.html">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Rewards
+        <span class="nav-badge">NEW</span>
+      </a>
+      <a class="nav-item" href="admin.html">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Admin
+        <span class="nav-badge-violet">ROOT</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showToast('Impact reports coming soon','info');return false;">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Impact
+      </a>
+    </div>
+
+    <div class="sidebar-mid">
+      <button class="gen-btn" onclick="showToast('Generating report…','info')">Generate Report</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <a class="footer-item" href="#" onclick="showToast('Settings','info');return false;">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+      <a class="footer-item" href="#" onclick="showToast('All systems nominal','info');return false;">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        System Status
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="top-bar">
+      <div class="top-nav">
+        <a class="top-nav-item active" href="index.html">Dashboard</a>
+        <a class="top-nav-item" href="analytics.html">Analytics</a>
+        <a class="top-nav-item" href="map.html">Map</a>
+        <a class="top-nav-item" href="truck.html">Trucks</a>
+        <a class="top-nav-item" href="scan.html">Scanner</a>
+        <a class="top-nav-item" href="reward.html">Rewards</a>
+        <a class="top-nav-item" href="admin.html">Admin</a>
+        <div class="search-wrap">
+          <span class="search-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" placeholder="Search resources…"/>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="ti"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+        <div class="admin-info">
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">MISSION CONTROL</div>
+        </div>
+        <div class="avatar">👤</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- HERO -->
+      <div class="hero fadein fadein-1">
+        <div class="hero-bg">
+          <div class="hero-ring" style="width:300px;height:300px;top:-120px;right:60px;border-color:rgba(0,232,150,.15);animation-duration:40s;"></div>
+          <div class="hero-ring" style="width:180px;height:180px;top:-50px;right:160px;border-color:rgba(0,200,255,.1);animation-duration:28s;animation-direction:reverse;"></div>
+        </div>
+        <div class="hero-tag">PATHANKOT SMART WASTE SYSTEM</div>
+        <h1>
+          Mission Control<br>
+          <span class="line2">for <span class="accent">Cleaner Cities</span></span>
+        </h1>
+        <p class="hero-desc">QuantCraft monitors every smart bin, optimises truck routes in real-time, and rewards citizens who segregate waste — turning Pathankot's waste management into a precision operation.</p>
+        <div class="hero-stats">
+          <div class="hstat">
+            <div class="hstat-val">12,400 <span>bins</span></div>
+            <div class="hstat-lbl">Monitored citywide</div>
+          </div>
+          <div class="hstat-div"></div>
+          <div class="hstat">
+            <div class="hstat-val">4 <span>trucks</span></div>
+            <div class="hstat-lbl">Smart-routed fleet</div>
+          </div>
+          <div class="hstat-div"></div>
+          <div class="hstat">
+            <div class="hstat-val">2 <span>pts/drop</span></div>
+            <div class="hstat-lbl">Citizen rewards</div>
+          </div>
+          <div class="hstat-div"></div>
+          <div class="hstat">
+            <div class="hstat-val">94.2<span>%</span></div>
+            <div class="hstat-lbl">Fleet efficiency</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURE CARDS -->
+      <div class="section-wrap fadein fadein-2">
+        <div class="section-label">PLATFORM MODULES</div>
+        <div class="cards-grid" style="grid-template-columns:repeat(3,1fr);">
+
+          <a class="feat-card card-green" href="map.html">
+            <div class="feat-header">
+              <div class="feat-icon" style="background:rgba(0,232,150,.1);">
+                <svg width="22" height="22" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              </div>
+              <span class="feat-arrow">↗</span>
+            </div>
+            <div>
+              <div class="feat-title">Live Map</div>
+              <div class="feat-desc">See all 12 smart bins across Pathankot in real-time. Colour-coded by fill level — red bins need pickup now, green bins are fine. 4 truck routes drawn on actual roads.</div>
+            </div>
+            <span class="feat-link" style="color:#00e896;">OPEN MAP</span>
+          </a>
+
+          <a class="feat-card card-cyan" href="analytics.html">
+            <div class="feat-header">
+              <div class="feat-icon" style="background:rgba(0,200,255,.1);">
+                <svg width="22" height="22" fill="none" stroke="#00c8ff" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+              <span class="feat-arrow">↗</span>
+            </div>
+            <div>
+              <div class="feat-title">Analytics</div>
+              <div class="feat-desc">Weekly intelligence on bins emptied, areas cleaned, recycling volume, and fleet km saved. Track performance trends and spot problem zones before they overflow.</div>
+            </div>
+            <span class="feat-link" style="color:#00c8ff;">VIEW ANALYTICS</span>
+          </a>
+
+          <a class="feat-card card-amber" href="truck.html">
+            <div class="feat-header">
+              <div class="feat-icon" style="background:rgba(255,180,0,.1);">
+                <svg width="22" height="22" fill="none" stroke="#ffb400" stroke-width="1.8" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              </div>
+              <span class="feat-arrow">↗</span>
+            </div>
+            <div>
+              <div class="feat-title">Smart Trucks</div>
+              <div class="feat-desc">4 trucks are auto-assigned routes based on which bins are most full. Urgent bins (≥80%) get priority. The algorithm skips empty bins — saving fuel every single day.</div>
+            </div>
+            <span class="feat-link" style="color:#ffb400;">TRUCK DISPATCH</span>
+          </a>
+
+          <a class="feat-card card-green" href="scan.html">
+            <div class="feat-header">
+              <div class="feat-icon" style="background:rgba(0,232,150,.1);">
+                <svg width="22" height="22" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><line x1="21" y1="21" x2="21" y2="21"/></svg>
+              </div>
+              <span class="feat-arrow">↗</span>
+            </div>
+            <div>
+              <div class="feat-title">Live Scanner</div>
+              <div class="feat-desc">Upload a photo of any waste item and the AI instantly classifies it — Organic, Recyclable, Hazardous, or General. Powered by Teachable Machine for real-time identification.</div>
+            </div>
+            <span class="feat-link" style="color:#00e896;">OPEN SCANNER</span>
+          </a>
+
+          <a class="feat-card card-amber" href="reward.html">
+            <div class="feat-header">
+              <div class="feat-icon" style="background:rgba(255,180,0,.1);">
+                <svg width="22" height="22" fill="none" stroke="#ffb400" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+              </div>
+              <span class="feat-arrow">↗</span>
+            </div>
+            <div>
+              <div class="feat-title">Rewards</div>
+              <div class="feat-desc">Citizens earn Green Points for every proper disposal. Redeem for grocery discounts, bus passes, and utility bill savings. 3,247 enrolled in Pathankot.</div>
+            </div>
+            <span class="feat-link" style="color:#ffb400;">VIEW REWARDS</span>
+          </a>
+
+          <a class="feat-card card-violet" href="admin.html">
+            <div class="feat-header">
+              <div class="feat-icon" style="background:rgba(176,107,255,.1);">
+                <svg width="22" height="22" fill="none" stroke="#b06bff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <span class="feat-arrow">↗</span>
+            </div>
+            <div>
+              <div class="feat-title">Admin Panel</div>
+              <div class="feat-desc">Root-level control over bins, trucks, users, and alerts. Monitor problematic bins, track truck status, and manage the full Pathankot waste network from one view.</div>
+            </div>
+            <span class="feat-link" style="color:#b06bff;">OPEN ADMIN</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="section-wrap fadein fadein-3">
+        <div class="section-label">HOW THE SYSTEM WORKS</div>
+        <div class="how-strip">
+          <div class="how-card">
+            <div class="how-num">01</div>
+            <div class="how-icon">🗑️</div>
+            <div class="how-title">Bins Report Fill</div>
+            <div class="how-desc">Smart bins send real-time fill-level data to Mission Control. Every bin across Pathankot is monitored continuously.</div>
+          </div>
+          <div class="how-card">
+            <div class="how-num">02</div>
+            <div class="how-icon">🧠</div>
+            <div class="how-title">AI Routes Trucks</div>
+            <div class="how-desc">The routing engine sorts bins by urgency and assigns the nearest truck using a greedy shortest-path algorithm — no wasted km.</div>
+          </div>
+          <div class="how-card">
+            <div class="how-num">03</div>
+            <div class="how-icon">♻️</div>
+            <div class="how-title">Citizens Segregate</div>
+            <div class="how-desc">Residents separate General, Recyclable, Organic and Hazardous waste before disposal — each proper drop earns 2 Green Points.</div>
+          </div>
+          <div class="how-card">
+            <div class="how-num">04</div>
+            <div class="how-icon">🏆</div>
+            <div class="how-title">Earn Rewards</div>
+            <div class="how-desc">Points unlock real rewards: grocery discounts at 500 pts, bus passes at 1000 pts, utility bill savings at 1500 pts.</div>
+            <div class="how-pts">500 → 1000 → 1500 PTS</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP STRIP -->
+      <div class="section-wrap fadein fadein-4">
+        <div class="map-strip" onclick="location.href='map.html'" title="Click to open Pathankot Map">
+          <div class="map-strip-badge"><span class="live-dot"></span>LIVE · PATHANKOT</div>
+          <canvas id="miniMap"></canvas>
+          <div class="map-strip-label">CLICK TO OPEN FULL MAP →</div>
+        </div>
+      </div>
+
+      <div class="section-wrap fadein fadein-5" style="padding-bottom:24px;">
+        <div class="bottom-row">
+          <div class="conn-card">
+            <div class="conn-big">99.98<sup>%</sup></div>
+            <div>
+              <div class="conn-label">UPTIME</div>
+              <div class="conn-sub">Active across 12,400 nodes citywide. All sensors reporting nominal.</div>
+            </div>
+          </div>
+          <a class="reward-preview" href="reward.html">
+            <div class="rp-icon">🌿</div>
+            <div class="rp-body">
+              <div class="rp-title">Green Rewards Program</div>
+              <div class="rp-desc">Segregate waste at smart bins and earn points redeemable for real city benefits. 3,247 citizens enrolled in Pathankot.</div>
+              <div class="rp-pts">
+                <span class="rp-tier" style="color:#00e896;border-color:rgba(0,232,150,.25);">500 pts · Grocery</span>
+                <span class="rp-tier" style="color:#00c8ff;border-color:rgba(0,200,255,.25);">1000 pts · Bus Pass</span>
+                <span class="rp-tier" style="color:#ffb400;border-color:rgba(255,180,0,.25);">1500 pts · Bill Disc.</span>
+              </div>
+            </div>
+            <div class="rp-right">
+              <div class="rp-big">+2</div>
+              <div class="rp-lbl">pts per drop</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="status-bar">
+      <div class="stat-item">
+        <div class="stat-lbl">ACTIVE BINS</div>
+        <div class="stat-val"><span class="stat-dot"></span>12,242 / 12,400</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-lbl">FLEET STATUS</div>
+        <div class="stat-val"><span class="stat-dot"></span>All Systems Nominal</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-lbl">EFFICIENCY</div>
+        <div class="stat-val"><span class="stat-dot"></span>94.2% Optimal</div>
+      </div>
+      <div class="status-right">
+        <span>LAST SYNC: <span id="sync-time">--:--:-- UTC</span></span>
+        <span>•</span>
+        <span>VER: 4.2.0-STABLE</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const mc = document.getElementById('miniMap');
+const mctx = mc.getContext('2d');
+let mf = 0;
+function resizeMini(){ const s=mc.parentElement; mc.width=s.offsetWidth; mc.height=s.offsetHeight; }
+resizeMini(); window.addEventListener('resize', resizeMini);
+
+function drawMini(){
+  const W=mc.width, H=mc.height;
+  mctx.clearRect(0,0,W,H);
+  mctx.fillStyle='#0d1828'; mctx.fillRect(0,0,W,H);
+  const cx=W*.5, cy=H*.5;
+  for(let a=0;a<360;a+=20){
+    const r=a*Math.PI/180;
+    mctx.beginPath(); mctx.moveTo(cx,cy);
+    mctx.lineTo(cx+Math.cos(r)*W*.6, cy+Math.sin(r)*H*1.2);
+    mctx.strokeStyle='rgba(0,200,160,.07)'; mctx.lineWidth=1; mctx.stroke();
+  }
+  [30,70,120,180].forEach(r=>{
+    mctx.beginPath(); mctx.ellipse(cx,cy,r,r*.45,0,0,Math.PI*2);
+    mctx.strokeStyle='rgba(0,200,160,.06)'; mctx.lineWidth=1; mctx.stroke();
+  });
+  for(let i=0;i<8;i++){
+    const angle=(mf*.01+i*(Math.PI*2/8));
+    const rad=60+i*12;
+    const x=cx+Math.cos(angle)*rad, y=cy+Math.sin(angle)*rad*.5;
+    mctx.beginPath(); mctx.arc(x,y,2,0,Math.PI*2);
+    mctx.fillStyle=i%3===0?'#00e896':i%3===1?'#00c8ff':'#ff8060';
+    mctx.globalAlpha=.7+Math.sin(mf*.05+i)*.3; mctx.fill(); mctx.globalAlpha=1;
+  }
+  mf++; requestAnimationFrame(drawMini);
+}
+drawMini();
+
+function updateSync(){
+  const n=new Date();
+  document.getElementById('sync-time').textContent=
+    String(n.getUTCHours()).padStart(2,'0')+':'+
+    String(n.getUTCMinutes()).padStart(2,'0')+':'+
+    String(n.getUTCSeconds()).padStart(2,'0')+' UTC';
+}
+updateSync(); setInterval(updateSync,1000);
+
+function showToast(msg,type){
+  type=type||'info';
+  const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  const el=document.createElement('div');
+  el.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(13,21,32,.97);border:1px solid rgba(0,232,150,.2);border-radius:10px;padding:13px 18px;min-width:260px;backdrop-filter:blur(16px);font-size:14px;font-family:Rajdhani,sans-serif;color:#c8dde8;box-shadow:0 8px 32px rgba(0,0,0,.5);';
+  el.innerHTML='<span>'+(icons[type]||'ℹ️')+'</span><span>'+msg+'</span>';
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(function(){ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(function(){el.remove();},300); },2500);
+}
+</script>
+</body>
+</html>

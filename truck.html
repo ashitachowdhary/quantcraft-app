@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantCraft — Truck Routes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;overflow:hidden;}
+
+.shell{display:flex;flex-direction:column;height:100vh;}
+
+/* TOP NAV */
+.topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;gap:0;z-index:1000;}
+.logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;margin-right:20px;text-decoration:none;}
+.tnav{display:flex;align-items:flex-end;height:100%;gap:0;}
+.tnav-item{padding:0 18px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:#4a6a7a;cursor:pointer;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;text-decoration:none;}
+.tnav-item:hover{color:#c8dde8;}
+.tnav-item.active{color:#00e896;border-bottom-color:#00e896;}
+.tnav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.ti-btn{color:#4a6a7a;cursor:pointer;transition:color .2s;background:none;border:none;padding:4px;}
+.ti-btn:hover{color:#00e896;}
+
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:220px;flex-shrink:0;background:#0a1020;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:500;}
+.user-card{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
+.uavatar{width:36px;height:36px;border-radius:9px;background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.uname{font-family:'Share Tech Mono',monospace;font-size:12px;color:#eaf4ff;font-weight:700;}
+.ustatus{font-family:'Share Tech Mono',monospace;font-size:10px;color:#1a5040;margin-top:2px;}
+.snav{flex:1;padding:10px 10px 0;display:flex;flex-direction:column;gap:2px;}
+.ni{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:9px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;color:#3a5a6a;border:none;background:none;font-family:'Rajdhani',sans-serif;width:100%;text-align:left;text-decoration:none;}
+.ni:hover{color:#c8dde8;background:rgba(255,255,255,.04);}
+.ni.active{color:#080e1c;background:#00e896;font-weight:700;}
+.ni.active svg{stroke:#080e1c !important;}
+.ni svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
+.sfooter{padding:10px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:2px;}
+.fi{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#3a5a6a;transition:all .2s;border:none;background:none;font-family:'Rajdhani',sans-serif;width:100%;text-align:left;}
+.fi:hover{color:#c8dde8;background:rgba(255,255,255,.04);}
+.fi.red{color:#e05050;}
+.fi.red:hover{background:rgba(200,50,50,.07);}
+.fi svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+.page-header{padding:14px 24px 12px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.ph-left h2{font-family:'Share Tech Mono',monospace;font-size:14px;color:#00e896;letter-spacing:2px;}
+.ph-left p{font-size:13px;color:#4a6a7a;margin-top:3px;}
+.dispatch-btn{padding:9px 20px;background:linear-gradient(135deg,#00e896,#00c87a);border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#080e1c;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
+.dispatch-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,232,150,.3);}
+
+.content{flex:1;overflow-y:auto;padding:16px 22px;display:flex;flex-direction:column;gap:14px;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:#080e1c;}
+::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0;}
+.kpi{background:#0d1525;border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:13px 15px;}
+.kpi-val{font-family:'Share Tech Mono',monospace;font-size:24px;font-weight:700;line-height:1;margin-bottom:4px;}
+.kpi-lbl{font-size:10px;color:#3a5a6a;letter-spacing:.5px;text-transform:uppercase;}
+.kpi-sub{font-size:11px;margin-top:4px;}
+.c-green{color:#00e896;} .c-amber{color:#ffaa40;} .c-cyan{color:#00c8ff;} .c-red{color:#ff6b6b;}
+
+/* ── FUEL COMPARISON BANNER ── */
+.fuel-banner{background:#0d1525;border:1px solid rgba(0,232,150,.18);border-radius:11px;padding:14px 18px;display:flex;align-items:center;gap:18px;flex-shrink:0;}
+.fb-icon{width:38px;height:38px;border-radius:9px;background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fb-body{flex:1;}
+.fb-title{font-family:'Share Tech Mono',monospace;font-size:11px;color:#00e896;letter-spacing:1.5px;margin-bottom:6px;}
+.fb-compare{display:flex;align-items:center;gap:14px;}
+.fb-route{display:flex;flex-direction:column;gap:2px;text-align:center;}
+.fb-route-label{font-size:10px;color:#3a5a6a;letter-spacing:.5px;}
+.fb-route-val{font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:700;}
+.fb-arrow{font-size:20px;color:#3a5a6a;}
+.fb-saving{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(0,232,150,.06);border:1px solid rgba(0,232,150,.15);border-radius:8px;padding:8px 16px;}
+.fb-saving-lbl{font-size:10px;color:#5a9a7a;letter-spacing:.5px;}
+.fb-saving-val{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:#00e896;}
+.fb-saving-sub{font-size:10px;color:#3a7060;}
+.fb-bar-wrap{flex:1;display:flex;flex-direction:column;gap:6px;}
+.fb-bar-row{display:flex;align-items:center;gap:10px;font-size:11px;}
+.fb-bar-lbl{font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a5a6a;min-width:90px;}
+.fb-bar-track{flex:1;height:8px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;}
+.fb-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.fb-bar-num{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;min-width:50px;text-align:right;}
+
+/* ── SECTION TITLE ── */
+.section-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a7a8a;letter-spacing:2px;margin-bottom:8px;}
+
+/* ── TRUCK GRID ── */
+.routes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.truck-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+.tc-header{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);}
+.tc-name{font-family:'Share Tech Mono',monospace;font-size:12px;font-weight:700;}
+.tc-status{font-size:11px;font-weight:600;padding:3px 9px;border-radius:5px;}
+.status-active{background:rgba(0,232,150,.1);color:#00e896;}
+.status-idle{background:rgba(255,255,255,.05);color:#5a7a8a;}
+.tc-body{padding:12px 16px;}
+.tc-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.tc-meta-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:7px;padding:8px 10px;}
+.tc-meta-val{font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;color:#eaf4ff;}
+.tc-meta-lbl{font-size:9px;color:#3a5a6a;letter-spacing:.5px;margin-top:2px;}
+
+/* ROUTE STOPS */
+.stops-list{display:flex;flex-direction:column;}
+.stop{display:flex;align-items:flex-start;gap:10px;}
+.stop-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.stop-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:2px;}
+.stop-connector{width:2px;flex:1;min-height:14px;background:rgba(255,255,255,.06);margin:2px 0;}
+.stop:last-child .stop-connector{display:none;}
+.stop-info{flex:1;padding-bottom:9px;}
+.stop-row{display:flex;align-items:flex-start;justify-content:space-between;width:100%;}
+.stop-name{font-size:12px;font-weight:700;color:#c8dde8;line-height:1.2;}
+.stop-detail{font-size:10px;color:#4a6a7a;margin-top:1px;}
+.stop-fill{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;margin-left:auto;flex-shrink:0;margin-top:2px;}
+.depot-dot{background:#5a7a8a !important;}
+.depot-name{color:#5a7a8a !important;}
+
+/* ── PER-TRUCK FUEL SAVING STRIP ── */
+.truck-fuel-strip{margin-top:10px;border-top:1px solid rgba(255,255,255,.05);padding-top:10px;}
+.tfs-title{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6050;letter-spacing:1px;margin-bottom:6px;}
+.tfs-bars{display:flex;flex-direction:column;gap:5px;}
+.tfs-row{display:flex;align-items:center;gap:8px;}
+.tfs-lbl{font-size:10px;min-width:62px;font-family:'Share Tech Mono',monospace;color:#4a6a7a;}
+.tfs-track{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;}
+.tfs-fill{height:100%;border-radius:3px;}
+.tfs-num{font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;min-width:42px;text-align:right;}
+.tfs-caption{font-size:11px;color:#3a7060;margin-top:5px;font-style:italic;}
+.tfs-caption strong{color:#00e896;font-style:normal;}
+
+/* STATUS BAR */
+.status-bar{padding:10px 24px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:28px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
+.sb-item{display:flex;flex-direction:column;gap:2px;}
+.sb-lbl{color:#2a4a5a;letter-spacing:1px;font-size:9px;}
+.sb-val{color:#eaf4ff;font-size:12px;}
+.sb-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e896;margin-right:5px;animation:blink 1.8s infinite;}
+.sb-right{margin-left:auto;color:#2a4a5a;font-size:10px;}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:55px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(0,232,150,.2);border-radius:9px;padding:10px 14px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <a href="index.html" class="logo">QuantCraft</a>
+    <div class="tnav">
+      <a class="tnav-item" href="map.html">Map View</a>
+      <a class="tnav-item" href="analytics.html">Analytics</a>
+      <a class="tnav-item active" href="truck.html">Trucks</a>
+      <a class="tnav-item" href="index.html">Home</a>
+    </div>
+    <div class="tnav-right">
+      <button class="ti-btn" onclick="toast('No new alerts','info')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <button class="ti-btn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="user-card">
+        <div class="uavatar">
+          <svg width="18" height="18" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div><div class="uname">OPS LEAD</div><div class="ustatus">● ACTIVE</div></div>
+      </div>
+      <div class="snav">
+        <a class="ni" href="map.html">
+          <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map View
+        </a>
+        <a class="ni" href="analytics.html">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
+        </a>
+        <a class="ni" href="index.html">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
+        </a>
+        <a class="ni active" href="truck.html">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trucks
+        </a>
+        <button class="ni" onclick="toast('Settings','info')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+        </button>
+      </div>
+      <div class="sfooter">
+        <button class="fi" onclick="toast('Help docs opening…','info')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>Help
+        </button>
+        <button class="fi red" onclick="toast('Logging out…','warning')">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="page-header">
+        <div class="ph-left">
+          <h2>SMART TRUCK DISPATCH</h2>
+          <p>Routes auto-optimized by bin fill level — urgent bins first, shortest path</p>
+        </div>
+        <button class="dispatch-btn" onclick="recompute()">⟳ Recompute Routes</button>
+      </div>
+
+      <div class="content">
+
+        <!-- KPI ROW -->
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="kpi-val c-red" id="kpi-urgent">0</div>
+            <div class="kpi-lbl">Urgent Bins (≥80%)</div>
+            <div class="kpi-sub c-red">needs pickup now</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-val c-amber" id="kpi-warn">0</div>
+            <div class="kpi-lbl">Warning Bins (40–79%)</div>
+            <div class="kpi-sub c-amber">pickup soon</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-val c-cyan" id="kpi-saved">0 L</div>
+            <div class="kpi-lbl">Total Fuel Saved Today</div>
+            <div class="kpi-sub c-green">vs old fixed route</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-val" style="color:#c8dde8">4</div>
+            <div class="kpi-lbl">Trucks Dispatched</div>
+            <div class="kpi-sub c-green">all units active</div>
+          </div>
+        </div>
+
+        <!-- FUEL COMPARISON BANNER -->
+        <div class="fuel-banner">
+          <div class="fb-icon">
+            <svg width="20" height="20" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17"/><circle cx="17" cy="19" r="2"/><circle cx="7" cy="19" r="2"/></svg>
+          </div>
+          <div class="fb-body">
+            <div class="fb-title">ROUTE COMPARISON — SMART vs FIXED</div>
+            <div class="fb-compare">
+              <div class="fb-route">
+                <div class="fb-route-label">OLD FIXED ROUTE</div>
+                <div class="fb-route-val c-red" id="fb-fixed">-- km</div>
+                <div style="font-size:10px;color:#5a3a3a;margin-top:2px;" id="fb-fixed-fuel">-- L diesel</div>
+              </div>
+              <div class="fb-arrow">→</div>
+              <div class="fb-route">
+                <div class="fb-route-label">SMART ROUTE</div>
+                <div class="fb-route-val c-green" id="fb-smart">-- km</div>
+                <div style="font-size:10px;color:#1a5040;margin-top:2px;" id="fb-smart-fuel">-- L diesel</div>
+              </div>
+              <div class="fb-arrow">=</div>
+              <div class="fb-saving">
+                <div class="fb-saving-lbl">YOU SAVE</div>
+                <div class="fb-saving-val" id="fb-save-val">-- L</div>
+                <div class="fb-saving-sub" id="fb-save-pct">-- % less fuel</div>
+              </div>
+            </div>
+          </div>
+          <div class="fb-bar-wrap">
+            <div class="fb-bar-row">
+              <span class="fb-bar-lbl">FIXED ROUTE</span>
+              <div class="fb-bar-track"><div class="fb-bar-fill" id="bar-fixed" style="width:100%;background:#ff6b6b;opacity:.5;"></div></div>
+              <span class="fb-bar-num c-red" id="barnum-fixed">--</span>
+            </div>
+            <div class="fb-bar-row">
+              <span class="fb-bar-lbl">SMART ROUTE</span>
+              <div class="fb-bar-track"><div class="fb-bar-fill" id="bar-smart" style="width:0%;background:#00e896;"></div></div>
+              <span class="fb-bar-num c-green" id="barnum-smart">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRUCK ROUTE CARDS -->
+        <div>
+          <div class="section-title">TRUCK ASSIGNMENTS &amp; OPTIMISED ROUTES</div>
+          <div class="routes-grid" id="routesGrid"></div>
+        </div>
+
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="sb-item">
+          <div class="sb-lbl">FLEET STATUS</div>
+          <div class="sb-val"><span class="sb-dot"></span>4 TRUCKS ACTIVE</div>
+        </div>
+        <div class="sb-item">
+          <div class="sb-lbl">DEPOT</div>
+          <div class="sb-val">MUNICIPAL DEPOT, PATHANKOT</div>
+        </div>
+        <div class="sb-item">
+          <div class="sb-lbl">LAST UPDATED</div>
+          <div class="sb-val" id="lastUpdate">--:--:--</div>
+        </div>
+        <div class="sb-right">VER 4.2.0-STABLE</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ========== BIN DATA ========== */
+const BINS = [
+  {id:'BIN-001', name:'Pathankot Bus Stand',   area:'Bus Stand',       fill:88, type:'General',    lat:32.2748, lng:75.6520},
+  {id:'BIN-002', name:'Railway Station',        area:'Railway Station', fill:42, type:'Recyclable', lat:32.2684, lng:75.6443},
+  {id:'BIN-003', name:'Dalhousie Road Market', area:'Dalhousie Road',  fill:19, type:'Organic',    lat:32.2810, lng:75.6478},
+  {id:'BIN-004', name:'Chakki Bank',            area:'Chakki Bank',     fill:73, type:'General',    lat:32.2612, lng:75.6571},
+  {id:'BIN-005', name:'Mamun Road',             area:'Mamun',           fill:55, type:'Recyclable', lat:32.2890, lng:75.6340},
+  {id:'BIN-006', name:'Civil Lines Market',     area:'Civil Lines',     fill:91, type:'General',    lat:32.2762, lng:75.6598},
+  {id:'BIN-007', name:'Shahpur Kandi Road',     area:'Shahpur Kandi',   fill:33, type:'Organic',    lat:32.2530, lng:75.6420},
+  {id:'BIN-008', name:'Mirthal Chowk',          area:'Mirthal',         fill:66, type:'General',    lat:32.3050, lng:75.6250},
+  {id:'BIN-009', name:'Sujanpur Road',          area:'Sujanpur',        fill:12, type:'Recyclable', lat:32.2680, lng:75.6670},
+  {id:'BIN-010', name:'Dunera Chowk',           area:'Dunera',          fill:80, type:'Hazardous',  lat:32.2920, lng:75.6600},
+  {id:'BIN-011', name:'Pathankot Fort Area',    area:'Fort',            fill:48, type:'Organic',    lat:32.2720, lng:75.6380},
+  {id:'BIN-012', name:'Nurpur Road Junction',   area:'Nurpur Road',     fill:95, type:'General',    lat:32.2600, lng:75.6490},
+];
+
+const DEPOT = {lat:32.2748, lng:75.6530, name:'Municipal Depot'};
+const TRUCKS = [
+  {id:'TRK-01', label:'TRUCK 01', color:'#00e896'},
+  {id:'TRK-02', label:'TRUCK 02', color:'#00c8ff'},
+  {id:'TRK-03', label:'TRUCK 03', color:'#ffaa40'},
+  {id:'TRK-04', label:'TRUCK 04', color:'#e86bff'},
+];
+
+/* ========== HELPERS ========== */
+function binColor(f){ return f>=80?'#ff6b6b':f>=40?'#ffaa40':'#00e896'; }
+function binBadge(f){ return f>=80?'URGENT':f>=40?'WARNING':'OK'; }
+function binBadgeClass(f){ return f>=80?'badge-full':f>=40?'badge-warn':'badge-ok'; }
+
+/* Haversine distance in km */
+function dist(a, b){
+  const R=6371, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+/* Nearest-neighbour greedy route */
+function greedyRoute(startPoint, bins){
+  const unvisited=[...bins];
+  const route=[];
+  let current=startPoint;
+  while(unvisited.length){
+    let nearest=null, nearestDist=Infinity, nearestIdx=-1;
+    unvisited.forEach((b,i)=>{ const d=dist(current,b); if(d<nearestDist){nearestDist=d;nearest=b;nearestIdx=i;} });
+    route.push(nearest); current=nearest; unvisited.splice(nearestIdx,1);
+  }
+  return route;
+}
+
+/* Total route km */
+function routeKm(startPoint, stops){
+  let total=0, prev=startPoint;
+  stops.forEach(s=>{total+=dist(prev,s);prev=s;});
+  total+=dist(prev,startPoint);
+  return total;
+}
+
+/* ========== SMART ROUTING ALGORITHM (unchanged) ========== */
+function computeSmartRoutes(){
+  const needsPickup = BINS.filter(b=>b.fill>=40).sort((a,b)=>b.fill-a.fill);
+  const fixedKmPerTruck = routeKm(DEPOT, BINS) / TRUCKS.length;
+  const urgent  = needsPickup.filter(b=>b.fill>=80);
+  const warning = needsPickup.filter(b=>b.fill>=40&&b.fill<80);
+  const truckBins = TRUCKS.map(()=>[]);
+  urgent.forEach((b,i)=>truckBins[i%4].push(b));
+  warning.forEach((b,i)=>truckBins[(urgent.length+i)%4].push(b));
+  return TRUCKS.map((truck,i)=>{
+    const ordered = greedyRoute(DEPOT, truckBins[i]);
+    const km = ordered.length ? routeKm(DEPOT, ordered) : 0;
+    const saved = Math.max(0, fixedKmPerTruck - km);
+    return {truck, stops:ordered, km, saved, fixedKm:fixedKmPerTruck};
+  });
+}
+
+/* ========== RENDER ========== */
+function render(){
+  const routes = computeSmartRoutes();
+
+  const urgentCount = BINS.filter(b=>b.fill>=80).length;
+  const warnCount   = BINS.filter(b=>b.fill>=40&&b.fill<80).length;
+  const totalSavedL = routes.reduce((s,r)=>s+r.saved,0)*8;
+  const fixedKmTotal = routes.reduce((s,r)=>s+r.fixedKm,0);
+  const smartKmTotal = routes.reduce((s,r)=>s+r.km,0);
+  const fixedFuel = (fixedKmTotal*8).toFixed(0);
+  const smartFuel = (smartKmTotal*8).toFixed(0);
+  const savePct   = fixedKmTotal>0 ? Math.round((fixedKmTotal-smartKmTotal)/fixedKmTotal*100) : 0;
+  const smartBarW = fixedKmTotal>0 ? Math.round(smartKmTotal/fixedKmTotal*100) : 0;
+
+  /* KPIs */
+  document.getElementById('kpi-urgent').textContent = urgentCount;
+  document.getElementById('kpi-warn').textContent   = warnCount;
+  document.getElementById('kpi-saved').textContent  = totalSavedL.toFixed(0)+' L';
+  document.getElementById('lastUpdate').textContent  = new Date().toLocaleTimeString();
+
+  /* Fuel banner */
+  document.getElementById('fb-fixed').textContent      = fixedKmTotal.toFixed(1)+' km';
+  document.getElementById('fb-fixed-fuel').textContent = fixedFuel+' L diesel';
+  document.getElementById('fb-smart').textContent      = smartKmTotal.toFixed(1)+' km';
+  document.getElementById('fb-smart-fuel').textContent = smartFuel+' L diesel';
+  document.getElementById('fb-save-val').textContent   = totalSavedL.toFixed(0)+' L';
+  document.getElementById('fb-save-pct').textContent   = savePct+'% less fuel';
+  document.getElementById('bar-smart').style.width     = smartBarW+'%';
+  document.getElementById('barnum-fixed').textContent  = fixedFuel+' L';
+  document.getElementById('barnum-smart').textContent  = smartFuel+' L';
+
+  /* Truck cards */
+  document.getElementById('routesGrid').innerHTML = routes.map(r=>{
+    const {truck, stops, km, saved, fixedKm} = r;
+    const truckFixed = (fixedKm*8).toFixed(0);
+    const truckSmart = (km*8).toFixed(0);
+    const truckSavedL = (saved*8).toFixed(0);
+    const truckBarW = fixedKm>0 ? Math.round(km/fixedKm*100) : 0;
+    const statusLabel = stops.length>0?'ACTIVE':'IDLE';
+    const statusClass = stops.length>0?'status-active':'status-idle';
+
+    const stopsHTML = stops.length===0
+      ? '<div style="font-size:12px;color:#3a5a6a;padding:8px 0;">No urgent bins assigned — on standby</div>'
+      : stops.map((b,si)=>{
+          const c = binColor(b.fill);
+          return `<div class="stop">
+            <div class="stop-line">
+              <div class="stop-dot" style="background:${c}"></div>
+              <div class="stop-connector"></div>
+            </div>
+            <div class="stop-info">
+              <div class="stop-row">
+                <div>
+                  <div class="stop-name">${si+1}. ${b.name}</div>
+                  <div class="stop-detail">${b.area} · ${b.type}</div>
+                </div>
+                <div class="stop-fill" style="color:${c}">${b.fill}%</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+
+    const depotHTML = `<div class="stop">
+      <div class="stop-line">
+        <div class="stop-dot depot-dot"></div>
+        <div class="stop-connector"></div>
+      </div>
+      <div class="stop-info"><div class="stop-name depot-name">Municipal Depot (Start/End)</div></div>
+    </div>`;
+
+    /* Per-truck fuel strip */
+    const fuelStrip = stops.length>0 ? `
+      <div class="truck-fuel-strip">
+        <div class="tfs-title">FUEL COMPARISON FOR THIS TRUCK</div>
+        <div class="tfs-bars">
+          <div class="tfs-row">
+            <span class="tfs-lbl">FIXED ROUTE</span>
+            <div class="tfs-track"><div class="tfs-fill" style="width:100%;background:#ff6b6b;opacity:.45;"></div></div>
+            <span class="tfs-num" style="color:#ff6b6b">${truckFixed} L</span>
+          </div>
+          <div class="tfs-row">
+            <span class="tfs-lbl">SMART ROUTE</span>
+            <div class="tfs-track"><div class="tfs-fill" style="width:${truckBarW}%;background:#00e896;"></div></div>
+            <span class="tfs-num" style="color:#00e896">${truckSmart} L</span>
+          </div>
+        </div>
+        <div class="tfs-caption">Smart routing saves this truck <strong>${truckSavedL} L</strong> of diesel today</div>
+      </div>` : '';
+
+    return `<div class="truck-card">
+      <div class="tc-header" style="border-left:3px solid ${truck.color}">
+        <div class="tc-name" style="color:${truck.color}">${truck.label}</div>
+        <div class="tc-status ${statusClass}">${statusLabel}</div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-meta">
+          <div class="tc-meta-item">
+            <div class="tc-meta-val">${stops.length}</div>
+            <div class="tc-meta-lbl">STOPS</div>
+          </div>
+          <div class="tc-meta-item">
+            <div class="tc-meta-val">${km.toFixed(1)} km</div>
+            <div class="tc-meta-lbl">ROUTE DIST</div>
+          </div>
+          <div class="tc-meta-item">
+            <div class="tc-meta-val" style="color:#00e896">${truckSavedL} L</div>
+            <div class="tc-meta-lbl">FUEL SAVED</div>
+          </div>
+        </div>
+        <div class="stops-list">
+          ${depotHTML}
+          ${stopsHTML}
+          ${stops.length>0?depotHTML:''}
+        </div>
+        ${fuelStrip}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ========== RECOMPUTE BUTTON (unchanged) ========== */
+function recompute(){
+  BINS.forEach(b=>{
+    const delta = Math.floor(Math.random()*7)-2;
+    b.fill = Math.max(0, Math.min(100, b.fill+delta));
+  });
+  render();
+  toast('Routes recomputed — fill levels updated','success');
+}
+
+/* ========== LIVE SIMULATION (unchanged) ========== */
+setInterval(()=>{
+  BINS.forEach(b=>{ if(Math.random()>.7) b.fill=Math.min(100,b.fill+1); });
+  render();
+}, 5000);
+
+/* ========== TOAST ========== */
+function toast(msg,type='info'){
+  const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),350);},2500);
+}
+
+render();
+</script>
+</body>
+</html>

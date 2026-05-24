@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuantCraft — Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { padding-top:64px; }
+    .page-header { background:rgba(0,255,150,.02); border-bottom:1px solid var(--border); padding:24px 0; }
+    .page-header-inner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+    .page-header h1 { font-size:24px; }
+    .toolbar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .search-input { background:rgba(0,255,150,.04); border:1px solid var(--border); border-radius:8px; padding:9px 16px; color:var(--white); font-family:var(--font-body); font-size:14px; outline:none; min-width:220px; }
+    .search-input:focus { border-color:var(--green); }
+    .filter-select { background:rgba(0,255,150,.04); border:1px solid var(--border); border-radius:8px; padding:9px 14px; color:var(--text); font-family:var(--font-body); font-size:14px; outline:none; cursor:pointer; }
+    .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin:24px 0; }
+    .kpi { padding:20px; }
+    .kpi .k-val { font-family:var(--font-head); font-size:28px; font-weight:900; color:var(--green); }
+    .kpi .k-lbl { font-size:12px; color:var(--muted); margin-top:4px; }
+    /* Bin cards */
+    .bins-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:20px; }
+    .bin-card { position:relative; overflow:hidden; }
+    .bin-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+    .bin-id { font-family:var(--font-head); font-size:14px; color:var(--white); }
+    .bin-type { font-size:12px; color:var(--muted); margin-top:3px; }
+    .fill-section { margin-bottom:14px; }
+    .fill-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; }
+    .fill-pct { font-family:var(--font-head); font-weight:700; }
+    .bin-meta { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+    .meta-item { background:rgba(0,0,0,.2); border-radius:8px; padding:8px 10px; }
+    .meta-item .mi-label { font-size:10px; color:var(--muted); letter-spacing:.5px; margin-bottom:2px; }
+    .meta-item .mi-val { font-family:var(--font-head); font-size:13px; color:var(--white); }
+    .bin-footer { display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.05); font-size:12px; color:var(--muted); }
+    .collect-chip { font-family:var(--font-head); font-size:10px; letter-spacing:.5px; }
+    /* Glow tints */
+    .bin-full  { border-color:rgba(255,61,90,.35); box-shadow:0 0 20px rgba(255,61,90,.06); }
+    .bin-half  { border-color:rgba(255,196,0,.3); }
+    .bin-empty { border-color:rgba(0,255,150,.2); }
+    @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">QUANT<span>CRAFT</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="map.html">Map</a></li>
+    <li><a href="analytics.html">Analytics</a></li>
+    <li><a href="admin.html">Admin</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-right" style="position:relative">
+    <button class="notif-btn" id="notif-btn">🔔<span class="notif-badge" id="notif-badge">3</span></button>
+    <div class="notif-dropdown" id="notif-dropdown"><div class="notif-head"><h4>ALERTS</h4></div><div id="notif-list"></div></div>
+    <a href="login.html" class="btn btn-ghost btn-sm">Logout</a>
+  </div>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="map.html">Map</a>
+  <a href="analytics.html">Analytics</a><a href="admin.html">Admin</a>
+</div>
+
+<div class="page-header">
+  <div class="container">
+    <div class="page-header-inner">
+      <div>
+        <h1>Bin <span class="neon">Monitoring</span> Dashboard</h1>
+        <p style="color:var(--muted);font-size:14px;margin-top:4px">Live telemetry · Auto-updates every 5s</p>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="searchInput" placeholder="🔍 Search bin ID or location…" oninput="filterBins()"/>
+        <select class="filter-select" id="statusFilter" onchange="filterBins()">
+          <option value="all">All Status</option>
+          <option value="full">Full (80%+)</option>
+          <option value="half">Half (40–79%)</option>
+          <option value="empty">Empty (&lt;40%)</option>
+        </select>
+        <select class="filter-select" id="typeFilter" onchange="filterBins()">
+          <option value="all">All Types</option>
+          <option value="General">General</option>
+          <option value="Recyclable">Recyclable</option>
+          <option value="Organic">Organic</option>
+          <option value="Hazardous">Hazardous</option>
+        </select>
+        <a href="map.html" class="btn btn-ghost btn-sm">🗺 View Map</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container section" style="padding-top:24px">
+  <div class="kpi-row">
+    <div class="card kpi"><div class="k-val" id="kTotal">0</div><div class="k-lbl">Total Bins</div></div>
+    <div class="card kpi"><div class="k-val" id="kFull" style="color:var(--red)">0</div><div class="k-lbl">Need Collection</div></div>
+    <div class="card kpi"><div class="k-val" id="kHalf" style="color:var(--yellow)">0</div><div class="k-lbl">Half Full</div></div>
+    <div class="card kpi"><div class="k-val" id="kEmpty">0</div><div class="k-lbl">Empty / OK</div></div>
+  </div>
+
+  <div class="bins-grid" id="binsGrid"></div>
+</div>
+
+<div id="toast-container"></div>
+<script src="app.js"></script>
+<script>
+const BIN_DATA = [
+  {id:'BIN-001',sector:'Sector A',fill:92,type:'General',batt:78,temp:28,last:'08:14 AM',lat:12.9,lng:77.6},
+  {id:'BIN-002',sector:'Sector B',fill:45,type:'Recyclable',batt:91,temp:24,last:'07:50 AM',lat:12.9,lng:77.6},
+  {id:'BIN-003',sector:'Sector A',fill:18,type:'Organic',batt:64,temp:30,last:'06:30 AM',lat:12.9,lng:77.6},
+  {id:'BIN-004',sector:'Sector C',fill:87,type:'Hazardous',batt:45,temp:35,last:'09:00 AM',lat:12.9,lng:77.6},
+  {id:'BIN-005',sector:'Sector D',fill:63,type:'General',batt:88,temp:25,last:'07:10 AM',lat:12.9,lng:77.6},
+  {id:'BIN-006',sector:'Sector B',fill:11,type:'Recyclable',batt:99,temp:22,last:'05:45 AM',lat:12.9,lng:77.6},
+  {id:'BIN-007',sector:'Sector E',fill:76,type:'Organic',batt:72,temp:27,last:'08:50 AM',lat:12.9,lng:77.6},
+  {id:'BIN-008',sector:'Sector C',fill:95,type:'General',batt:30,temp:31,last:'09:20 AM',lat:12.9,lng:77.6},
+  {id:'BIN-009',sector:'Sector F',fill:50,type:'Recyclable',batt:82,temp:24,last:'07:30 AM',lat:12.9,lng:77.6},
+  {id:'BIN-010',sector:'Sector A',fill:33,type:'Organic',batt:95,temp:23,last:'06:00 AM',lat:12.9,lng:77.6},
+  {id:'BIN-011',sector:'Sector D',fill:88,type:'General',batt:56,temp:29,last:'09:05 AM',lat:12.9,lng:77.6},
+  {id:'BIN-012',sector:'Sector E',fill:22,type:'Hazardous',batt:100,temp:26,last:'05:00 AM',lat:12.9,lng:77.6},
+];
+
+const typeEmoji = {General:'🗑️',Recyclable:'♻️',Organic:'🌿',Hazardous:'☢️'};
+
+function getStatus(fill){ return fill>=80?'full':fill>=40?'half':'empty'; }
+function getColor(fill){ return fill>=80?'var(--red)':fill>=40?'var(--yellow)':'var(--green)'; }
+function getBadge(fill){ return fill>=80?'badge-red':fill>=40?'badge-yellow':'badge-green'; }
+function getLabel(fill){ return fill>=80?'● FULL':fill>=40?'● HALF':'● EMPTY'; }
+
+function renderBins(data) {
+  const grid = document.getElementById('binsGrid');
+  grid.innerHTML = '';
+  let full=0, half=0, empty=0;
+  data.forEach(b => {
+    const st = getStatus(b.fill);
+    if(st==='full') full++; else if(st==='half') half++; else empty++;
+    const pct = Math.min(b.fill,100);
+    const col = getColor(pct);
+    const card = document.createElement('div');
+    card.className = `card bin-card bin-${st} fade-up`;
+    card.innerHTML = `
+      <div class="bin-card-header">
+        <div>
+          <div class="bin-id">${typeEmoji[b.type]} ${b.id}</div>
+          <div class="bin-type">${b.type} · ${b.sector}</div>
+        </div>
+        <span class="badge ${getBadge(pct)}">${getLabel(pct)}</span>
+      </div>
+      <div class="fill-section">
+        <div class="fill-row">
+          <span>Fill Level</span>
+          <span class="fill-pct" style="color:${col}">${pct}%</span>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-bar" style="width:${pct}%;background:${col};box-shadow:0 0 8px ${col}"></div>
+        </div>
+      </div>
+      <div class="bin-meta">
+        <div class="meta-item"><div class="mi-label">⚡ BATTERY</div><div class="mi-val">${b.batt}%</div></div>
+        <div class="meta-item"><div class="mi-label">🌡 TEMP</div><div class="mi-val">${b.temp}°C</div></div>
+        <div class="meta-item" style="grid-column:1/-1"><div class="mi-label">🕐 LAST COLLECTED</div><div class="mi-val">${b.last}</div></div>
+      </div>
+      <div class="bin-footer">
+        <span>${b.sector}</span>
+        ${pct>=80?`<button class="btn btn-danger btn-sm collect-chip" onclick="collectBin('${b.id}',this)">🚛 COLLECT NOW</button>`:'<span class="badge badge-green" style="font-size:10px">✓ OPERATIONAL</span>'}
+      </div>`;
+    grid.appendChild(card);
+  });
+  // KPIs
+  document.getElementById('kTotal').textContent = BIN_DATA.length;
+  document.getElementById('kFull').textContent = BIN_DATA.filter(b=>getStatus(b.fill)==='full').length;
+  document.getElementById('kHalf').textContent = BIN_DATA.filter(b=>getStatus(b.fill)==='half').length;
+  document.getElementById('kEmpty').textContent = BIN_DATA.filter(b=>getStatus(b.fill)==='empty').length;
+  // Trigger fade-up
+  setTimeout(()=>{document.querySelectorAll('.fade-up').forEach(el=>el.classList.add('visible'));},50);
+}
+
+function filterBins() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  const filtered = BIN_DATA.filter(b => {
+    const matchSearch = b.id.toLowerCase().includes(search) || b.sector.toLowerCase().includes(search);
+    const matchStatus = status==='all' || getStatus(b.fill)===status;
+    const matchType = type==='all' || b.type===type;
+    return matchSearch && matchStatus && matchType;
+  });
+  renderBins(filtered);
+}
+
+function collectBin(id, btn) {
+  btn.textContent='⏳ DISPATCHED…'; btn.disabled=true;
+  showToast(`Collection truck dispatched to ${id}`, 'success');
+  setTimeout(()=>{
+    const bin = BIN_DATA.find(b=>b.id===id);
+    if(bin){ bin.fill=Math.floor(Math.random()*15)+2; bin.last=new Date().toLocaleTimeString(); }
+    filterBins();
+    showToast(`${id} collected successfully! ✓`, 'success');
+  },3000);
+}
+
+// Real-time updates
+function tickBins() {
+  BIN_DATA.forEach(b => {
+    b.fill = Math.min(100, b.fill + (Math.random()>.7 ? Math.floor(Math.random()*3)+1 : 0));
+    b.temp = parseFloat((b.temp + (Math.random()-.5)*.5).toFixed(1));
+    if(b.fill>=95) showToast(`🚨 ${b.id} overflow risk! Immediate collection needed!`,'error');
+  });
+  filterBins();
+}
+
+renderBins(BIN_DATA);
+setInterval(tickBins, 5000);
+</script>
+</body>
+</html>

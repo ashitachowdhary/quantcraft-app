@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantCraft — Admin</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;overflow:hidden;}
+.shell{display:flex;flex-direction:column;height:100vh;}
+
+/* TOP NAV */
+.topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;margin-right:20px;text-decoration:none;}
+.tnav{display:flex;align-items:flex-end;height:100%;}
+.tnav-item{padding:0 18px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:#4a6a7a;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;text-decoration:none;letter-spacing:.3px;}
+.tnav-item:hover{color:#c8dde8;}
+.tnav-item.active{color:#00e896;border-bottom-color:#00e896;}
+.tnav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.admin-badge{font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(176,107,255,.12);color:#b06bff;border:1px solid rgba(176,107,255,.25);padding:4px 10px;border-radius:5px;letter-spacing:1px;}
+.avatar{width:32px;height:32px;border-radius:50%;background:#1a2a3a;border:2px solid rgba(176,107,255,.3);display:flex;align-items:center;justify-content:center;font-size:15px;}
+
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:220px;flex-shrink:0;background:#0a1020;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;}
+.user-card{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
+.uavatar{width:36px;height:36px;border-radius:9px;background:rgba(176,107,255,.1);border:1px solid rgba(176,107,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.uname{font-family:'Share Tech Mono',monospace;font-size:12px;color:#eaf4ff;font-weight:700;}
+.urole{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a4aaa;margin-top:2px;}
+.snav{flex:1;padding:10px;display:flex;flex-direction:column;gap:2px;}
+.ni{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:9px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;color:#3a5a6a;border:none;background:none;font-family:'Rajdhani',sans-serif;width:100%;text-align:left;text-decoration:none;}
+.ni:hover{color:#c8dde8;background:rgba(255,255,255,.04);}
+.ni.active{color:#080e1c;background:#00e896;font-weight:700;}
+.ni.active svg{stroke:#080e1c !important;}
+.ni svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
+.sfooter{padding:10px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:2px;}
+.fi{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#3a5a6a;transition:all .2s;border:none;background:none;font-family:'Rajdhani',sans-serif;width:100%;text-align:left;}
+.fi:hover{color:#c8dde8;background:rgba(255,255,255,.04);}
+.fi.red{color:#e05050;}
+.fi.red:hover{background:rgba(200,50,50,.07);}
+.fi svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.page-header{padding:12px 22px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.ph-title{font-family:'Share Tech Mono',monospace;font-size:13px;color:#b06bff;letter-spacing:2px;}
+.ph-sub{font-size:12px;color:#4a6a7a;margin-top:2px;}
+.add-btn{padding:8px 18px;background:linear-gradient(135deg,#b06bff,#8a4aee);border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;}
+.add-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(176,107,255,.3);}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:#080e1c;}
+::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
+
+/* SUMMARY STRIP */
+.summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex-shrink:0;}
+.sum-card{background:#0d1525;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;}
+.sum-num{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;line-height:1;}
+.sum-lbl{font-size:10px;color:#3a5a6a;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+
+/* DUAL GRID */
+.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* SECTION CARD */
+.sec-card{background:#0d1525;border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+.sec-head{display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;}
+.sec-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.si-violet{background:rgba(176,107,255,.12);border:1px solid rgba(176,107,255,.18);}
+.si-amber{background:rgba(255,180,0,.10);border:1px solid rgba(255,180,0,.18);}
+.si-blue{background:rgba(0,200,255,.10);border:1px solid rgba(0,200,255,.18);}
+.si-red{background:rgba(255,107,107,.10);border:1px solid rgba(255,107,107,.18);}
+.sec-head-text{flex:1;}
+.sec-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;font-weight:700;}
+.st-violet{color:#b06bff;} .st-amber{color:#ffb400;} .st-blue{color:#00c8ff;} .st-red{color:#ff6b6b;}
+.sec-sub{font-size:10px;color:#3a5a6a;margin-top:1px;}
+.sec-action{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:#3a5a6a;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:3px 8px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.sec-action:hover{color:#c8dde8;border-color:rgba(255,255,255,.15);}
+.sec-body{flex:1;overflow-y:auto;min-height:0;}
+
+/* SHARED ROW STYLE */
+.list-row{display:flex;align-items:center;gap:9px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.03);transition:background .15s;}
+.list-row:hover{background:rgba(255,255,255,.02);}
+.list-row:last-child{border-bottom:none;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid;font-weight:700;letter-spacing:.4px;white-space:nowrap;}
+.badge-admin{color:#b06bff;border-color:rgba(176,107,255,.25);background:rgba(176,107,255,.08);}
+.badge-ops{color:#00c8ff;border-color:rgba(0,200,255,.25);background:rgba(0,200,255,.08);}
+.badge-viewer{color:#5a7a8a;border-color:rgba(90,122,138,.2);background:rgba(90,122,138,.05);}
+.badge-active{color:#00e896;border-color:rgba(0,232,150,.25);background:rgba(0,232,150,.08);}
+.badge-inactive{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.08);}
+.badge-pending{color:#ffb400;border-color:rgba(255,180,0,.25);background:rgba(255,180,0,.08);}
+
+/* STATUS PILLS */
+.pill{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;border:1px solid;white-space:nowrap;}
+.pill-full{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.08);}
+.pill-half{color:#ffb400;border-color:rgba(255,180,0,.25);background:rgba(255,180,0,.08);}
+.pill-ok{color:#00e896;border-color:rgba(0,232,150,.25);background:rgba(0,232,150,.08);}
+.pill-offline{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.08);}
+.pill-noreport{color:#5a7a8a;border-color:rgba(90,122,138,.2);background:rgba(90,122,138,.05);}
+.pill-running{color:#00e896;border-color:rgba(0,232,150,.25);background:rgba(0,232,150,.08);}
+.pill-stuck{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.08);animation:blink 1.2s infinite;}
+.pill-idle{color:#ffb400;border-color:rgba(255,180,0,.25);background:rgba(255,180,0,.08);}
+
+/* ROW ELEMENTS */
+.row-btn{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:#3a5a6a;cursor:pointer;background:none;border:none;transition:color .2s;flex-shrink:0;}
+.row-btn:hover{color:#b06bff;}
+.row-main{font-size:12px;font-weight:600;color:#c8dde8;}
+.row-sub{font-size:10px;color:#3a5a6a;margin-top:1px;}
+.fill-bar-wrap{width:52px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;flex-shrink:0;}
+.fill-bar{height:4px;border-radius:2px;}
+
+/* HEALTH */
+.h-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot-green{background:#00e896;box-shadow:0 0 5px rgba(0,232,150,.5);animation:blink 2.5s infinite;}
+.dot-amber{background:#ffb400;box-shadow:0 0 5px rgba(255,180,0,.4);}
+.dot-red{background:#ff6b6b;box-shadow:0 0 5px rgba(255,107,107,.5);animation:blink 1s infinite;}
+.h-val{font-family:'Share Tech Mono',monospace;font-size:10px;flex-shrink:0;}
+
+/* COLORS */
+.c-green{color:#00e896;} .c-red{color:#ff6b6b;} .c-amber{color:#ffb400;} .c-violet{color:#b06bff;} .c-blue{color:#00c8ff;}
+
+/* MODAL */
+.modal{background:#0d1525;border:1px solid rgba(176,107,255,.25);border-radius:14px;padding:26px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.modal-title{font-family:'Share Tech Mono',monospace;font-size:12px;color:#b06bff;letter-spacing:1.5px;margin-bottom:18px;}
+.form-group{margin-bottom:12px;}
+.form-label{font-size:12px;color:#5a7a8a;margin-bottom:5px;display:block;}
+.form-input{width:100%;padding:9px 13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:rgba(176,107,255,.4);}
+.form-select{width:100%;padding:9px 13px;background:#0a1020;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;}
+.modal-actions{display:flex;gap:8px;margin-top:18px;}
+.mbtn{flex:1;padding:10px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+.mbtn-primary{background:linear-gradient(135deg,#b06bff,#8a4aee);color:#fff;}
+.mbtn-primary:hover{box-shadow:0 4px 16px rgba(176,107,255,.3);}
+.mbtn-cancel{background:rgba(255,255,255,.05);color:#5a7a8a;}
+.mbtn-cancel:hover{color:#c8dde8;}
+
+/* STATUS BAR */
+.status-bar{padding:8px 22px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:24px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
+.sb-item{display:flex;flex-direction:column;gap:1px;}
+.sb-lbl{color:#2a4a5a;letter-spacing:1px;font-size:9px;}
+.sb-val{color:#eaf4ff;font-size:11px;}
+.sb-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#b06bff;margin-right:4px;animation:blink 2s infinite;}
+.sb-right{margin-left:auto;color:#2a4a5a;}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:50px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(176,107,255,.2);border-radius:9px;padding:9px 14px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:opacity .3s;}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <a href="index.html" class="logo">QuantCraft</a>
+    <div class="tnav">
+      <a class="tnav-item" href="index.html">Home</a>
+      <a class="tnav-item" href="map.html">Map View</a>
+      <a class="tnav-item" href="analytics.html">Analytics</a>
+      <a class="tnav-item" href="truck.html">Trucks</a>
+      <a class="tnav-item active" href="admin.html">Admin</a>
+    </div>
+    <div class="tnav-right">
+      <span class="admin-badge">SUPER ADMIN</span>
+      <div class="avatar">👤</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="user-card">
+        <div class="uavatar">🛡️</div>
+        <div>
+          <div class="uname">ROOT ADMIN</div>
+          <div class="urole">SUPER ADMIN</div>
+        </div>
+      </div>
+      <div class="snav">
+        <a class="ni" href="index.html">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
+        </a>
+        <a class="ni" href="map.html">
+          <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map View
+        </a>
+        <a class="ni" href="analytics.html">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
+        </a>
+        <a class="ni" href="truck.html">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trucks
+        </a>
+        <a class="ni active" href="admin.html">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin
+        </a>
+      </div>
+      <div class="sfooter">
+        <button class="fi red" onclick="toast('Logging out…','warning')">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="page-header">
+        <div>
+          <div class="ph-title">ADMIN PANEL</div>
+          <div class="ph-sub">Live data · Pathankot · syncs every 5s</div>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- SUMMARY STRIP -->
+        <div class="summary-strip" style="grid-template-columns:repeat(3,1fr);">
+          <div class="sum-card">
+            <div style="font-size:18px;">🔴</div>
+            <div>
+              <div class="sum-num c-red" id="kpi-full">0</div>
+              <div class="sum-lbl">Full Bins ≥80%</div>
+            </div>
+          </div>
+          <div class="sum-card">
+            <div style="font-size:18px;">🟡</div>
+            <div>
+              <div class="sum-num c-amber" id="kpi-half">0</div>
+              <div class="sum-lbl">Half Bins 40–79%</div>
+            </div>
+          </div>
+          <div class="sum-card">
+            <div style="font-size:18px;">🚛</div>
+            <div>
+              <div class="sum-num c-amber" id="kpi-stuck">1</div>
+              <div class="sum-lbl">Truck Issues</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TWO PANELS -->
+        <div class="quad-grid" style="flex:1;min-height:0;">
+
+          <!-- PROBLEMATIC BINS -->
+          <div class="sec-card">
+            <div class="sec-head">
+              <div class="sec-icon si-amber">🗑️</div>
+              <div class="sec-head-text">
+                <div class="sec-title st-amber">PROBLEMATIC BINS</div>
+                <div class="sec-sub" id="bin-sub">Live · Pathankot</div>
+              </div>
+              <button class="sec-action" onclick="window.location.href='map.html'">Map →</button>
+            </div>
+            <div class="sec-body" id="bin-list"></div>
+          </div>
+
+          <!-- TRUCKS -->
+          <div class="sec-card">
+            <div class="sec-head">
+              <div class="sec-icon si-blue">🚛</div>
+              <div class="sec-head-text">
+                <div class="sec-title st-blue">TRUCKS RUNNING?</div>
+                <div class="sec-sub">4 routes · Pathankot</div>
+              </div>
+              <button class="sec-action" onclick="window.location.href='truck.html'">Details →</button>
+            </div>
+            <div class="sec-body" id="truck-list"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="sb-item">
+          <div class="sb-lbl">SESSION</div>
+          <div class="sb-val"><span class="sb-dot"></span>Root Admin · Active</div>
+        </div>
+        <div class="sb-item">
+          <div class="sb-lbl">LAST SYNC</div>
+          <div class="sb-val" id="sb-time">--:--:-- UTC</div>
+        </div>
+        <div class="sb-item">
+          <div class="sb-lbl">BINS ONLINE</div>
+          <div class="sb-val c-green" id="sb-online">12 / 12</div>
+        </div>
+        <div class="sb-right">VER 4.2.0-STABLE</div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input class="form-input" type="text" id="newName" placeholder="e.g. Ramesh Kumar"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input class="form-input" type="email" id="newEmail" placeholder="user@pathankot.gov.in"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Role</label>
+      <select class="form-select" id="newRole">
+        <option value="VIEWER">Viewer</option>
+        <option value="OPS">Ops Lead</option>
+        <option value="ADMIN">Admin</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mbtn mbtn-primary" onclick="addUser()">Create User</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ============================================================
+   EXACT SAME DATA AS map.html — single source of truth
+   ============================================================ */
+const BINS = [
+  {id:'BIN-001', name:'Pathankot Bus Stand',   area:'Bus Stand',       fill:88, type:'General',    lat:32.2748, lng:75.6520},
+  {id:'BIN-002', name:'Railway Station',        area:'Railway Station', fill:42, type:'Recyclable', lat:32.2684, lng:75.6443},
+  {id:'BIN-003', name:'Dalhousie Road Market',  area:'Dalhousie Road',  fill:19, type:'Organic',    lat:32.2810, lng:75.6478},
+  {id:'BIN-004', name:'Chakki Bank',            area:'Chakki Bank',     fill:73, type:'General',    lat:32.2612, lng:75.6571},
+  {id:'BIN-005', name:'Mamun Road',             area:'Mamun',           fill:55, type:'Recyclable', lat:32.2890, lng:75.6340},
+  {id:'BIN-006', name:'Civil Lines Market',     area:'Civil Lines',     fill:91, type:'General',    lat:32.2762, lng:75.6598},
+  {id:'BIN-007', name:'Shahpur Kandi Road',     area:'Shahpur Kandi',   fill:33, type:'Organic',    lat:32.2530, lng:75.6420},
+  {id:'BIN-008', name:'Mirthal Chowk',          area:'Mirthal',         fill:66, type:'General',    lat:32.3050, lng:75.6250},
+  {id:'BIN-009', name:'Sujanpur Road',          area:'Sujanpur',        fill:12, type:'Recyclable', lat:32.2680, lng:75.6670},
+  {id:'BIN-010', name:'Dunera Chowk',           area:'Dunera',          fill:80, type:'Hazardous',  lat:32.2920, lng:75.6600},
+  {id:'BIN-011', name:'Pathankot Fort Area',    area:'Fort',            fill:48, type:'Organic',    lat:32.2720, lng:75.6380},
+  {id:'BIN-012', name:'Nurpur Road Junction',   area:'Nurpur Road',     fill:95, type:'General',    lat:32.2600, lng:75.6490},
+];
+
+/* SAME routes as map.html */
+const ROUTES = [
+  {id:'RT-01', label:'North – Bus Stand',  bins:['BIN-003','BIN-001','BIN-006','BIN-010'], color:'#00e896'},
+  {id:'RT-02', label:'East – Civil Lines', bins:['BIN-002','BIN-011','BIN-009','BIN-004'], color:'#00c8ff'},
+  {id:'RT-03', label:'West – Mamun Rd',    bins:['BIN-005','BIN-008','BIN-003'],           color:'#ffaa40'},
+  {id:'RT-04', label:'South – Chakki',     bins:['BIN-012','BIN-007','BIN-004'],           color:'#e86bff'},
+];
+
+/* Trucks mapped 1-to-1 with routes */
+const TRUCKS = [
+  {id:'TRK-001', driver:'Amarjit Singh',  route:'RT-01', status:'running', eta:'12m'},
+  {id:'TRK-002', driver:'Gurpreet Kaur',  route:'RT-02', status:'stuck',   eta:'34m+'},
+  {id:'TRK-003', driver:'Rajinder Pal',   route:'RT-03', status:'idle',    eta:'—'},
+  {id:'TRK-004', driver:'Mandeep Bajwa',  route:'RT-04', status:'running', eta:'8m'},
+];
+
+
+
+/* ============================================================
+   SAME fill simulation as map.html (5s interval)
+   ============================================================ */
+setInterval(()=>{
+  BINS.forEach(b=>{ if(Math.random()>.7) b.fill = Math.min(100, b.fill+1); });
+  renderBins();
+  renderSummary();
+}, 5000);
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function binColor(f){ return f>=80?'#ff6b6b':f>=40?'#ffaa40':'#00e896'; }
+function binPillClass(f){ return f>=80?'pill-full':f>=40?'pill-half':'pill-ok'; }
+function binPillLabel(f){ return f>=80?'FULL':f>=40?'HALF':'OK'; }
+
+function routeColor(routeId){
+  const r = ROUTES.find(x=>x.id===routeId);
+  return r?r.color:'#5a7a8a';
+}
+function routeLabel(routeId){
+  const r = ROUTES.find(x=>x.id===routeId);
+  return r?r.label:routeId;
+}
+
+/* ============================================================
+   RENDER — SUMMARY STRIP
+   ============================================================ */
+function renderSummary(){
+  const full = BINS.filter(b=>b.fill>=80).length;
+  const half = BINS.filter(b=>b.fill>=40&&b.fill<80).length;
+  document.getElementById('kpi-full').textContent  = full;
+  document.getElementById('kpi-half').textContent  = half;
+  document.getElementById('kpi-stuck').textContent = TRUCKS.filter(t=>t.status==='stuck'||t.status==='idle').length;
+  document.getElementById('sb-online').textContent  = BINS.length+' / '+BINS.length;
+}
+
+
+
+/* ============================================================
+   RENDER — BINS (live fill from BINS[])
+   ============================================================ */
+function renderBins(){
+  /* Show only problematic bins: full or half — sorted worst first */
+  const problematic = BINS
+    .filter(b=>b.fill>=40)
+    .sort((a,b)=>b.fill-a.fill);
+
+  const fullCount = BINS.filter(b=>b.fill>=80).length;
+  const halfCount = BINS.filter(b=>b.fill>=40&&b.fill<80).length;
+  document.getElementById('bin-sub').textContent =
+    `${fullCount} full · ${halfCount} half · live`;
+
+  document.getElementById('bin-list').innerHTML = problematic.length
+    ? problematic.map(b=>{
+        const c = binColor(b.fill);
+        const pClass = binPillClass(b.fill);
+        const pLabel = binPillLabel(b.fill);
+        /* which route covers this bin? */
+        const route = ROUTES.find(r=>r.bins.includes(b.id));
+        const routeDot = route
+          ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${route.color};margin-right:4px;flex-shrink:0;"></span>`
+          : '';
+        return `<div class="list-row">
+          <div class="fill-bar-wrap" style="flex-shrink:0;">
+            <div class="fill-bar" style="width:${b.fill}%;background:${c};"></div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div class="row-main" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.id} · ${b.name}</div>
+            <div class="row-sub" style="display:flex;align-items:center;">${routeDot}${route?route.id+' · ':''} ${b.area}</div>
+          </div>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${c};margin-right:6px;">${b.fill}%</span>
+          <span class="pill ${pClass}">${pLabel}</span>
+        </div>`;
+      }).join('')
+    : `<div class="list-row" style="justify-content:center;color:#3a5a6a;font-size:12px;">All bins under 40% ✓</div>`;
+}
+
+/* ============================================================
+   RENDER — TRUCKS (routes from map.html)
+   ============================================================ */
+function renderTrucks(){
+  document.getElementById('truck-list').innerHTML = TRUCKS.map(t=>{
+    const pillClass = `pill-${t.status}`;
+    const pillLabel = t.status.toUpperCase();
+    const c = routeColor(t.route);
+    const rLabel = routeLabel(t.route);
+    return `<div class="list-row">
+      <div style="width:6px;height:6px;border-radius:50%;background:${c};flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="row-main">${t.id} · ${t.driver}</div>
+        <div class="row-sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.route} · ${rLabel}</div>
+      </div>
+      <span class="pill ${pillClass}">${pillLabel}</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a6a7a;margin-left:6px;width:36px;text-align:right;flex-shrink:0;">${t.eta}</span>
+    </div>`;
+  }).join('');
+}
+
+
+
+
+
+/* ============================================================
+   CLOCK
+   ============================================================ */
+function updateTime(){
+  const n=new Date();
+  document.getElementById('sb-time').textContent =
+    String(n.getUTCHours()).padStart(2,'0')+':'+
+    String(n.getUTCMinutes()).padStart(2,'0')+':'+
+    String(n.getUTCSeconds()).padStart(2,'0')+' UTC';
+}
+updateTime(); setInterval(updateTime,1000);
+
+/* ============================================================
+   TOAST (same as original)
+   ============================================================ */
+function toast(msg,type='info'){
+  const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),350);},2500);
+}
+
+/* ============================================================
+   BOOT — render everything
+   ============================================================ */
+renderBins();
+renderTrucks();
+renderSummary();
+</script>
+</body>
+</html>
