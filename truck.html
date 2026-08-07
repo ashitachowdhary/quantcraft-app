@@ -11,7 +11,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 
 .shell{display:flex;flex-direction:column;height:100vh;}
 
-/* TOP NAV */
 .topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;gap:0;z-index:1000;}
 .logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;margin-right:20px;text-decoration:none;}
 .tnav{display:flex;align-items:flex-end;height:100%;gap:0;}
@@ -24,7 +23,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 
 .body{display:flex;flex:1;overflow:hidden;}
 
-/* SIDEBAR */
 .sidebar{width:220px;flex-shrink:0;background:#0a1020;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:500;}
 .user-card{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
 .uavatar{width:36px;height:36px;border-radius:9px;background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -43,21 +41,23 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .fi.red:hover{background:rgba(200,50,50,.07);}
 .fi svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;}
 
-/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 
 .page-header{padding:14px 24px 12px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
 .ph-left h2{font-family:'Share Tech Mono',monospace;font-size:14px;color:#00e896;letter-spacing:2px;}
 .ph-left p{font-size:13px;color:#4a6a7a;margin-top:3px;}
+.ph-right{display:flex;align-items:center;gap:10px;}
 .dispatch-btn{padding:9px 20px;background:linear-gradient(135deg,#00e896,#00c87a);border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#080e1c;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
 .dispatch-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,232,150,.3);}
+.conn-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.4px;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.08);color:#4a6a7a;}
+.conn-status.ok{color:#00e896;border-color:rgba(0,232,150,.3);}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
 
 .content{flex:1;overflow-y:auto;padding:16px 22px;display:flex;flex-direction:column;gap:14px;}
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-track{background:#080e1c;}
 ::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
 
-/* ── KPI ROW ── */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0;}
 .kpi{background:#0d1525;border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:13px 15px;}
 .kpi-val{font-family:'Share Tech Mono',monospace;font-size:24px;font-weight:700;line-height:1;margin-bottom:4px;}
@@ -65,7 +65,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .kpi-sub{font-size:11px;margin-top:4px;}
 .c-green{color:#00e896;} .c-amber{color:#ffaa40;} .c-cyan{color:#00c8ff;} .c-red{color:#ff6b6b;}
 
-/* ── FUEL COMPARISON BANNER ── */
 .fuel-banner{background:#0d1525;border:1px solid rgba(0,232,150,.18);border-radius:11px;padding:14px 18px;display:flex;align-items:center;gap:18px;flex-shrink:0;}
 .fb-icon{width:38px;height:38px;border-radius:9px;background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .fb-body{flex:1;}
@@ -86,10 +85,8 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .fb-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
 .fb-bar-num{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;min-width:50px;text-align:right;}
 
-/* ── SECTION TITLE ── */
 .section-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a7a8a;letter-spacing:2px;margin-bottom:8px;}
 
-/* ── TRUCK GRID ── */
 .routes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
 .truck-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
 .tc-header{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);}
@@ -103,11 +100,11 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .tc-meta-val{font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;color:#eaf4ff;}
 .tc-meta-lbl{font-size:9px;color:#3a5a6a;letter-spacing:.5px;margin-top:2px;}
 
-/* ROUTE STOPS */
 .stops-list{display:flex;flex-direction:column;}
 .stop{display:flex;align-items:flex-start;gap:10px;}
 .stop-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
 .stop-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:2px;}
+.stop-dot.live-dot{border:2px solid #00e896;box-shadow:0 0 6px #00e896;}
 .stop-connector{width:2px;flex:1;min-height:14px;background:rgba(255,255,255,.06);margin:2px 0;}
 .stop:last-child .stop-connector{display:none;}
 .stop-info{flex:1;padding-bottom:9px;}
@@ -118,7 +115,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .depot-dot{background:#5a7a8a !important;}
 .depot-name{color:#5a7a8a !important;}
 
-/* ── PER-TRUCK FUEL SAVING STRIP ── */
 .truck-fuel-strip{margin-top:10px;border-top:1px solid rgba(255,255,255,.05);padding-top:10px;}
 .tfs-title{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6050;letter-spacing:1px;margin-bottom:6px;}
 .tfs-bars{display:flex;flex-direction:column;gap:5px;}
@@ -130,7 +126,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .tfs-caption{font-size:11px;color:#3a7060;margin-top:5px;font-style:italic;}
 .tfs-caption strong{color:#00e896;font-style:normal;}
 
-/* STATUS BAR */
 .status-bar{padding:10px 24px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:28px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
 .sb-item{display:flex;flex-direction:column;gap:2px;}
 .sb-lbl{color:#2a4a5a;letter-spacing:1px;font-size:9px;}
@@ -138,7 +133,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .sb-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e896;margin-right:5px;animation:blink 1.8s infinite;}
 .sb-right{margin-left:auto;color:#2a4a5a;font-size:10px;}
 
-/* TOAST */
 #toast-wrap{position:fixed;bottom:55px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
 .toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(0,232,150,.2);border-radius:9px;padding:10px 14px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);}
 
@@ -148,7 +142,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 <body>
 <div class="shell">
 
-  <!-- TOP NAV -->
   <div class="topnav">
     <a href="index.html" class="logo">QuantCraft</a>
     <div class="tnav">
@@ -168,7 +161,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
   </div>
 
   <div class="body">
-    <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="user-card">
         <div class="uavatar">
@@ -203,19 +195,20 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
       </div>
     </div>
 
-    <!-- MAIN -->
     <div class="main">
       <div class="page-header">
         <div class="ph-left">
           <h2>SMART TRUCK DISPATCH</h2>
           <p>Routes auto-optimized by bin fill level — urgent bins first, shortest path</p>
         </div>
-        <button class="dispatch-btn" onclick="recompute()">⟳ Recompute Routes</button>
+        <div class="ph-right">
+          <span class="conn-status" id="connStatus"><span class="conn-dot"></span>Connecting…</span>
+          <button class="dispatch-btn" onclick="recompute()">⟳ Recompute Routes</button>
+        </div>
       </div>
 
       <div class="content">
 
-        <!-- KPI ROW -->
         <div class="kpi-row">
           <div class="kpi">
             <div class="kpi-val c-red" id="kpi-urgent">0</div>
@@ -239,7 +232,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
           </div>
         </div>
 
-        <!-- FUEL COMPARISON BANNER -->
         <div class="fuel-banner">
           <div class="fb-icon">
             <svg width="20" height="20" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17"/><circle cx="17" cy="19" r="2"/><circle cx="7" cy="19" r="2"/></svg>
@@ -280,15 +272,13 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
           </div>
         </div>
 
-        <!-- TRUCK ROUTE CARDS -->
         <div>
-          <div class="section-title">TRUCK ASSIGNMENTS &amp; OPTIMISED ROUTES</div>
+          <div class="section-title">TRUCK ASSIGNMENTS &amp; OPTIMISED ROUTES (INCL. 4 LIVE ESP32 BINS)</div>
           <div class="routes-grid" id="routesGrid"></div>
         </div>
 
       </div>
 
-      <!-- STATUS BAR -->
       <div class="status-bar">
         <div class="sb-item">
           <div class="sb-lbl">FLEET STATUS</div>
@@ -311,7 +301,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 <div id="toast-wrap"></div>
 
 <script>
-/* ========== BIN DATA ========== */
+/* ========== DEMO BIN DATA ========== */
 const BINS = [
   {id:'BIN-001', name:'Pathankot Bus Stand',   area:'Bus Stand',       fill:88, type:'General',    lat:32.2748, lng:75.6520},
   {id:'BIN-002', name:'Railway Station',        area:'Railway Station', fill:42, type:'Recyclable', lat:32.2684, lng:75.6443},
@@ -327,6 +317,16 @@ const BINS = [
   {id:'BIN-012', name:'Nurpur Road Junction',   area:'Nurpur Road',     fill:95, type:'General',    lat:32.2600, lng:75.6490},
 ];
 
+/* ========== LIVE ESP32 BINS (Firebase) ========== */
+const FIREBASE_DB_URL = 'https://ecoroute-a871a-default-rtdb.firebaseio.com';
+const LIVE_BINS = [
+  {id:'B-01', name:'ESP32 Live Sensor 1', area:'Live Sensor', fill:0, type:'General',    lat:32.2770, lng:75.6510, isLive:true},
+  {id:'B-02', name:'ESP32 Live Sensor 2', area:'Live Sensor', fill:0, type:'Recyclable', lat:32.2700, lng:75.6600, isLive:true},
+  {id:'B-03', name:'ESP32 Live Sensor 3', area:'Live Sensor', fill:0, type:'Organic',    lat:32.2850, lng:75.6450, isLive:true},
+  {id:'B-04', name:'ESP32 Live Sensor 4', area:'Live Sensor', fill:0, type:'Hazardous',  lat:32.2650, lng:75.6350, isLive:true},
+];
+function allBins(){ return [...LIVE_BINS, ...BINS]; }
+
 const DEPOT = {lat:32.2748, lng:75.6530, name:'Municipal Depot'};
 const TRUCKS = [
   {id:'TRK-01', label:'TRUCK 01', color:'#00e896'},
@@ -337,17 +337,13 @@ const TRUCKS = [
 
 /* ========== HELPERS ========== */
 function binColor(f){ return f>=80?'#ff6b6b':f>=40?'#ffaa40':'#00e896'; }
-function binBadge(f){ return f>=80?'URGENT':f>=40?'WARNING':'OK'; }
-function binBadgeClass(f){ return f>=80?'badge-full':f>=40?'badge-warn':'badge-ok'; }
 
-/* Haversine distance in km */
 function dist(a, b){
   const R=6371, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
   const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
 
-/* Nearest-neighbour greedy route */
 function greedyRoute(startPoint, bins){
   const unvisited=[...bins];
   const route=[];
@@ -360,7 +356,6 @@ function greedyRoute(startPoint, bins){
   return route;
 }
 
-/* Total route km */
 function routeKm(startPoint, stops){
   let total=0, prev=startPoint;
   stops.forEach(s=>{total+=dist(prev,s);prev=s;});
@@ -368,10 +363,11 @@ function routeKm(startPoint, stops){
   return total;
 }
 
-/* ========== SMART ROUTING ALGORITHM (unchanged) ========== */
+/* ========== SMART ROUTING (now includes live ESP32 bins) ========== */
 function computeSmartRoutes(){
-  const needsPickup = BINS.filter(b=>b.fill>=40).sort((a,b)=>b.fill-a.fill);
-  const fixedKmPerTruck = routeKm(DEPOT, BINS) / TRUCKS.length;
+  const all = allBins();
+  const needsPickup = all.filter(b=>b.fill>=40).sort((a,b)=>b.fill-a.fill);
+  const fixedKmPerTruck = routeKm(DEPOT, all) / TRUCKS.length;
   const urgent  = needsPickup.filter(b=>b.fill>=80);
   const warning = needsPickup.filter(b=>b.fill>=40&&b.fill<80);
   const truckBins = TRUCKS.map(()=>[]);
@@ -388,9 +384,10 @@ function computeSmartRoutes(){
 /* ========== RENDER ========== */
 function render(){
   const routes = computeSmartRoutes();
+  const all = allBins();
 
-  const urgentCount = BINS.filter(b=>b.fill>=80).length;
-  const warnCount   = BINS.filter(b=>b.fill>=40&&b.fill<80).length;
+  const urgentCount = all.filter(b=>b.fill>=80).length;
+  const warnCount   = all.filter(b=>b.fill>=40&&b.fill<80).length;
   const totalSavedL = routes.reduce((s,r)=>s+r.saved,0)*8;
   const fixedKmTotal = routes.reduce((s,r)=>s+r.fixedKm,0);
   const smartKmTotal = routes.reduce((s,r)=>s+r.km,0);
@@ -399,13 +396,11 @@ function render(){
   const savePct   = fixedKmTotal>0 ? Math.round((fixedKmTotal-smartKmTotal)/fixedKmTotal*100) : 0;
   const smartBarW = fixedKmTotal>0 ? Math.round(smartKmTotal/fixedKmTotal*100) : 0;
 
-  /* KPIs */
   document.getElementById('kpi-urgent').textContent = urgentCount;
   document.getElementById('kpi-warn').textContent   = warnCount;
   document.getElementById('kpi-saved').textContent  = totalSavedL.toFixed(0)+' L';
   document.getElementById('lastUpdate').textContent  = new Date().toLocaleTimeString();
 
-  /* Fuel banner */
   document.getElementById('fb-fixed').textContent      = fixedKmTotal.toFixed(1)+' km';
   document.getElementById('fb-fixed-fuel').textContent = fixedFuel+' L diesel';
   document.getElementById('fb-smart').textContent      = smartKmTotal.toFixed(1)+' km';
@@ -416,7 +411,6 @@ function render(){
   document.getElementById('barnum-fixed').textContent  = fixedFuel+' L';
   document.getElementById('barnum-smart').textContent  = smartFuel+' L';
 
-  /* Truck cards */
   document.getElementById('routesGrid').innerHTML = routes.map(r=>{
     const {truck, stops, km, saved, fixedKm} = r;
     const truckFixed = (fixedKm*8).toFixed(0);
@@ -432,13 +426,13 @@ function render(){
           const c = binColor(b.fill);
           return `<div class="stop">
             <div class="stop-line">
-              <div class="stop-dot" style="background:${c}"></div>
+              <div class="stop-dot ${b.isLive?'live-dot':''}" style="background:${c}"></div>
               <div class="stop-connector"></div>
             </div>
             <div class="stop-info">
               <div class="stop-row">
                 <div>
-                  <div class="stop-name">${si+1}. ${b.name}</div>
+                  <div class="stop-name">${si+1}. ${b.isLive?'🔴 ':''}${b.name}</div>
                   <div class="stop-detail">${b.area} · ${b.type}</div>
                 </div>
                 <div class="stop-fill" style="color:${c}">${b.fill}%</div>
@@ -455,7 +449,6 @@ function render(){
       <div class="stop-info"><div class="stop-name depot-name">Municipal Depot (Start/End)</div></div>
     </div>`;
 
-    /* Per-truck fuel strip */
     const fuelStrip = stops.length>0 ? `
       <div class="truck-fuel-strip">
         <div class="tfs-title">FUEL COMPARISON FOR THIS TRUCK</div>
@@ -505,7 +498,7 @@ function render(){
   }).join('');
 }
 
-/* ========== RECOMPUTE BUTTON (unchanged) ========== */
+/* ========== RECOMPUTE BUTTON (demo bins only) ========== */
 function recompute(){
   BINS.forEach(b=>{
     const delta = Math.floor(Math.random()*7)-2;
@@ -515,11 +508,34 @@ function recompute(){
   toast('Routes recomputed — fill levels updated','success');
 }
 
-/* ========== LIVE SIMULATION (unchanged) ========== */
+/* ========== LIVE SIMULATION (demo bins only) ========== */
 setInterval(()=>{
   BINS.forEach(b=>{ if(Math.random()>.7) b.fill=Math.min(100,b.fill+1); });
   render();
 }, 5000);
+
+/* ========== FIREBASE POLLING (live ESP32 bins) ========== */
+function setConnStatus(state){
+  const el = document.getElementById('connStatus');
+  if(state==='ok'){ el.className='conn-status ok'; el.innerHTML='<span class="conn-dot"></span>Firebase Connected'; }
+  else { el.className='conn-status'; el.innerHTML='<span class="conn-dot" style="animation:none;"></span>Connection Error'; }
+}
+async function pollFirebase(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/bins.json`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json() || {};
+    LIVE_BINS.forEach(b=>{
+      const entry = data[b.id];
+      const val = entry && typeof entry.fillLevel === 'number' ? entry.fillLevel : null;
+      if(val !== null) b.fill = val;
+    });
+    setConnStatus('ok');
+    render();
+  } catch(err){
+    setConnStatus('err');
+  }
+}
 
 /* ========== TOAST ========== */
 function toast(msg,type='info'){
@@ -532,6 +548,8 @@ function toast(msg,type='info'){
 }
 
 render();
+pollFirebase();
+setInterval(pollFirebase, 3000);
 </script>
 </body>
 </html>

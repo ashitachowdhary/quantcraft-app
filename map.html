@@ -11,10 +11,8 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;overflow:hidden;}
 
-/* SHELL */
 .shell{display:flex;flex-direction:column;height:100vh;}
 
-/* TOP NAV */
 .topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;gap:0;z-index:1000;position:relative;}
 .logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;margin-right:20px;text-decoration:none;}
 .tnav{display:flex;align-items:flex-end;height:100%;gap:0;}
@@ -30,10 +28,8 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .ti-btn{color:#4a6a7a;cursor:pointer;transition:color .2s;background:none;border:none;padding:4px;}
 .ti-btn:hover{color:#00e896;}
 
-/* BODY */
 .body{display:flex;flex:1;overflow:hidden;}
 
-/* SIDEBAR */
 .sidebar{width:220px;flex-shrink:0;background:#0a1020;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:500;}
 .user-card{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
 .uavatar{width:36px;height:36px;border-radius:9px;background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -52,13 +48,11 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .fi.red:hover{background:rgba(200,50,50,.07);}
 .fi svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;}
 
-/* STATS BAR below sidebar nav */
 .stats-bar{padding:10px 14px;border-top:1px solid rgba(255,255,255,.05);display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .stat-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;text-align:center;}
 .stat-val{font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;}
 .stat-lbl{font-size:11px;color:#3a5a6a;margin-top:2px;}
 
-/* MAP */
 .map-area{flex:1;position:relative;overflow:hidden;}
 #map{position:absolute;inset:0;}
 .leaflet-tile{filter:brightness(.46) saturate(.22) hue-rotate(190deg) contrast(1.1);}
@@ -67,12 +61,10 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .leaflet-attribution-flag{display:none !important;}
 .leaflet-control-attribution{display:none !important;}
 
-/* ZOOM BTNS */
 .zbtns{position:absolute;bottom:20px;right:14px;z-index:900;display:flex;flex-direction:column;gap:6px;}
 .zbtn{width:38px;height:38px;border-radius:9px;background:rgba(8,14,28,.94);border:1px solid rgba(255,255,255,.12);color:#c8dde8;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(8px);}
 .zbtn:hover{border-color:rgba(0,232,150,.5);color:#00e896;}
 
-/* POPUP */
 .leaflet-popup-content-wrapper{background:rgba(8,14,28,.97)!important;border:1px solid rgba(0,232,150,.3)!important;border-radius:11px!important;color:#c8dde8!important;box-shadow:0 8px 30px rgba(0,0,0,.7)!important;backdrop-filter:blur(12px);}
 .leaflet-popup-tip{background:rgba(8,14,28,.97)!important;}
 .leaflet-popup-content{margin:11px 15px!important;font-family:'Rajdhani',sans-serif;}
@@ -81,44 +73,43 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .popup-row span:last-child{color:#eaf4ff;}
 .leaflet-popup-close-button{color:#4a6a7a!important;font-size:17px!important;}
 
-/* LEGEND */
 .legend{position:absolute;bottom:20px;left:14px;z-index:900;background:rgba(8,14,28,.92);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:10px 13px;font-size:12px;color:#5a7a8a;backdrop-filter:blur(8px);}
 .legend-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
 .legend-row:last-child{margin-bottom:0;}
 .ldot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .lline{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
 
-/* ROUTE INFO PANEL */
-.route-panel{position:absolute;top:14px;right:14px;z-index:900;background:rgba(8,14,28,.92);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:12px 14px;min-width:180px;backdrop-filter:blur(8px);}
+.route-panel{position:absolute;top:14px;right:14px;z-index:900;background:rgba(8,14,28,.92);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:12px 14px;min-width:190px;backdrop-filter:blur(8px);}
 .rp-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:#00e896;margin-bottom:8px;letter-spacing:.5px;}
 .rp-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px;color:#5a7a8a;cursor:pointer;transition:color .2s;}
 .rp-row:hover{color:#c8dde8;}
 .rp-row:last-child{margin-bottom:0;}
 .rdot{width:12px;height:3px;border-radius:2px;flex-shrink:0;}
 
-/* SEARCH DROPDOWN */
+.conn-badge{position:absolute;top:14px;left:14px;z-index:900;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.5px;padding:6px 12px;border-radius:20px;background:rgba(8,14,28,.92);border:1px solid rgba(255,255,255,.12);color:#4a6a7a;backdrop-filter:blur(8px);display:flex;align-items:center;gap:6px;}
+.conn-badge.ok{color:#00e896;border-color:rgba(0,232,150,.3);}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
+
 #sresults{position:absolute;top:100%;left:0;width:250px;background:rgba(8,14,28,.98);border:1px solid rgba(0,232,150,.2);border-radius:8px;margin-top:4px;display:none;z-index:2000;overflow:hidden;}
 .sitem{padding:9px 14px;cursor:pointer;font-size:13px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s;}
 .sitem:hover{background:rgba(0,232,150,.08);}
 .sitem:last-child{border-bottom:none;}
 .sitem-sub{font-size:11px;color:#3a5a6a;margin-top:2px;}
 
-/* LOADING */
 #loading{position:absolute;inset:0;background:rgba(8,14,28,.85);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(4px);}
 .loading-inner{text-align:center;}
 .spinner{width:36px;height:36px;border:3px solid rgba(0,232,150,.2);border-top-color:#00e896;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-family:'Share Tech Mono',monospace;font-size:12px;color:#00e896;letter-spacing:.5px;}
 
-/* TOAST */
 #toast-wrap{position:fixed;bottom:20px;right:70px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
 .toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(0,232,150,.2);border-radius:9px;padding:10px 14px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:opacity .3s;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 </style>
 </head>
 <body>
 <div class="shell">
 
-  <!-- TOP NAV -->
   <div class="topnav">
     <a href="index.html" class="logo" style="text-decoration:none;">QuantCraft</a>
     <div class="tnav">
@@ -140,7 +131,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
   </div>
 
   <div class="body">
-    <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="user-card">
         <div class="uavatar">
@@ -163,12 +153,11 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
         </button>
       </div>
 
-      <!-- LIVE STATS -->
       <div class="stats-bar" id="statsBar">
         <div class="stat-box"><div class="stat-val" id="s-full" style="color:#ff6b6b">0</div><div class="stat-lbl">Full Bins</div></div>
         <div class="stat-box"><div class="stat-val" id="s-ok" style="color:#00e896">0</div><div class="stat-lbl">OK Bins</div></div>
         <div class="stat-box"><div class="stat-val" id="s-routes" style="color:#00c8ff">4</div><div class="stat-lbl">Routes</div></div>
-        <div class="stat-box"><div class="stat-val" id="s-total" style="color:#c8dde8">12</div><div class="stat-lbl">Total Bins</div></div>
+        <div class="stat-box"><div class="stat-val" id="s-total" style="color:#c8dde8">16</div><div class="stat-lbl">Total Bins</div></div>
       </div>
 
       <div class="sfooter">
@@ -181,11 +170,9 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
       </div>
     </div>
 
-    <!-- MAP -->
     <div class="map-area">
       <div id="map"></div>
 
-      <!-- LOADING OVERLAY -->
       <div id="loading">
         <div class="loading-inner">
           <div class="spinner"></div>
@@ -193,7 +180,8 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
         </div>
       </div>
 
-      <!-- ROUTE PANEL -->
+      <div class="conn-badge" id="connBadge"><span class="conn-dot"></span>Connecting to Firebase…</div>
+
       <div class="route-panel">
         <div class="rp-title">ACTIVE ROUTES</div>
         <div class="rp-row" onclick="focusRoute(0)"><div class="rdot" style="background:#00e896"></div>RT-01 · North (Bus Stand)</div>
@@ -202,20 +190,18 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
         <div class="rp-row" onclick="focusRoute(3)"><div class="rdot" style="background:#e86bff"></div>RT-04 · South (Chakki)</div>
       </div>
 
-      <!-- ZOOM -->
       <div class="zbtns">
         <button class="zbtn" onclick="map.zoomIn()">+</button>
         <button class="zbtn" onclick="map.zoomOut()">−</button>
         <button class="zbtn" onclick="resetView()" title="Reset">⊙</button>
       </div>
 
-      <!-- LEGEND -->
       <div class="legend">
         <div class="legend-row"><span class="ldot" style="background:#ff6b6b"></span>Full ≥ 80%</div>
         <div class="legend-row"><span class="ldot" style="background:#ffaa40"></span>Half 40–79%</div>
         <div class="legend-row"><span class="ldot" style="background:#00e896"></span>OK &lt; 40%</div>
         <div class="legend-row" style="margin-top:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:6px;">
-          <span class="lline" style="background:#00e896;opacity:.7"></span>Road route
+          <span style="width:10px;height:10px;border-radius:50%;background:#0d1828;border:2px solid #00e896;display:inline-block;"></span>Live ESP32 sensor
         </div>
       </div>
     </div>
@@ -225,7 +211,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 <div id="toast-wrap"></div>
 
 <script>
-/* ===== DATA ===== */
+/* ===== DEMO DATA ===== */
 const BINS = [
   {id:'BIN-001', name:'Pathankot Bus Stand',      area:'Bus Stand',       fill:88, type:'General',    lat:32.2748, lng:75.6520},
   {id:'BIN-002', name:'Railway Station',          area:'Railway Station', fill:42, type:'Recyclable', lat:32.2684, lng:75.6443},
@@ -241,7 +227,16 @@ const BINS = [
   {id:'BIN-012', name:'Nurpur Road Junction',     area:'Nurpur Road',     fill:95, type:'General',    lat:32.2600, lng:75.6490},
 ];
 
-/* Route definitions: ordered bin IDs and display colour */
+/* ===== LIVE ESP32 BINS (Firebase) ===== */
+const FIREBASE_DB_URL = 'https://ecoroute-a871a-default-rtdb.firebaseio.com';
+const LIVE_BINS = [
+  {id:'B-01', name:'ESP32 Live Sensor 1', area:'Live Sensor', fill:0, type:'General',    lat:32.2770, lng:75.6510, isLive:true},
+  {id:'B-02', name:'ESP32 Live Sensor 2', area:'Live Sensor', fill:0, type:'Recyclable', lat:32.2700, lng:75.6600, isLive:true},
+  {id:'B-03', name:'ESP32 Live Sensor 3', area:'Live Sensor', fill:0, type:'Organic',    lat:32.2850, lng:75.6450, isLive:true},
+  {id:'B-04', name:'ESP32 Live Sensor 4', area:'Live Sensor', fill:0, type:'Hazardous',  lat:32.2650, lng:75.6350, isLive:true},
+];
+function allBins(){ return [...LIVE_BINS, ...BINS]; }
+
 const ROUTES = [
   {id:'RT-01', label:'North – Bus Stand',  bins:['BIN-003','BIN-001','BIN-006','BIN-010'], color:'#00e896'},
   {id:'RT-02', label:'East – Civil Lines', bins:['BIN-002','BIN-011','BIN-009','BIN-004'], color:'#00c8ff'},
@@ -251,40 +246,50 @@ const ROUTES = [
 
 function binColor(f){return f>=80?'#ff6b6b':f>=40?'#ffaa40':'#00e896';}
 
-/* ===== MAP INIT ===== */
 const map = L.map('map',{zoomControl:false,attributionControl:false}).setView([32.2748,75.6520],14);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
 
 const markerMap = {};
 const routePolylines = [];
 
-/* ===== MARKERS ===== */
-BINS.forEach(b=>{
+function makeIcon(b){
   const c = binColor(b.fill);
-  const icon = L.divIcon({
+  const ringStyle = b.isLive
+    ? `border:3px solid #00e896;box-shadow:0 0 14px #00e896;`
+    : `border:2.5px solid rgba(255,255,255,.3);box-shadow:0 0 12px ${c};`;
+  return L.divIcon({
     className:'',
-    html:`<div style="width:22px;height:22px;border-radius:50%;background:${c};border:2.5px solid rgba(255,255,255,.3);box-shadow:0 0 12px ${c};display:flex;align-items:center;justify-content:center;cursor:pointer;">
+    html:`<div style="width:22px;height:22px;border-radius:50%;background:${c};${ringStyle}display:flex;align-items:center;justify-content:center;cursor:pointer;">
             <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);"></div>
           </div>`,
     iconSize:[22,22], iconAnchor:[11,11], popupAnchor:[0,-14],
   });
+}
+
+function popupHTML(b){
+  const c = binColor(b.fill);
   const lvl = b.fill>=80
     ? `<span style="color:#ff6b6b;font-weight:700">FULL</span>`
     : b.fill>=40
       ? `<span style="color:#ffaa40;font-weight:700">HALF</span>`
       : `<span style="color:#00e896;font-weight:700">OK</span>`;
-  const popup = `
-    <div class="popup-title">${b.id}</div>
+  return `
+    <div class="popup-title">${b.isLive?'🔴 ':''}${b.id}</div>
     <div class="popup-row"><span>Location</span><span>${b.name}</span></div>
     <div class="popup-row"><span>Area</span><span>${b.area}</span></div>
     <div class="popup-row"><span>Fill</span><span style="color:${c}">${b.fill}%</span></div>
     <div class="popup-row"><span>Type</span><span>${b.type}</span></div>
-    <div class="popup-row"><span>Status</span><span>${lvl}</span></div>`;
-  const m = L.marker([b.lat,b.lng],{icon}).addTo(map).bindPopup(popup,{maxWidth:220});
+    <div class="popup-row"><span>Status</span><span>${lvl}</span></div>
+    ${b.isLive?`<div class="popup-row"><span>Source</span><span style="color:#00e896">ESP32 / Firebase</span></div>`:''}`;
+}
+
+/* ===== MARKERS (demo + live) ===== */
+allBins().forEach(b=>{
+  const m = L.marker([b.lat,b.lng],{icon:makeIcon(b)}).addTo(map).bindPopup(popupHTML(b),{maxWidth:220});
   markerMap[b.id] = {marker:m, bin:b};
 });
 
-/* ===== REAL ROAD ROUTES via OSRM ===== */
+/* ===== REAL ROAD ROUTES via OSRM (demo bins only) ===== */
 async function fetchRoute(waypoints, color) {
   const coords = waypoints.map(w=>w[1]+','+w[0]).join(';');
   const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
@@ -298,7 +303,6 @@ async function fetchRoute(waypoints, color) {
       return line;
     }
   } catch(e){}
-  /* fallback straight line if OSRM fails */
   return L.polyline(waypoints, {color, weight:2.5, opacity:0.6, dashArray:'10 6'}).addTo(map);
 }
 
@@ -318,7 +322,6 @@ async function loadRoutes() {
 }
 loadRoutes();
 
-/* ===== FOCUS ROUTE ===== */
 function focusRoute(idx){
   const r = ROUTES[idx];
   const pts = r.bins.map(id=>{ const b=BINS.find(x=>x.id===id); return b?[b.lat,b.lng]:null; }).filter(Boolean);
@@ -328,7 +331,7 @@ function focusRoute(idx){
 
 /* ===== SEARCH ===== */
 const searchIndex = [
-  ...BINS.map(b=>({label:b.name, sub:b.id+' · '+b.area+' · Fill: '+b.fill+'%', lat:b.lat, lng:b.lng, id:b.id})),
+  ...allBins().map(b=>({label:b.name, sub:b.id+' · '+b.area+' · Fill: '+b.fill+'%', lat:b.lat, lng:b.lng, id:b.id})),
   {label:'Bus Stand Chowk',         sub:'Central Pathankot', lat:32.2748, lng:75.6520},
   {label:'Railway Station',         sub:'Station Road',      lat:32.2684, lng:75.6443},
   {label:'Civil Lines',             sub:'Market area',       lat:32.2762, lng:75.6598},
@@ -379,17 +382,49 @@ function resetOpacity(){
 
 /* ===== STATS ===== */
 function updateStats(){
-  const full = BINS.filter(b=>b.fill>=80).length;
-  const ok   = BINS.filter(b=>b.fill<40).length;
-  document.getElementById('s-full').textContent = full;
-  document.getElementById('s-ok').textContent   = ok;
+  const all = allBins();
+  document.getElementById('s-full').textContent = all.filter(b=>b.fill>=80).length;
+  document.getElementById('s-ok').textContent   = all.filter(b=>b.fill<40).length;
+  document.getElementById('s-total').textContent = all.length;
 }
 
-/* ===== REALTIME FILL SIMULATION ===== */
+/* ===== REALTIME FILL SIMULATION (demo bins only) ===== */
 setInterval(()=>{
   BINS.forEach(b=>{ if(Math.random()>.7) b.fill=Math.min(100,b.fill+1); });
   updateStats();
 },5000);
+
+/* ===== FIREBASE POLLING (live bins) ===== */
+function setConnBadge(state){
+  const el = document.getElementById('connBadge');
+  if(state==='ok'){ el.className='conn-badge ok'; el.innerHTML='<span class="conn-dot"></span>Firebase Connected'; }
+  else { el.className='conn-badge'; el.innerHTML='<span class="conn-dot" style="animation:none;"></span>Connection Error'; }
+}
+async function pollFirebase(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/bins.json`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json() || {};
+    LIVE_BINS.forEach(b=>{
+      const entry = data[b.id];
+      const val = entry && typeof entry.fillLevel === 'number' ? entry.fillLevel : null;
+      if(val !== null){
+        b.fill = val;
+        const m = markerMap[b.id];
+        if(m){
+          m.marker.setIcon(makeIcon(b));
+          m.marker.setPopupContent(popupHTML(b));
+        }
+      }
+    });
+    setConnBadge('ok');
+    updateStats();
+  } catch(err){
+    setConnBadge('err');
+  }
+}
+pollFirebase();
+setInterval(pollFirebase, 3000);
 
 /* ===== RESET VIEW ===== */
 function resetView(){ map.setView([32.2748,75.6520],14); resetOpacity(); }

@@ -47,8 +47,10 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .page-header{padding:12px 22px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
 .ph-title{font-family:'Share Tech Mono',monospace;font-size:13px;color:#b06bff;letter-spacing:2px;}
 .ph-sub{font-size:12px;color:#4a6a7a;margin-top:2px;}
-.add-btn{padding:8px 18px;background:linear-gradient(135deg,#b06bff,#8a4aee);border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;}
-.add-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(176,107,255,.3);}
+.conn-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.4px;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.08);color:#4a6a7a;}
+.conn-status.ok{color:#00e896;border-color:rgba(0,232,150,.3);}
+.conn-status.err{color:#ff6b6b;border-color:rgba(255,107,107,.3);}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
 
 /* CONTENT */
 .content{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px;}
@@ -85,15 +87,12 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .list-row{display:flex;align-items:center;gap:9px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.03);transition:background .15s;}
 .list-row:hover{background:rgba(255,255,255,.02);}
 .list-row:last-child{border-bottom:none;}
+.list-row.live-row{background:rgba(0,232,150,.04);}
 
 /* BADGES */
 .badge{display:inline-flex;align-items:center;font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid;font-weight:700;letter-spacing:.4px;white-space:nowrap;}
 .badge-admin{color:#b06bff;border-color:rgba(176,107,255,.25);background:rgba(176,107,255,.08);}
-.badge-ops{color:#00c8ff;border-color:rgba(0,200,255,.25);background:rgba(0,200,255,.08);}
-.badge-viewer{color:#5a7a8a;border-color:rgba(90,122,138,.2);background:rgba(90,122,138,.05);}
-.badge-active{color:#00e896;border-color:rgba(0,232,150,.25);background:rgba(0,232,150,.08);}
-.badge-inactive{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.08);}
-.badge-pending{color:#ffb400;border-color:rgba(255,180,0,.25);background:rgba(255,180,0,.08);}
+.badge-live{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
 
 /* STATUS PILLS */
 .pill{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;border:1px solid;white-space:nowrap;}
@@ -123,21 +122,6 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 
 /* COLORS */
 .c-green{color:#00e896;} .c-red{color:#ff6b6b;} .c-amber{color:#ffb400;} .c-violet{color:#b06bff;} .c-blue{color:#00c8ff;}
-
-/* MODAL */
-.modal{background:#0d1525;border:1px solid rgba(176,107,255,.25);border-radius:14px;padding:26px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
-.modal-title{font-family:'Share Tech Mono',monospace;font-size:12px;color:#b06bff;letter-spacing:1.5px;margin-bottom:18px;}
-.form-group{margin-bottom:12px;}
-.form-label{font-size:12px;color:#5a7a8a;margin-bottom:5px;display:block;}
-.form-input{width:100%;padding:9px 13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
-.form-input:focus{border-color:rgba(176,107,255,.4);}
-.form-select{width:100%;padding:9px 13px;background:#0a1020;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;}
-.modal-actions{display:flex;gap:8px;margin-top:18px;}
-.mbtn{flex:1;padding:10px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
-.mbtn-primary{background:linear-gradient(135deg,#b06bff,#8a4aee);color:#fff;}
-.mbtn-primary:hover{box-shadow:0 4px 16px rgba(176,107,255,.3);}
-.mbtn-cancel{background:rgba(255,255,255,.05);color:#5a7a8a;}
-.mbtn-cancel:hover{color:#c8dde8;}
 
 /* STATUS BAR */
 .status-bar{padding:8px 22px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:24px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
@@ -214,6 +198,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
           <div class="ph-title">ADMIN PANEL</div>
           <div class="ph-sub">Live data · Pathankot · syncs every 5s</div>
         </div>
+        <span class="conn-status" id="connStatus"><span class="conn-dot"></span>Connecting to Firebase…</span>
       </div>
 
       <div class="content">
@@ -287,32 +272,10 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
         </div>
         <div class="sb-item">
           <div class="sb-lbl">BINS ONLINE</div>
-          <div class="sb-val c-green" id="sb-online">12 / 12</div>
+          <div class="sb-val c-green" id="sb-online">16 / 16</div>
         </div>
         <div class="sb-right">VER 4.2.0-STABLE</div>
       </div>
-    </div>
-  </div>
-</div>
-    <div class="form-group">
-      <label class="form-label">Full Name</label>
-      <input class="form-input" type="text" id="newName" placeholder="e.g. Ramesh Kumar"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Email Address</label>
-      <input class="form-input" type="email" id="newEmail" placeholder="user@pathankot.gov.in"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Role</label>
-      <select class="form-select" id="newRole">
-        <option value="VIEWER">Viewer</option>
-        <option value="OPS">Ops Lead</option>
-        <option value="ADMIN">Admin</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="mbtn mbtn-primary" onclick="addUser()">Create User</button>
     </div>
   </div>
 </div>
@@ -321,7 +284,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 
 <script>
 /* ============================================================
-   EXACT SAME DATA AS map.html — single source of truth
+   DEMO BINS — same data as map.html
    ============================================================ */
 const BINS = [
   {id:'BIN-001', name:'Pathankot Bus Stand',   area:'Bus Stand',       fill:88, type:'General',    lat:32.2748, lng:75.6520},
@@ -337,6 +300,18 @@ const BINS = [
   {id:'BIN-011', name:'Pathankot Fort Area',    area:'Fort',            fill:48, type:'Organic',    lat:32.2720, lng:75.6380},
   {id:'BIN-012', name:'Nurpur Road Junction',   area:'Nurpur Road',     fill:95, type:'General',    lat:32.2600, lng:75.6490},
 ];
+
+/* ============================================================
+   LIVE BINS — real ESP32 sensors via Firebase Realtime DB
+   ============================================================ */
+const FIREBASE_DB_URL = 'https://ecoroute-a871a-default-rtdb.firebaseio.com';
+const LIVE_BINS = [
+  {id:'B-01', name:'ESP32 Live Sensor 1', area:'Live Sensor', fill:0, type:'General',    lat:32.2770, lng:75.6510, isLive:true},
+  {id:'B-02', name:'ESP32 Live Sensor 2', area:'Live Sensor', fill:0, type:'Recyclable', lat:32.2700, lng:75.6600, isLive:true},
+  {id:'B-03', name:'ESP32 Live Sensor 3', area:'Live Sensor', fill:0, type:'Organic',    lat:32.2850, lng:75.6450, isLive:true},
+  {id:'B-04', name:'ESP32 Live Sensor 4', area:'Live Sensor', fill:0, type:'Hazardous',  lat:32.2650, lng:75.6350, isLive:true},
+];
+function allBins(){ return [...LIVE_BINS, ...BINS]; }
 
 /* SAME routes as map.html */
 const ROUTES = [
@@ -354,16 +329,49 @@ const TRUCKS = [
   {id:'TRK-004', driver:'Mandeep Bajwa',  route:'RT-04', status:'running', eta:'8m'},
 ];
 
-
-
 /* ============================================================
-   SAME fill simulation as map.html (5s interval)
+   SAME fill simulation as map.html (5s interval) — demo bins only
    ============================================================ */
 setInterval(()=>{
   BINS.forEach(b=>{ if(Math.random()>.7) b.fill = Math.min(100, b.fill+1); });
   renderBins();
   renderSummary();
 }, 5000);
+
+/* ============================================================
+   FIREBASE POLLING — live ESP32 bins
+   ============================================================ */
+function setConnStatus(state){
+  const el = document.getElementById('connStatus');
+  if(state==='ok'){
+    el.className = 'conn-status ok';
+    el.innerHTML = '<span class="conn-dot"></span>Firebase Connected';
+  } else if(state==='err'){
+    el.className = 'conn-status err';
+    el.innerHTML = '<span class="conn-dot" style="animation:none;"></span>Connection Error';
+  } else {
+    el.className = 'conn-status';
+    el.innerHTML = '<span class="conn-dot" style="animation:none;"></span>Connecting to Firebase…';
+  }
+}
+
+async function pollFirebase(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/bins.json`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json() || {};
+    LIVE_BINS.forEach(b=>{
+      const entry = data[b.id];
+      const val = entry && typeof entry.fillLevel === 'number' ? entry.fillLevel : null;
+      if(val !== null) b.fill = val;
+    });
+    setConnStatus('ok');
+    renderBins();
+    renderSummary();
+  } catch(err){
+    setConnStatus('err');
+  }
+}
 
 /* ============================================================
    HELPERS
@@ -385,27 +393,31 @@ function routeLabel(routeId){
    RENDER — SUMMARY STRIP
    ============================================================ */
 function renderSummary(){
-  const full = BINS.filter(b=>b.fill>=80).length;
-  const half = BINS.filter(b=>b.fill>=40&&b.fill<80).length;
+  const all = allBins();
+  const full = all.filter(b=>b.fill>=80).length;
+  const half = all.filter(b=>b.fill>=40&&b.fill<80).length;
   document.getElementById('kpi-full').textContent  = full;
   document.getElementById('kpi-half').textContent  = half;
   document.getElementById('kpi-stuck').textContent = TRUCKS.filter(t=>t.status==='stuck'||t.status==='idle').length;
-  document.getElementById('sb-online').textContent  = BINS.length+' / '+BINS.length;
+  document.getElementById('sb-online').textContent  = all.length+' / '+all.length;
 }
 
-
-
 /* ============================================================
-   RENDER — BINS (live fill from BINS[])
+   RENDER — BINS (live + demo)
    ============================================================ */
 function renderBins(){
-  /* Show only problematic bins: full or half — sorted worst first */
-  const problematic = BINS
-    .filter(b=>b.fill>=40)
-    .sort((a,b)=>b.fill-a.fill);
+  const all = allBins();
+  /* Show only problematic bins: full or half — sorted worst first, live bins pinned to top */
+  const problematic = all
+    .filter(b=>b.fill>=40 || b.isLive)
+    .sort((a,b)=>{
+      if(a.isLive && !b.isLive) return -1;
+      if(!a.isLive && b.isLive) return 1;
+      return b.fill-a.fill;
+    });
 
-  const fullCount = BINS.filter(b=>b.fill>=80).length;
-  const halfCount = BINS.filter(b=>b.fill>=40&&b.fill<80).length;
+  const fullCount = all.filter(b=>b.fill>=80).length;
+  const halfCount = all.filter(b=>b.fill>=40&&b.fill<80).length;
   document.getElementById('bin-sub').textContent =
     `${fullCount} full · ${halfCount} half · live`;
 
@@ -413,13 +425,12 @@ function renderBins(){
     ? problematic.map(b=>{
         const c = binColor(b.fill);
         const pClass = binPillClass(b.fill);
-        const pLabel = binPillLabel(b.fill);
-        /* which route covers this bin? */
+        const pLabel = b.isLive ? 'ESP32' : binPillLabel(b.fill);
         const route = ROUTES.find(r=>r.bins.includes(b.id));
         const routeDot = route
           ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${route.color};margin-right:4px;flex-shrink:0;"></span>`
           : '';
-        return `<div class="list-row">
+        return `<div class="list-row ${b.isLive?'live-row':''}">
           <div class="fill-bar-wrap" style="flex-shrink:0;">
             <div class="fill-bar" style="width:${b.fill}%;background:${c};"></div>
           </div>
@@ -428,7 +439,9 @@ function renderBins(){
             <div class="row-sub" style="display:flex;align-items:center;">${routeDot}${route?route.id+' · ':''} ${b.area}</div>
           </div>
           <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${c};margin-right:6px;">${b.fill}%</span>
-          <span class="pill ${pClass}">${pLabel}</span>
+          ${b.isLive
+            ? `<span class="badge badge-live">🔴 LIVE</span>`
+            : `<span class="pill ${pClass}">${pLabel}</span>`}
         </div>`;
       }).join('')
     : `<div class="list-row" style="justify-content:center;color:#3a5a6a;font-size:12px;">All bins under 40% ✓</div>`;
@@ -455,10 +468,6 @@ function renderTrucks(){
   }).join('');
 }
 
-
-
-
-
 /* ============================================================
    CLOCK
    ============================================================ */
@@ -472,7 +481,7 @@ function updateTime(){
 updateTime(); setInterval(updateTime,1000);
 
 /* ============================================================
-   TOAST (same as original)
+   TOAST
    ============================================================ */
 function toast(msg,type='info'){
   const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
@@ -489,6 +498,8 @@ function toast(msg,type='info'){
 renderBins();
 renderTrucks();
 renderSummary();
+pollFirebase();
+setInterval(pollFirebase, 3000);
 </script>
 </body>
 </html>

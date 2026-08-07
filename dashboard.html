@@ -38,6 +38,15 @@
     .bin-half  { border-color:rgba(255,196,0,.3); }
     .bin-empty { border-color:rgba(0,255,150,.2); }
     @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+
+    /* Live sensor styling */
+    .bin-live { border-color:rgba(0,255,150,.5) !important; box-shadow:0 0 24px rgba(0,255,150,.12); order:-1; }
+    .live-ribbon { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-head); font-size:10px; letter-spacing:.5px; color:var(--green); }
+    .live-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:livePulse 1.5s infinite; }
+    @keyframes livePulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .conn-status { font-family:var(--font-head); font-size:11px; letter-spacing:.4px; display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:20px; border:1px solid var(--border); color:var(--muted); }
+    .conn-status.ok { color:var(--green); border-color:rgba(0,255,150,.3); }
+    .conn-status.err { color:var(--red); border-color:rgba(255,61,90,.3); }
   </style>
 </head>
 <body>
@@ -73,6 +82,7 @@
         <p style="color:var(--muted);font-size:14px;margin-top:4px">Live telemetry · Auto-updates every 5s</p>
       </div>
       <div class="toolbar">
+        <span class="conn-status" id="connStatus"><span class="live-dot" style="animation:none;background:var(--muted)"></span> Connecting to Firebase…</span>
         <input class="search-input" id="searchInput" placeholder="🔍 Search bin ID or location…" oninput="filterBins()"/>
         <select class="filter-select" id="statusFilter" onchange="filterBins()">
           <option value="all">All Status</option>
@@ -107,6 +117,7 @@
 <div id="toast-container"></div>
 <script src="app.js"></script>
 <script>
+// ---------------- Static demo bins ----------------
 const BIN_DATA = [
   {id:'BIN-001',sector:'Sector A',fill:92,type:'General',batt:78,temp:28,last:'08:14 AM',lat:12.9,lng:77.6},
   {id:'BIN-002',sector:'Sector B',fill:45,type:'Recyclable',batt:91,temp:24,last:'07:50 AM',lat:12.9,lng:77.6},
@@ -122,6 +133,17 @@ const BIN_DATA = [
   {id:'BIN-012',sector:'Sector E',fill:22,type:'Hazardous',batt:100,temp:26,last:'05:00 AM',lat:12.9,lng:77.6},
 ];
 
+// ---------------- Live sensor bins (from Firebase / ESP32) ----------------
+const FIREBASE_DB_URL = 'https://ecoroute-a871a-default-rtdb.firebaseio.com';
+const liveBins = [
+  { id:'B-01', sector:'ESP32 Sensor · Live', fill:0, type:'General',    last:'—', isLive:true },
+  { id:'B-02', sector:'ESP32 Sensor · Live', fill:0, type:'Recyclable', last:'—', isLive:true },
+  { id:'B-03', sector:'ESP32 Sensor · Live', fill:0, type:'Organic',    last:'—', isLive:true },
+  { id:'B-04', sector:'ESP32 Sensor · Live', fill:0, type:'Hazardous',  last:'—', isLive:true },
+];
+
+function getAllBins(){ return [...liveBins, ...BIN_DATA]; }
+
 const typeEmoji = {General:'🗑️',Recyclable:'♻️',Organic:'🌿',Hazardous:'☢️'};
 
 function getStatus(fill){ return fill>=80?'full':fill>=40?'half':'empty'; }
@@ -132,21 +154,21 @@ function getLabel(fill){ return fill>=80?'● FULL':fill>=40?'● HALF':'● EMP
 function renderBins(data) {
   const grid = document.getElementById('binsGrid');
   grid.innerHTML = '';
-  let full=0, half=0, empty=0;
   data.forEach(b => {
     const st = getStatus(b.fill);
-    if(st==='full') full++; else if(st==='half') half++; else empty++;
     const pct = Math.min(b.fill,100);
     const col = getColor(pct);
     const card = document.createElement('div');
-    card.className = `card bin-card bin-${st} fade-up`;
+    card.className = `card bin-card bin-${st} ${b.isLive ? 'bin-live' : ''} fade-up`;
     card.innerHTML = `
       <div class="bin-card-header">
         <div>
           <div class="bin-id">${typeEmoji[b.type]} ${b.id}</div>
           <div class="bin-type">${b.type} · ${b.sector}</div>
         </div>
-        <span class="badge ${getBadge(pct)}">${getLabel(pct)}</span>
+        ${b.isLive
+          ? `<span class="live-ribbon"><span class="live-dot"></span> LIVE</span>`
+          : `<span class="badge ${getBadge(pct)}">${getLabel(pct)}</span>`}
       </div>
       <div class="fill-section">
         <div class="fill-row">
@@ -158,21 +180,24 @@ function renderBins(data) {
         </div>
       </div>
       <div class="bin-meta">
-        <div class="meta-item"><div class="mi-label">⚡ BATTERY</div><div class="mi-val">${b.batt}%</div></div>
-        <div class="meta-item"><div class="mi-label">🌡 TEMP</div><div class="mi-val">${b.temp}°C</div></div>
-        <div class="meta-item" style="grid-column:1/-1"><div class="mi-label">🕐 LAST COLLECTED</div><div class="mi-val">${b.last}</div></div>
+        ${b.isLive
+          ? `<div class="meta-item" style="grid-column:1/-1"><div class="mi-label">📡 SOURCE</div><div class="mi-val">Firebase Realtime DB</div></div>`
+          : `<div class="meta-item"><div class="mi-label">⚡ BATTERY</div><div class="mi-val">${b.batt}%</div></div>
+             <div class="meta-item"><div class="mi-label">🌡 TEMP</div><div class="mi-val">${b.temp}°C</div></div>`}
+        <div class="meta-item" style="grid-column:1/-1"><div class="mi-label">🕐 LAST UPDATE</div><div class="mi-val">${b.last}</div></div>
       </div>
       <div class="bin-footer">
         <span>${b.sector}</span>
-        ${pct>=80?`<button class="btn btn-danger btn-sm collect-chip" onclick="collectBin('${b.id}',this)">🚛 COLLECT NOW</button>`:'<span class="badge badge-green" style="font-size:10px">✓ OPERATIONAL</span>'}
+        ${pct>=80 && !b.isLive?`<button class="btn btn-danger btn-sm collect-chip" onclick="collectBin('${b.id}',this)">🚛 COLLECT NOW</button>`:'<span class="badge badge-green" style="font-size:10px">✓ OPERATIONAL</span>'}
       </div>`;
     grid.appendChild(card);
   });
-  // KPIs
-  document.getElementById('kTotal').textContent = BIN_DATA.length;
-  document.getElementById('kFull').textContent = BIN_DATA.filter(b=>getStatus(b.fill)==='full').length;
-  document.getElementById('kHalf').textContent = BIN_DATA.filter(b=>getStatus(b.fill)==='half').length;
-  document.getElementById('kEmpty').textContent = BIN_DATA.filter(b=>getStatus(b.fill)==='empty').length;
+  // KPIs (across all bins, live + demo)
+  const all = getAllBins();
+  document.getElementById('kTotal').textContent = all.length;
+  document.getElementById('kFull').textContent = all.filter(b=>getStatus(b.fill)==='full').length;
+  document.getElementById('kHalf').textContent = all.filter(b=>getStatus(b.fill)==='half').length;
+  document.getElementById('kEmpty').textContent = all.filter(b=>getStatus(b.fill)==='empty').length;
   // Trigger fade-up
   setTimeout(()=>{document.querySelectorAll('.fade-up').forEach(el=>el.classList.add('visible'));},50);
 }
@@ -181,7 +206,7 @@ function filterBins() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   const status = document.getElementById('statusFilter').value;
   const type = document.getElementById('typeFilter').value;
-  const filtered = BIN_DATA.filter(b => {
+  const filtered = getAllBins().filter(b => {
     const matchSearch = b.id.toLowerCase().includes(search) || b.sector.toLowerCase().includes(search);
     const matchStatus = status==='all' || getStatus(b.fill)===status;
     const matchType = type==='all' || b.type===type;
@@ -196,22 +221,69 @@ function collectBin(id, btn) {
   setTimeout(()=>{
     const bin = BIN_DATA.find(b=>b.id===id);
     if(bin){ bin.fill=Math.floor(Math.random()*15)+2; bin.last=new Date().toLocaleTimeString(); }
+    notifiedFull.delete(id);
     filterBins();
     showToast(`${id} collected successfully! ✓`, 'success');
   },3000);
 }
 
-// Real-time updates
+// Real-time updates for the static demo bins only
+const notifiedFull = new Set();
 function tickBins() {
   BIN_DATA.forEach(b => {
     b.fill = Math.min(100, b.fill + (Math.random()>.7 ? Math.floor(Math.random()*3)+1 : 0));
     b.temp = parseFloat((b.temp + (Math.random()-.5)*.5).toFixed(1));
-    if(b.fill>=95) showToast(`🚨 ${b.id} overflow risk! Immediate collection needed!`,'error');
+    if(b.fill>=95){
+      if(!notifiedFull.has(b.id)){
+        showToast(`🚨 ${b.id} overflow risk! Immediate collection needed!`,'error');
+        notifiedFull.add(b.id);
+      }
+    } else {
+      notifiedFull.delete(b.id);
+    }
   });
   filterBins();
 }
 
-renderBins(BIN_DATA);
+// ---------------- Firebase polling for the real ESP32 sensor ----------------
+function setConnStatus(state){
+  const el = document.getElementById('connStatus');
+  if(state==='ok'){
+    el.className = 'conn-status ok';
+    el.innerHTML = '<span class="live-dot"></span> Firebase Connected';
+  } else if(state==='err'){
+    el.className = 'conn-status err';
+    el.innerHTML = '<span class="live-dot" style="animation:none;background:var(--red)"></span> Connection Error';
+  } else {
+    el.className = 'conn-status';
+    el.innerHTML = '<span class="live-dot" style="animation:none;background:var(--muted)"></span> Connecting to Firebase…';
+  }
+}
+
+async function pollFirebase(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/bins.json`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json() || {};
+    const now = new Date().toLocaleTimeString();
+    liveBins.forEach(b => {
+      const entry = data[b.id];
+      const val = entry && typeof entry.fillLevel === 'number' ? entry.fillLevel : null;
+      if(val !== null){
+        b.fill = val;
+        b.last = now;
+      }
+    });
+    setConnStatus('ok');
+    filterBins();
+  } catch(err){
+    setConnStatus('err');
+  }
+}
+
+renderBins(getAllBins());
+pollFirebase();
+setInterval(pollFirebase, 3000);
 setInterval(tickBins, 5000);
 </script>
 </body>
