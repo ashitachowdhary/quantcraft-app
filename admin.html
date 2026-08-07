@@ -228,6 +228,36 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
           </div>
         </div>
 
+        <!-- DRIVER NOTIFICATION COMPOSER -->
+        <div class="sec-card" style="flex-shrink:0;">
+          <div class="sec-head">
+            <div class="sec-icon si-red">📢</div>
+            <div class="sec-head-text">
+              <div class="sec-title st-red">NOTIFY DRIVERS</div>
+              <div class="sec-sub">Reaches truck panel in real time</div>
+            </div>
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;gap:8px;">
+              <select id="notifyTarget" style="flex:1;background:#0d1525;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:13px;padding:8px;">
+                <option value="ALL">All Trucks</option>
+                <option value="TRK-001">TRK-001 · Amarjit Singh</option>
+                <option value="TRK-002">TRK-002 · Gurpreet Kaur</option>
+                <option value="TRK-003">TRK-003 · Rajinder Pal</option>
+                <option value="TRK-004">TRK-004 · Mandeep Bajwa</option>
+              </select>
+              <select id="notifyPrio" style="background:#0d1525;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:13px;padding:8px;">
+                <option value="info">ℹ️ Info</option>
+                <option value="warn">⚠️ Warning</option>
+                <option value="alert">🚨 Alert</option>
+              </select>
+            </div>
+            <textarea id="notifyMsg" rows="2" placeholder="e.g. BIN-006 is 91% full — take Route RT-01 (Depot → BIN-003 → BIN-001 → BIN-006 → BIN-010)"
+              style="width:100%;resize:vertical;background:#0d1525;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:13px;padding:9px;"></textarea>
+            <button onclick="sendNotification()" style="align-self:flex-end;padding:8px 18px;background:linear-gradient(135deg,#ff6b6b,#e05050);border:none;border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Send to Drivers</button>
+          </div>
+        </div>
+
         <!-- TWO PANELS -->
         <div class="quad-grid" style="flex:1;min-height:0;">
 
@@ -319,6 +349,7 @@ const ROUTES = [
   {id:'RT-02', label:'East – Civil Lines', bins:['BIN-002','BIN-011','BIN-009','BIN-004'], color:'#00c8ff'},
   {id:'RT-03', label:'West – Mamun Rd',    bins:['BIN-005','BIN-008','BIN-003'],           color:'#ffaa40'},
   {id:'RT-04', label:'South – Chakki',     bins:['BIN-012','BIN-007','BIN-004'],           color:'#e86bff'},
+  {id:'RT-05', label:'Live Sensors',       bins:['B-01','B-02','B-03','B-04'],             color:'#00e896'},
 ];
 
 /* Trucks mapped 1-to-1 with routes */
@@ -442,6 +473,7 @@ function renderBins(){
           ${b.isLive
             ? `<span class="badge badge-live">🔴 LIVE</span>`
             : `<span class="pill ${pClass}">${pLabel}</span>`}
+          <button class="row-btn" title="Notify driver about this bin" onclick="quickNotify('${b.id}')" style="margin-left:6px;">🔔</button>
         </div>`;
       }).join('')
     : `<div class="list-row" style="justify-content:center;color:#3a5a6a;font-size:12px;">All bins under 40% ✓</div>`;
@@ -469,8 +501,57 @@ function renderTrucks(){
 }
 
 /* ============================================================
-   CLOCK
+   DRIVER NOTIFICATIONS — pushed to Firebase, read by truckpanel.html
    ============================================================ */
+async function sendNotification(){
+  const target = document.getElementById('notifyTarget').value;
+  const prio = document.getElementById('notifyPrio').value;
+  const msgEl = document.getElementById('notifyMsg');
+  const msg = msgEl.value.trim();
+  if(!msg){ toast('Write a message first','warning'); return; }
+
+  const id = 'n_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  const payload = { ts: Date.now(), target, prio, msg, read: [] };
+
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/notifications/${id}.json`, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('failed');
+    toast(`Notification sent to ${target === 'ALL' ? 'all drivers' : target}`, 'success');
+    msgEl.value = '';
+  } catch(err){
+    toast('Failed to send — check connection', 'error');
+  }
+}
+
+function quickNotify(binId){
+  const b = allBins().find(x=>x.id===binId);
+  if(!b) return;
+  const route = ROUTES.find(r=>r.bins.includes(binId));
+  const truck = route ? TRUCKS.find(t=>t.route===route.id) : null;
+
+  document.getElementById('notifyTarget').value = truck ? truck.id : 'ALL';
+  document.getElementById('notifyPrio').value = b.fill >= 80 ? 'alert' : b.fill >= 40 ? 'warn' : 'info';
+
+  let msg = `${b.id} (${b.name}) is ${b.fill}% full`;
+  if(route){
+    const stops = route.bins.map(id=>{
+      const rb = allBins().find(x=>x.id===id);
+      return rb ? rb.id : id;
+    }).join(' → ');
+    msg += ` — take Route ${route.id}: Depot → ${stops}`;
+  } else {
+    msg += ' — needs collection';
+  }
+  document.getElementById('notifyMsg').value = msg;
+  document.getElementById('notifyMsg').scrollIntoView({behavior:'smooth', block:'center'});
+  toast('Message pre-filled — review and Send', 'info');
+}
+
+
 function updateTime(){
   const n=new Date();
   document.getElementById('sb-time').textContent =
