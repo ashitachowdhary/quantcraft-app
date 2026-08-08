@@ -214,6 +214,10 @@
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><line x1="21" y1="21" x2="21" y2="21"/></svg>
         Live Scanner
       </a>
+      <a class="nav-item" href="reports.html">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+        Reports
+      </a>
       <a class="nav-item" href="reward.html">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
         Rewards
@@ -231,7 +235,7 @@
     </div>
 
     <div class="sidebar-mid">
-      <button class="gen-btn" onclick="showToast('Generating report…','info')">Generate Report</button>
+      <button class="gen-btn" onclick="location.href='reports.html'">Generate Report</button>
     </div>
 
     <div class="sidebar-footer">
@@ -256,6 +260,7 @@
         <a class="top-nav-item" href="map.html">Map</a>
         <a class="top-nav-item" href="truck.html">Trucks</a>
         <a class="top-nav-item" href="scan.html">Scanner</a>
+        <a class="top-nav-item" href="reports.html">Reports</a>
         <a class="top-nav-item" href="reward.html">Rewards</a>
         <a class="top-nav-item" href="admin.html">Admin</a>
         <div class="search-wrap">
@@ -369,6 +374,20 @@
               <div class="feat-desc">Upload a photo of any waste item and the AI instantly classifies it — Organic, Recyclable, Hazardous, or General. Powered by Teachable Machine for real-time identification.</div>
             </div>
             <span class="feat-link" style="color:#00e896;">OPEN SCANNER</span>
+          </a>
+
+          <a class="feat-card card-cyan" href="reports.html">
+            <div class="feat-header">
+              <div class="feat-icon" style="background:rgba(0,200,255,.1);">
+                <svg width="22" height="22" fill="none" stroke="#00c8ff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <span class="feat-arrow">↗</span>
+            </div>
+            <div>
+              <div class="feat-title">Environment Reports</div>
+              <div class="feat-desc">Community-submitted incident reports — illegal dumping, air and water pollution, hazardous spills — with photo evidence, status tracking, and CSV/HTML/PDF export.</div>
+            </div>
+            <span class="feat-link" style="color:#00c8ff;">VIEW REPORTS</span>
           </a>
 
           <a class="feat-card card-amber" href="reward.html">
