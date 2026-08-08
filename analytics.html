@@ -63,6 +63,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 .ph-sub{font-size:12px;color:#4a6a7a;margin-top:3px;}
 .dl-btn{display:flex;align-items:center;gap:8px;padding:9px 18px;background:transparent;border:1.5px solid #00e896;border-radius:8px;color:#00e896;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;}
 .dl-btn:hover{background:rgba(0,232,150,.1);}
+.dl-btn:disabled{opacity:.5;cursor:not-allowed;}
 .dl-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;}
 .conn-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.4px;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.08);color:#4a6a7a;margin-right:12px;}
 .conn-status.ok{color:#00e896;border-color:rgba(0,232,150,.3);}
@@ -264,7 +265,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
         </div>
         <div style="display:flex;align-items:center;">
           <span class="conn-status" id="connStatus"><span class="conn-dot"></span>Connecting…</span>
-          <button class="dl-btn" onclick="dlToast()">
+          <button class="dl-btn" id="dlBtn" onclick="downloadReport()">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Download Report
           </button>
@@ -657,7 +658,76 @@ function toast(msg,type='info'){
   setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),350);},2500);
 }
 
-function dlToast(){ toast('Preparing report…','info'); }
+// ===== WORKING DOWNLOAD REPORT =====
+function csvEscape(v){
+  const s = String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+
+function buildReportCSV(){
+  const now = new Date();
+  const stamp = now.toISOString().replace('T',' ').slice(0,19)+' UTC';
+  const bins = [...allBins()].sort((a,b)=>{
+    if(a.isLive && !b.isLive) return -1;
+    if(!a.isLive && b.isLive) return 1;
+    return b.fill-a.fill;
+  });
+  const routes = computeTrucks();
+
+  const lines = [];
+  lines.push('QuantCraft Mission Intelligence Report');
+  lines.push(`Generated,${stamp}`);
+  lines.push('Region,Pathankot Waste Operations');
+  lines.push('');
+
+  lines.push('KEY METRICS');
+  lines.push('Metric,Value');
+  lines.push(`Bins Emptied (visits),${document.getElementById('cv1').textContent}`);
+  lines.push(`Clean Areas (%),${document.getElementById('cv2').textContent}`);
+  lines.push(`Fuel Saved (litres),${document.getElementById('cv3').textContent}`);
+  lines.push(`Plastic Saved (kg),${document.getElementById('cv4').textContent}`);
+  lines.push('');
+
+  lines.push('BIN STATUS');
+  lines.push('Bin ID,Name,Type,Fill %,Status,Live Sensor');
+  bins.forEach(b=>{
+    const status = b.fill>=80?'FULL':b.fill>=40?'WARNING':'OK';
+    lines.push([b.id,b.name,b.type,b.fill,status,b.isLive?'YES':'NO'].map(csvEscape).join(','));
+  });
+  lines.push('');
+
+  lines.push('TRUCK DISPATCH SUMMARY');
+  lines.push('Truck ID,Stops,Distance (km),Fuel Saved (L)');
+  routes.forEach(r=>{
+    lines.push([r.truck.id, r.stops, r.km, r.saved].map(csvEscape).join(','));
+  });
+
+  return lines.join('\n');
+}
+
+function downloadReport(){
+  const btn = document.getElementById('dlBtn');
+  btn.disabled = true;
+  toast('Preparing report…','info');
+  try{
+    const csv = buildReportCSV();
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `quantcraft-report-${stamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    toast('Report downloaded ✅','success');
+  } catch(err){
+    toast('Report generation failed','error');
+  } finally {
+    setTimeout(()=>{ btn.disabled = false; }, 600);
+  }
+}
 
 renderDonut();
 renderBinTable();
