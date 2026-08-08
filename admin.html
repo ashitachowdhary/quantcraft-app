@@ -391,6 +391,7 @@ function logAuditEvent(binId, newFill, isLive){
   let event = null;
   if(prev >= 40 && newFill < 15){
     event = 'collected'; /* sharp drop = bin was emptied */
+    autoAlerted.delete(binId); /* bin was collected — future overflows can alert again */
   } else if(binStatusCat(newFill) !== binStatusCat(prev)){
     event = 'reading'; /* crossed OK/HALF/FULL boundary */
   }
@@ -402,6 +403,69 @@ function logAuditEvent(binId, newFill, isLive){
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ event, fillLevel:newFill, isLive: !!isLive, ts: Date.now() })
   }).catch(()=>{});
+
+  checkAutoAlert(binId, newFill);
+}
+
+/* ============================================================
+   BACKGROUND ALERT & ESCALATION PIPELINE (Bounty 3)
+   ============================================================ */
+const autoAlerted = new Set(); /* binIds we've already auto-alerted for, until collected */
+const sensorAlerted = new Set(); /* live binIds already flagged as non-reporting */
+const escalated = new Set(); /* notification ids we've already escalated once */
+
+function pushNotification(target, prio, msg, extra){
+  const id = 'n_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  return fetch(`${FIREBASE_DB_URL}/notifications/${id}.json`, {
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(Object.assign({ ts: Date.now(), target, prio, msg, read: [] }, extra||{}))
+  }).then(()=>id).catch(()=>null);
+}
+
+/* Auto-generate an alert the moment a bin crosses into overflow territory */
+function checkAutoAlert(binId, fill){
+  if(fill < 80) return;
+  if(autoAlerted.has(binId)) return; /* already alerted for this overflow episode */
+  autoAlerted.add(binId);
+
+  const route = ROUTES.find(r=>r.bins.includes(binId));
+  const truck = route ? TRUCKS.find(t=>t.route===route.id) : null;
+  const target = truck ? truck.id : 'ALL';
+  const prio = fill>=90 ? 'alert' : 'warn';
+  const routeInfo = route ? ` — take Route ${route.id}: Depot → ${route.bins.join(' → ')}` : '';
+
+  pushNotification(target, prio,
+    `🤖 AUTO-ALERT: ${binId} is ${fill}% full${routeInfo}`,
+    { auto:true }
+  );
+}
+
+/* Flag a live sensor bin that's never reported data (possible sensor failure) */
+function checkSensorHealth(binId, hasData){
+  if(hasData || sensorAlerted.has(binId)) return;
+  sensorAlerted.add(binId);
+  pushNotification('ALL', 'warn', `⚠️ SENSOR ALERT: ${binId} hasn't reported any data — check the hardware/connection`, { auto:true, sensorIssue:true });
+}
+
+/* Retry pipeline — resend any alert/warn notification that's still unread after 30s */
+async function checkEscalations(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/notifications.json`);
+    if(!res.ok) return;
+    const data = await res.json() || {};
+    const now = Date.now();
+    for(const [id, n] of Object.entries(data)){
+      if(escalated.has(id)) continue;
+      if(n.prio!=='warn' && n.prio!=='alert') continue;
+      const unread = !n.read || n.read.length===0;
+      if(unread && (now - n.ts) > 30000){
+        escalated.add(id);
+        const bumpedPrio = n.prio==='warn' ? 'alert' : 'alert';
+        pushNotification(n.target, bumpedPrio, `🔁 REMINDER: ${n.msg}`, { auto:true, retryOf:id });
+      }
+    }
+  } catch(err){}
 }
 
 async function pollAuditLog(){
@@ -469,6 +533,7 @@ setInterval(()=>{
 /* ============================================================
    FIREBASE POLLING — live ESP32 bins
    ============================================================ */
+let pollFirebaseCount = 0;
 function setConnStatus(state){
   const el = document.getElementById('connStatus');
   if(state==='ok'){
@@ -484,6 +549,7 @@ function setConnStatus(state){
 }
 
 async function pollFirebase(){
+  pollFirebaseCount++;
   try{
     const res = await fetch(`${FIREBASE_DB_URL}/bins.json`);
     if(!res.ok) throw new Error('bad response');
@@ -491,6 +557,7 @@ async function pollFirebase(){
     LIVE_BINS.forEach(b=>{
       const entry = data[b.id];
       const val = entry && typeof entry.fillLevel === 'number' ? entry.fillLevel : null;
+      if(pollFirebaseCount > 3) checkSensorHealth(b.id, val !== null);
       if(val !== null){
         logAuditEvent(b.id, val, true);
         b.fill = val;
@@ -683,6 +750,8 @@ pollFirebase();
 setInterval(pollFirebase, 3000);
 pollAuditLog();
 setInterval(pollAuditLog, 5000);
+checkEscalations();
+setInterval(checkEscalations, 15000);
 </script>
 </body>
 </html>
