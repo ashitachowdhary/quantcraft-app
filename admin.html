@@ -291,6 +291,19 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
           </div>
 
         </div>
+
+        <!-- TIMELINE / AUDIT LOG (Bounty 2) -->
+        <div class="sec-card" style="flex-shrink:0;max-height:260px;">
+          <div class="sec-head">
+            <div class="sec-icon si-violet">🕒</div>
+            <div class="sec-head-text">
+              <div class="sec-title st-violet">TIMELINE / AUDIT LOG</div>
+              <div class="sec-sub">Every fill reading, collection &amp; notification — append-only, never edited or deleted</div>
+            </div>
+            <button class="sec-action" onclick="pollAuditLog()">↻ Refresh</button>
+          </div>
+          <div class="sec-body" id="audit-list" style="max-height:200px;"></div>
+        </div>
       </div>
 
       <!-- STATUS BAR -->
@@ -364,10 +377,91 @@ const TRUCKS = [
 ];
 
 /* ============================================================
+   TIMELINE / AUDIT LOG (Bounty 2) — append-only history
+   ============================================================ */
+const lastKnownFill = {}; /* binId -> last fill % we saw, for detecting transitions */
+const binStatusCat = f => f>=80?'FULL':f>=40?'HALF':'OK';
+
+function logAuditEvent(binId, newFill, isLive){
+  const prev = lastKnownFill[binId];
+  lastKnownFill[binId] = newFill;
+  if(prev === undefined) return; /* skip the very first reading on page load */
+  if(newFill === prev) return;
+
+  let event = null;
+  if(prev >= 40 && newFill < 15){
+    event = 'collected'; /* sharp drop = bin was emptied */
+  } else if(binStatusCat(newFill) !== binStatusCat(prev)){
+    event = 'reading'; /* crossed OK/HALF/FULL boundary */
+  }
+  if(!event) return;
+
+  const id = 'a_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  fetch(`${FIREBASE_DB_URL}/auditlog/${binId}/${id}.json`, {
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ event, fillLevel:newFill, isLive: !!isLive, ts: Date.now() })
+  }).catch(()=>{});
+}
+
+async function pollAuditLog(){
+  try{
+    const [auditRes, notifRes] = await Promise.all([
+      fetch(`${FIREBASE_DB_URL}/auditlog.json`),
+      fetch(`${FIREBASE_DB_URL}/notifications.json`)
+    ]);
+    const auditData = await auditRes.json() || {};
+    const notifData = await notifRes.json() || {};
+
+    const entries = [];
+    Object.entries(auditData).forEach(([binId, events])=>{
+      Object.values(events || {}).forEach(e=>{
+        entries.push({
+          ts: e.ts,
+          icon: e.event==='collected' ? '🚛' : '📊',
+          text: e.event==='collected'
+            ? `${binId} was collected (fill dropped to ${e.fillLevel}%)`
+            : `${binId} reading crossed into ${binStatusCat(e.fillLevel)} (${e.fillLevel}%)`,
+          color: e.event==='collected' ? '#00e896' : '#00c8ff'
+        });
+      });
+    });
+    Object.values(notifData).forEach(n=>{
+      entries.push({
+        ts: n.ts,
+        icon: n.prio==='alert'?'🚨':n.prio==='warn'?'⚠️':'📢',
+        text: `Notification sent to ${n.target}: "${n.msg}"`,
+        color: n.prio==='alert'?'#ff6b6b':n.prio==='warn'?'#ffb400':'#b06bff'
+      });
+    });
+
+    entries.sort((a,b)=>b.ts-a.ts);
+    const top = entries.slice(0,30);
+
+    document.getElementById('audit-list').innerHTML = top.length
+      ? top.map(e=>`<div class="list-row">
+          <span style="font-size:14px;flex-shrink:0;">${e.icon}</span>
+          <div style="flex:1;min-width:0;">
+            <div class="row-main" style="color:${e.color};white-space:normal;">${e.text}</div>
+            <div class="row-sub">${new Date(e.ts).toLocaleString()}</div>
+          </div>
+        </div>`).join('')
+      : `<div class="list-row" style="justify-content:center;color:#3a5a6a;font-size:12px;">No events logged yet</div>`;
+  } catch(err){
+    document.getElementById('audit-list').innerHTML = `<div class="list-row" style="justify-content:center;color:#ff6b6b;font-size:12px;">Couldn't load audit log</div>`;
+  }
+}
+
+/* ============================================================
    SAME fill simulation as map.html (5s interval) — demo bins only
    ============================================================ */
 setInterval(()=>{
-  BINS.forEach(b=>{ if(Math.random()>.7) b.fill = Math.min(100, b.fill+1); });
+  BINS.forEach(b=>{
+    if(Math.random()>.7){
+      b.fill = Math.min(100, b.fill+1);
+      logAuditEvent(b.id, b.fill, false);
+    }
+  });
   renderBins();
   renderSummary();
 }, 5000);
@@ -397,7 +491,10 @@ async function pollFirebase(){
     LIVE_BINS.forEach(b=>{
       const entry = data[b.id];
       const val = entry && typeof entry.fillLevel === 'number' ? entry.fillLevel : null;
-      if(val !== null) b.fill = val;
+      if(val !== null){
+        logAuditEvent(b.id, val, true);
+        b.fill = val;
+      }
     });
     setConnStatus('ok');
     renderBins();
@@ -584,6 +681,8 @@ renderTrucks();
 renderSummary();
 pollFirebase();
 setInterval(pollFirebase, 3000);
+pollAuditLog();
+setInterval(pollAuditLog, 5000);
 </script>
 </body>
 </html>
