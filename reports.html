@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantCraft — Environment Reports</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { padding-top:64px; }
+  .page-header { background:rgba(0,255,150,.02); border-bottom:1px solid var(--border); padding:24px 0; }
+  .page-header-inner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+  .page-header h1 { font-size:24px; }
+  .toolbar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .search-input { background:rgba(0,255,150,.04); border:1px solid var(--border); border-radius:8px; padding:9px 16px; color:var(--white); font-family:var(--font-body); font-size:14px; outline:none; min-width:220px; }
+  .search-input:focus { border-color:var(--green); }
+  .filter-select { background:rgba(0,255,150,.04); border:1px solid var(--border); border-radius:8px; padding:9px 14px; color:var(--text); font-family:var(--font-body); font-size:14px; outline:none; cursor:pointer; }
+  .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin:24px 0; }
+  .kpi { padding:20px; }
+  .kpi .k-val { font-family:var(--font-head); font-size:28px; font-weight:900; color:var(--green); }
+  .kpi .k-lbl { font-size:12px; color:var(--muted); margin-top:4px; }
+
+  .reports-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:20px; }
+  .report-card { position:relative; overflow:hidden; cursor:pointer; }
+  .report-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:10px; }
+  .report-title { font-family:var(--font-head); font-size:14px; color:var(--white); line-height:1.4; }
+  .report-cat { font-size:12px; color:var(--muted); margin-top:4px; }
+  .report-desc { font-size:13px; color:var(--text); line-height:1.5; margin-bottom:14px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .report-meta { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,.05); font-size:12px; color:var(--muted); align-items:center; }
+  .attach-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.2); color:var(--cyan); padding:3px 9px; border-radius:20px; }
+  .attach-thumb { width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:12px; border:1px solid var(--border); }
+
+  .status-open { border-color:rgba(255,196,0,.3); }
+  .status-review { border-color:rgba(0,229,255,.3); }
+  .status-resolved { border-color:rgba(0,255,150,.3); }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:2000; display:none; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:28px; width:100%; max-width:560px; max-height:88vh; overflow-y:auto; }
+  .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .modal-close { background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer; }
+  .modal-close:hover { color:var(--red); }
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-family:var(--font-head); font-size:10px; letter-spacing:1px; color:var(--green); margin-bottom:6px; }
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  textarea.form-input { resize:vertical; min-height:70px; font-family:var(--font-body); }
+  .attach-tabs { display:flex; gap:8px; margin-bottom:10px; }
+  .attach-tab { flex:1; padding:8px; text-align:center; border-radius:7px; border:1px solid var(--border); background:rgba(255,255,255,.02); cursor:pointer; font-size:12px; color:var(--muted); transition:all .2s; }
+  .attach-tab.active { border-color:var(--green); color:var(--green); background:rgba(0,255,150,.06); }
+  .attach-pane { display:none; }
+  .attach-pane.active { display:block; }
+  .file-drop { border:1.5px dashed var(--border); border-radius:8px; padding:18px; text-align:center; cursor:pointer; transition:border-color .2s; }
+  .file-drop:hover { border-color:rgba(0,255,150,.4); }
+  .file-drop-preview { margin-top:10px; font-size:12px; color:var(--green); }
+  .file-drop-preview img { max-width:100%; max-height:120px; border-radius:6px; margin-top:8px; display:block; }
+
+  /* DETAIL VIEW */
+  .detail-attachment { margin-top:16px; }
+  .detail-attachment img { width:100%; border-radius:10px; border:1px solid var(--border); }
+  .detail-attachment a.file-link { display:flex; align-items:center; gap:10px; background:rgba(0,255,150,.05); border:1px solid var(--border); border-radius:8px; padding:12px 14px; color:var(--green); text-decoration:none; font-size:13px; }
+  .detail-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13px; }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-row span:first-child { color:var(--muted); }
+  .detail-row span:last-child { color:var(--white); text-align:right; }
+
+  .empty-msg { text-align:center; padding:60px 20px; color:var(--muted); grid-column:1/-1; }
+
+  /* ROLE-AWARE FILTER TABS */
+  .role-tabs-wrap { margin-bottom:18px; }
+  .role-tabs-label { font-family:var(--font-head); font-size:10px; letter-spacing:1.5px; color:var(--muted); margin-bottom:10px; }
+  .role-tabs { display:flex; gap:8px; flex-wrap:wrap; }
+  .role-tab { display:flex; align-items:center; gap:7px; padding:8px 16px; border-radius:20px; border:1px solid var(--border); background:rgba(255,255,255,.02); cursor:pointer; font-size:13px; font-weight:600; color:var(--muted); transition:all .2s; font-family:var(--font-body); }
+  .role-tab:hover { color:var(--text); border-color:rgba(255,255,255,.2); }
+  .role-tab.active { color:#050d18; background:var(--green); border-color:var(--green); box-shadow:var(--glow-sm); }
+  .role-tab .rt-count { font-family:var(--font-head); font-size:10px; background:rgba(255,255,255,.08); padding:1px 7px; border-radius:10px; }
+  .role-tab.active .rt-count { background:rgba(0,0,0,.2); }
+  .visible-count { font-size:12px; color:var(--muted); margin-bottom:14px; }
+  .visible-count strong { color:var(--green); }
+
+  @media(max-width:768px){ .kpi-row{grid-template-columns:repeat(2,1fr)} .field-row{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">QUANT<span>CRAFT</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="map.html">Map</a></li>
+    <li><a href="analytics.html">Analytics</a></li>
+    <li><a href="reports.html">Reports</a></li>
+    <li><a href="admin.html">Admin</a></li>
+  </ul>
+  <div class="nav-right" style="position:relative">
+    <button class="notif-btn" id="notif-btn">🔔<span class="notif-badge" id="notif-badge">3</span></button>
+    <div class="notif-dropdown" id="notif-dropdown"><div class="notif-head"><h4>ALERTS</h4></div><div id="notif-list"></div></div>
+    <a href="login.html" class="btn btn-ghost btn-sm">Logout</a>
+  </div>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="map.html">Map</a>
+  <a href="analytics.html">Analytics</a><a href="reports.html">Reports</a><a href="admin.html">Admin</a>
+</div>
+
+<div class="page-header">
+  <div class="container">
+    <div class="page-header-inner">
+      <div>
+        <h1>Environment <span class="neon">Reports</span></h1>
+        <p style="color:var(--muted);font-size:14px;margin-top:4px">Community-submitted environmental incidents · evidence attached · synced live</p>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="searchInput" placeholder="🔍 Search title or location…" oninput="renderReports()"/>
+        <select class="filter-select" id="catFilter" onchange="renderReports()">
+          <option value="all">All Categories</option>
+          <option>Illegal Dumping</option>
+          <option>Air Pollution</option>
+          <option>Water Contamination</option>
+          <option>Overflowing Bin</option>
+          <option>Hazardous Spill</option>
+          <option>Noise Pollution</option>
+          <option>Other</option>
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="renderReports()">
+          <option value="all">All Status</option>
+          <option>Open</option>
+          <option>In Review</option>
+          <option>Resolved</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openNewReportModal()">+ New Report</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container section" style="padding-top:24px">
+  <div class="kpi-row">
+    <div class="card kpi"><div class="k-val" id="kTotal">0</div><div class="k-lbl">Total Reports</div></div>
+    <div class="card kpi"><div class="k-val" id="kOpen" style="color:var(--yellow)">0</div><div class="k-lbl">Open</div></div>
+    <div class="card kpi"><div class="k-val" id="kReview" style="color:var(--cyan)">0</div><div class="k-lbl">In Review</div></div>
+    <div class="card kpi"><div class="k-val" id="kResolved">0</div><div class="k-lbl">Resolved</div></div>
+  </div>
+
+  <div class="role-tabs-wrap">
+    <div class="role-tabs-label">VIEWING AS</div>
+    <div class="role-tabs" id="roleTabs"></div>
+  </div>
+
+  <div class="visible-count" id="visibleCount"></div>
+  <div class="reports-grid" id="reportsGrid"></div>
+</div>
+
+<!-- NEW REPORT MODAL -->
+<div class="modal-overlay" id="newModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>New Environment Report</h3>
+      <button class="modal-close" onclick="closeNewReportModal()">×</button>
+    </div>
+
+    <div class="field">
+      <label>TITLE</label>
+      <input class="form-input" id="f-title" placeholder="e.g. Overflowing bin near Bus Stand"/>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>CATEGORY</label>
+        <select class="form-input" id="f-cat">
+          <option>Illegal Dumping</option>
+          <option>Air Pollution</option>
+          <option>Water Contamination</option>
+          <option>Overflowing Bin</option>
+          <option>Hazardous Spill</option>
+          <option>Noise Pollution</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>LOCATION / AREA</label>
+        <input class="form-input" id="f-location" placeholder="e.g. Civil Lines"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>DESCRIPTION</label>
+      <textarea class="form-input" id="f-desc" placeholder="What did you observe?"></textarea>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>REPORTED BY</label>
+        <input class="form-input" id="f-name" placeholder="Your name"/>
+      </div>
+      <div class="field">
+        <label>ROLE</label>
+        <select class="form-input" id="f-role">
+          <option>Citizen</option>
+          <option>Admin</option>
+          <option>Authority</option>
+          <option>Hospital</option>
+          <option>Investigator</option>
+          <option>Reviewer</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>EVIDENCE / ATTACHMENT</label>
+      <div class="attach-tabs">
+        <div class="attach-tab active" id="tabUpload" onclick="switchAttachTab('upload')">📎 Upload File</div>
+        <div class="attach-tab" id="tabLink" onclick="switchAttachTab('link')">🔗 Add Link</div>
+      </div>
+      <div class="attach-pane active" id="paneUpload">
+        <div class="file-drop" onclick="document.getElementById('fileInput').click()">
+          <div style="font-size:13px;color:var(--muted)">Click to choose a photo or file (max 800KB)</div>
+          <input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(this)"/>
+          <div class="file-drop-preview" id="filePreview"></div>
+        </div>
+      </div>
+      <div class="attach-pane" id="paneLink">
+        <input class="form-input" id="f-link" placeholder="https://… link to photo/video/document"/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>RECOMMENDATIONS (optional)</label>
+      <input class="form-input" id="f-rec" placeholder="Suggested action"/>
+    </div>
+    <div class="field">
+      <label>NOTES (optional)</label>
+      <input class="form-input" id="f-notes" placeholder="Any other notes"/>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeNewReportModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitReport()">Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal" id="detailModalBody"></div>
+</div>
+
+<div id="toast-container"></div>
+<script src="app.js"></script>
+<script>
+const FIREBASE_DB_URL = 'https://ecoroute-a871a-default-rtdb.firebaseio.com';
+let REPORTS = {};
+let pendingAttachment = null; // {type:'upload', mime, name, data} or {type:'link', url}
+
+/* ---------- ROLE-AWARE RELEVANCE ---------- */
+// Which report records are relevant to which role. null = no restriction (sees everything).
+const ROLES = ['All','Citizen','Admin','Authority','Hospital','Investigator','Reviewer'];
+const ROLE_RELEVANCE = {
+  All:          null,
+  Citizen:      null, // public transparency — citizens can see every report
+  Admin:        null, // full visibility
+  Authority:    { statuses:   ['Open','In Review'] },                              // action-needed only
+  Hospital:     { categories: ['Air Pollution','Water Contamination','Hazardous Spill'] }, // public-health relevant
+  Investigator: { categories: ['Illegal Dumping','Hazardous Spill'] },             // enforcement relevant
+  Reviewer:     { statuses:   ['Resolved'] },                                      // audit / QA
+};
+let currentRole = 'All';
+
+function matchesRole(r, role){
+  const rule = ROLE_RELEVANCE[role];
+  if(!rule) return true;
+  if(rule.categories && !rule.categories.includes(r.category)) return false;
+  if(rule.statuses && !rule.statuses.includes(r.status)) return false;
+  return true;
+}
+
+function renderRoleTabs(){
+  const wrap = document.getElementById('roleTabs');
+  wrap.innerHTML = ROLES.map(role=>{
+    const count = Object.values(REPORTS).filter(r=>matchesRole(r,role)).length;
+    return `<button class="role-tab ${role===currentRole?'active':''}" onclick="selectRole('${role}')">
+      ${role} <span class="rt-count">${count}</span>
+    </button>`;
+  }).join('');
+}
+
+function selectRole(role){
+  currentRole = role;
+  renderRoleTabs();
+  renderReports();
+}
+
+/* ---------- SEED (only used if Firebase has nothing yet) ---------- */
+const SEED_SVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="300">
+  <rect width="480" height="300" fill="#0d1525"/>
+  <rect x="0" y="220" width="480" height="80" fill="#142018"/>
+  <circle cx="90" cy="140" r="34" fill="#ffaa40" opacity=".8"/>
+  <rect x="150" y="120" width="26" height="50" fill="#8b5a2b"/>
+  <rect x="190" y="140" width="20" height="30" fill="#8b5a2b"/>
+  <rect x="220" y="110" width="30" height="60" fill="#5a3a1a"/>
+  <text x="240" y="270" font-family="monospace" font-size="13" fill="#ff6b6b" text-anchor="middle">EVIDENCE PHOTO — SAMPLE</text>
+</svg>`);
+
+function seedIfEmpty(){
+  return fetch(`${FIREBASE_DB_URL}/envreports.json`)
+    .then(r=>r.json())
+    .then(data=>{
+      if(data && Object.keys(data).length) return;
+      const now = Date.now();
+      const seeds = [
+        {
+          title: 'Illegal dumping behind Chakki Bank',
+          category: 'Illegal Dumping', location: 'Chakki Bank',
+          description: 'Construction debris and mixed household waste dumped along the riverbank, blocking the drainage channel.',
+          reportedBy: 'Amarjit Singh', role: 'Citizen', status: 'Open',
+          recommendations: 'Dispatch a collection truck and place a signboard prohibiting dumping.',
+          notes: 'Reported after repeated occurrences over 2 weeks.',
+          attachment: { type:'upload', mime:'image/svg+xml', name:'evidence.svg', data:SEED_SVG },
+          ts: now
+        },
+        {
+          title: 'Smoke haze near Mirthal Chowk',
+          category: 'Air Pollution', location: 'Mirthal',
+          description: 'Thick smoke from open burning of waste, affecting nearby residents and a primary school.',
+          reportedBy: 'Dr. Neha Sharma', role: 'Hospital', status: 'In Review',
+          recommendations: 'Health advisory for the area; enforcement visit to identify the burning source.',
+          notes: 'Two respiratory-complaint cases logged at the nearest clinic this week.',
+          attachment: { type:'link', url:'https://example.com/reports/mirthal-smoke.jpg' },
+          ts: now - 3600000
+        },
+        {
+          title: 'Leaking drum near Dunera Chowk',
+          category: 'Hazardous Spill', location: 'Dunera',
+          description: 'An unmarked chemical drum found leaking near a storm drain; contents unknown.',
+          reportedBy: 'Investigator Rao', role: 'Investigator', status: 'Resolved',
+          recommendations: 'Drum was safely removed by the hazardous-waste contractor; site tested clean.',
+          notes: 'Closed after follow-up site visit — no further contamination detected.',
+          attachment: null,
+          ts: now - 7200000
+        }
+      ];
+      return Promise.all(seeds.map((seed,i)=>
+        fetch(`${FIREBASE_DB_URL}/envreports/r_${now}_${i}.json`, {
+          method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(seed)
+        })
+      ));
+    }).catch(()=>{});
+}
+
+/* ---------- LOAD ---------- */
+async function loadReports(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/envreports.json`);
+    const data = await res.json() || {};
+    REPORTS = data;
+    renderRoleTabs();
+    renderReports();
+  }catch(err){
+    showToast('Could not load reports — check connection','error');
+  }
+}
+
+/* ---------- RENDER ---------- */
+function renderReports(){
+  const search = (document.getElementById('searchInput').value||'').toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const status = document.getElementById('statusFilter').value;
+
+  const list = Object.entries(REPORTS)
+    .map(([id,r])=>({id,...r}))
+    .filter(r=>{
+      const matchSearch = !search || (r.title||'').toLowerCase().includes(search) || (r.location||'').toLowerCase().includes(search);
+      const matchCat = cat==='all' || r.category===cat;
+      const matchStatus = status==='all' || r.status===status;
+      const matchRole = matchesRole(r, currentRole);
+      return matchSearch && matchCat && matchStatus && matchRole;
+    })
+    .sort((a,b)=>(b.ts||0)-(a.ts||0));
+
+  const totalForRole = Object.values(REPORTS).filter(r=>matchesRole(r,currentRole)).length;
+  document.getElementById('visibleCount').innerHTML =
+    `Showing <strong>${list.length}</strong> of <strong>${totalForRole}</strong> reports relevant to <strong>${currentRole}</strong>${(search||cat!=='all'||status!=='all')?' (plus your search/filters)':''}`;
+
+  document.getElementById('kTotal').textContent = Object.keys(REPORTS).length;
+  document.getElementById('kOpen').textContent = Object.values(REPORTS).filter(r=>r.status==='Open').length;
+  document.getElementById('kReview').textContent = Object.values(REPORTS).filter(r=>r.status==='In Review').length;
+  document.getElementById('kResolved').textContent = Object.values(REPORTS).filter(r=>r.status==='Resolved').length;
+
+  const grid = document.getElementById('reportsGrid');
+  if(!list.length){ grid.innerHTML = '<div class="empty-msg">No reports match your filters.</div>'; return; }
+
+  grid.innerHTML = list.map(r=>{
+    const statusCls = r.status==='Open'?'status-open':r.status==='In Review'?'status-review':'status-resolved';
+    const statusBadge = r.status==='Open'?'badge-yellow':r.status==='In Review'?'badge-cyan':'badge-green';
+    const thumb = (r.attachment && r.attachment.type==='upload' && r.attachment.mime && r.attachment.mime.startsWith('image/'))
+      ? `<img class="attach-thumb" src="${r.attachment.data}" alt="evidence"/>` : '';
+    const attachChip = r.attachment
+      ? `<span class="attach-chip">📎 ${r.attachment.type==='link'?'Linked evidence':'Attachment'}</span>`
+      : '';
+    return `<div class="card report-card ${statusCls}" onclick="openDetail('${r.id}')">
+      <div class="report-card-header">
+        <div>
+          <div class="report-title">${escapeHtml(r.title)}</div>
+          <div class="report-cat">${r.category} · ${r.location||'—'}</div>
+        </div>
+        <span class="badge ${statusBadge}">${r.status}</span>
+      </div>
+      ${thumb}
+      <div class="report-desc">${escapeHtml(r.description||'')}</div>
+      <div class="report-meta">
+        <span>${r.reportedBy||'Anonymous'} · ${r.role||''}</span>
+        ${attachChip}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+
+/* ---------- NEW REPORT MODAL ---------- */
+function openNewReportModal(){
+  document.getElementById('newModal').classList.add('open');
+}
+function closeNewReportModal(){
+  document.getElementById('newModal').classList.remove('open');
+  ['f-title','f-location','f-desc','f-name','f-link','f-rec','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('filePreview').innerHTML='';
+  pendingAttachment = null;
+  switchAttachTab('upload');
+}
+
+function switchAttachTab(tab){
+  document.getElementById('tabUpload').classList.toggle('active', tab==='upload');
+  document.getElementById('tabLink').classList.toggle('active', tab==='link');
+  document.getElementById('paneUpload').classList.toggle('active', tab==='upload');
+  document.getElementById('paneLink').classList.toggle('active', tab==='link');
+}
+
+function handleFileSelect(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 800*1024){
+    showToast('File too large — please keep it under 800KB or use a link instead','warning');
+    input.value=''; return;
+  }
+  const reader = new FileReader();
+  reader.onload = e=>{
+    pendingAttachment = { type:'upload', mime:file.type||'application/octet-stream', name:file.name, data:e.target.result };
+    const preview = document.getElementById('filePreview');
+    if((file.type||'').startsWith('image/')){
+      preview.innerHTML = `✓ ${file.name}<img src="${e.target.result}"/>`;
+    } else {
+      preview.innerHTML = `✓ ${file.name} attached`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitReport(){
+  const title = document.getElementById('f-title').value.trim();
+  if(!title){ showToast('Please add a title','warning'); return; }
+
+  const linkVal = document.getElementById('f-link').value.trim();
+  let attachment = null;
+  if(document.getElementById('paneUpload').classList.contains('active') && pendingAttachment){
+    attachment = pendingAttachment;
+  } else if(document.getElementById('paneLink').classList.contains('active') && linkVal){
+    attachment = { type:'link', url: linkVal };
+  }
+
+  const report = {
+    title,
+    category: document.getElementById('f-cat').value,
+    location: document.getElementById('f-location').value.trim(),
+    description: document.getElementById('f-desc').value.trim(),
+    reportedBy: document.getElementById('f-name').value.trim() || 'Anonymous',
+    role: document.getElementById('f-role').value,
+    status: 'Open',
+    recommendations: document.getElementById('f-rec').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    attachment,
+    ts: Date.now()
+  };
+
+  const id = 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  fetch(`${FIREBASE_DB_URL}/envreports/${id}.json`, {
+    method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(report)
+  }).then(res=>{
+    if(!res.ok) throw new Error('save failed');
+    REPORTS[id] = report;
+    renderRoleTabs();
+    renderReports();
+    closeNewReportModal();
+    showToast('Report submitted' + (attachment ? ' with evidence attached' : ''), 'success');
+  }).catch(()=>{
+    showToast('Could not save report — check connection','error');
+  });
+}
+
+/* ---------- DETAIL VIEW ---------- */
+function openDetail(id){
+  const r = REPORTS[id];
+  if(!r) return;
+  let attachHtml = '';
+  if(r.attachment){
+    if(r.attachment.type==='upload' && (r.attachment.mime||'').startsWith('image/')){
+      attachHtml = `<div class="detail-attachment"><img src="${r.attachment.data}" alt="evidence"/></div>`;
+    } else if(r.attachment.type==='upload'){
+      attachHtml = `<div class="detail-attachment"><a class="file-link" href="${r.attachment.data}" download="${r.attachment.name}">📎 ${r.attachment.name} — click to download</a></div>`;
+    } else if(r.attachment.type==='link'){
+      const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(r.attachment.url);
+      attachHtml = isImg
+        ? `<div class="detail-attachment"><img src="${r.attachment.url}" alt="evidence"/></div>`
+        : `<div class="detail-attachment"><a class="file-link" href="${r.attachment.url}" target="_blank" rel="noopener">🔗 ${r.attachment.url}</a></div>`;
+    }
+  } else {
+    attachHtml = `<div class="detail-attachment"><div style="font-size:13px;color:var(--muted)">No evidence attached to this report.</div></div>`;
+  }
+
+  document.getElementById('detailModalBody').innerHTML = `
+    <div class="modal-header">
+      <h3>${escapeHtml(r.title)}</h3>
+      <button class="modal-close" onclick="closeDetail()">×</button>
+    </div>
+    <div class="detail-row"><span>Category</span><span>${r.category}</span></div>
+    <div class="detail-row"><span>Location</span><span>${r.location||'—'}</span></div>
+    <div class="detail-row"><span>Status</span><span>${r.status}</span></div>
+    <div class="detail-row"><span>Reported By</span><span>${r.reportedBy} (${r.role})</span></div>
+    <div class="detail-row"><span>Description</span><span>${escapeHtml(r.description)||'—'}</span></div>
+    ${r.recommendations ? `<div class="detail-row"><span>Recommendations</span><span>${escapeHtml(r.recommendations)}</span></div>` : ''}
+    ${r.notes ? `<div class="detail-row"><span>Notes</span><span>${escapeHtml(r.notes)}</span></div>` : ''}
+    <div class="detail-row"><span>Submitted</span><span>${new Date(r.ts).toLocaleString()}</span></div>
+    ${attachHtml}
+  `;
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeDetail(){ document.getElementById('detailModal').classList.remove('open'); }
+
+/* ---------- INIT ---------- */
+seedIfEmpty().then(loadReports);
+setInterval(loadReports, 8000);
+</script>
+</body>
+</html>
