@@ -51,7 +51,6 @@ html,body{height:100%;background:#0f1923;font-family:'Rajdhani',sans-serif;color
 .ph-icon{color:#00e896;}
 .ph-left h2{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#eaf4ff;letter-spacing:.3px;}
 .ph-left p{font-size:13px;color:#5a7a8a;margin-top:3px;}
-.ph-text{}
 .log-btn-primary{padding:11px 24px;background:#00e896;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a1520;cursor:pointer;transition:all .2s;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
 .log-btn-primary:hover{background:#00ffaa;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,232,150,.25);}
 .log-btn-primary:active{transform:scale(.98);}
@@ -103,7 +102,6 @@ html,body{height:100%;background:#0f1923;font-family:'Rajdhani',sans-serif;color
 .ms-pts.active{color:#eaf4ff;}
 .ms-pts.locked{color:#3a5a6a;}
 
-/* MILESTONE NUMBERS BELOW */
 .milestone-nums{display:flex;padding:0;position:relative;}
 .mn-item{flex:1;text-align:center;font-size:13px;font-weight:700;color:#5a7a8a;}
 .mn-item.active{color:#eaf4ff;}
@@ -134,13 +132,36 @@ html,body{height:100%;background:#0f1923;font-family:'Rajdhani',sans-serif;color
 .ts-unlocked{background:rgba(0,232,150,.1);color:#00e896;}
 .ts-claim{background:#00e896;color:#0a1520;cursor:pointer;font-weight:700;border-radius:6px;padding:7px 14px;}
 
-/* HOW IT WORKS */
-.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-.how-card{background:#151f2e;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;display:flex;gap:16px;align-items:flex-start;}
-.how-icon{width:44px;height:44px;border-radius:10px;background:#1a2a3a;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.how-icon svg{width:20px;height:20px;stroke:#00e896;fill:none;stroke-width:1.8;}
-.how-title{font-size:14px;font-weight:700;color:#eaf4ff;margin-bottom:6px;}
-.how-desc{font-size:12px;color:#5a7a8a;line-height:1.6;}
+/* WASTE SORTING GUIDE (expanded How It Works) */
+.guide-intro{font-size:13px;color:#5a7a8a;margin-bottom:14px;line-height:1.6;max-width:720px;}
+.guide-intro strong{color:#00e896;}
+.guide-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.guide-card{background:#151f2e;border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:10px;border:1px solid;transition:transform .2s;}
+.guide-card:hover{transform:translateY(-2px);}
+.gc-general{border-color:rgba(140,140,180,.25);}
+.gc-recyclable{border-color:rgba(0,200,255,.25);}
+.gc-organic{border-color:rgba(255,170,64,.25);}
+.gc-hazardous{border-color:rgba(255,95,95,.25);}
+.guide-head{display:flex;align-items:center;gap:10px;}
+.guide-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.gi-general{background:rgba(140,140,180,.12);}
+.gi-recyclable{background:rgba(0,200,255,.12);}
+.gi-organic{background:rgba(255,170,64,.12);}
+.gi-hazardous{background:rgba(255,95,95,.12);}
+.guide-title{font-size:15px;font-weight:700;color:#eaf4ff;}
+.guide-pts{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;margin-top:2px;}
+.gp-general{color:#aab0d0;} .gp-recyclable{color:#00c8ff;} .gp-organic{color:#ffaa40;} .gp-hazardous{color:#ff6b6b;}
+.guide-desc{font-size:12px;color:#5a7a8a;line-height:1.5;}
+.guide-examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}
+.gx-chip{font-size:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:#8fa5b5;padding:4px 9px;border-radius:20px;white-space:nowrap;}
+.guide-bin{margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);font-size:11px;color:#4a6a7a;display:flex;align-items:center;gap:6px;}
+
+.guide-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.gstep-card{background:#151f2e;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px;display:flex;gap:14px;align-items:flex-start;position:relative;}
+.gstep-num{width:30px;height:30px;border-radius:9px;background:rgba(0,232,150,.12);border:1px solid rgba(0,232,150,.22);color:#00e896;font-family:'Share Tech Mono',monospace;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.gstep-title{font-size:14px;font-weight:700;color:#eaf4ff;margin-bottom:5px;}
+.gstep-desc{font-size:12px;color:#5a7a8a;line-height:1.6;}
+.gstep-pts{display:inline-block;margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#00e896;background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.15);padding:3px 9px;border-radius:20px;}
 
 /* ACTIVITY */
 .activity-list{display:flex;flex-direction:column;gap:8px;}
@@ -347,7 +368,6 @@ html,body{height:100%;background:#0f1923;font-family:'Rajdhani',sans-serif;color
               <div class="ms-pts locked" id="m1500-pts">1500 pts</div>
             </div>
           </div>
-          <!-- number row -->
           <div class="milestone-nums">
             <div class="mn-item active">0</div>
             <div class="mn-item" id="mn500">500 pts</div>
@@ -374,35 +394,112 @@ html,body{height:100%;background:#0f1923;font-family:'Rajdhani',sans-serif;color
           <div class="tiers-grid" id="tiersGrid"></div>
         </div>
 
-        <!-- HOW IT WORKS -->
+        <!-- ═══════════════ WASTE SORTING GUIDE (expanded) ═══════════════ -->
         <div>
-          <div class="section-title">HOW IT WORKS</div>
-          <div class="how-grid">
-            <div class="how-card">
-              <div class="how-icon">
-                <svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          <div class="section-title">♻️ WASTE SORTING GUIDE — HOW TO SEGREGATE &amp; EARN POINTS</div>
+          <p class="guide-intro">Every properly segregated drop at a QuantCraft smart bin earns <strong>+2 Green Points</strong>, no matter which category. The category only decides <strong>which bin</strong> it goes in — sort correctly and every drop counts toward your rewards below.</p>
+
+          <div class="guide-grid">
+            <!-- GENERAL -->
+            <div class="guide-card gc-general">
+              <div class="guide-head">
+                <div class="guide-icon gi-general">🗑️</div>
+                <div>
+                  <div class="guide-title">General</div>
+                  <div class="guide-pts gp-general">+2 PTS PER DROP</div>
+                </div>
               </div>
+              <div class="guide-desc">Dry waste that can't be recycled or composted — the leftover category after sorting everything else out.</div>
+              <div class="guide-examples">
+                <span class="gx-chip">Wrappers</span>
+                <span class="gx-chip">Diapers</span>
+                <span class="gx-chip">Broken ceramics</span>
+                <span class="gx-chip">Multilayer packets</span>
+              </div>
+              <div class="guide-bin">🪣 Drop in the <strong style="color:#c8dde8;margin-left:3px;">General&nbsp;bin</strong></div>
+            </div>
+
+            <!-- RECYCLABLE -->
+            <div class="guide-card gc-recyclable">
+              <div class="guide-head">
+                <div class="guide-icon gi-recyclable">♻️</div>
+                <div>
+                  <div class="guide-title">Recyclable</div>
+                  <div class="guide-pts gp-recyclable">+2 PTS PER DROP</div>
+                </div>
+              </div>
+              <div class="guide-desc">Clean, dry materials that can be reprocessed into new products — rinse containers before dropping.</div>
+              <div class="guide-examples">
+                <span class="gx-chip">Plastic bottles</span>
+                <span class="gx-chip">Paper &amp; cardboard</span>
+                <span class="gx-chip">Glass jars</span>
+                <span class="gx-chip">Metal cans</span>
+              </div>
+              <div class="guide-bin">🪣 Drop in the <strong style="color:#c8dde8;margin-left:3px;">Recyclable&nbsp;bin</strong></div>
+            </div>
+
+            <!-- ORGANIC -->
+            <div class="guide-card gc-organic">
+              <div class="guide-head">
+                <div class="guide-icon gi-organic">🌿</div>
+                <div>
+                  <div class="guide-title">Organic</div>
+                  <div class="guide-pts gp-organic">+2 PTS PER DROP</div>
+                </div>
+              </div>
+              <div class="guide-desc">Biodegradable food and garden waste that breaks down naturally and can be composted.</div>
+              <div class="guide-examples">
+                <span class="gx-chip">Fruit &amp; veg peels</span>
+                <span class="gx-chip">Leftover food</span>
+                <span class="gx-chip">Tea leaves</span>
+                <span class="gx-chip">Garden trimmings</span>
+              </div>
+              <div class="guide-bin">🪣 Drop in the <strong style="color:#c8dde8;margin-left:3px;">Organic&nbsp;bin</strong></div>
+            </div>
+
+            <!-- HAZARDOUS -->
+            <div class="guide-card gc-hazardous">
+              <div class="guide-head">
+                <div class="guide-icon gi-hazardous">⚠️</div>
+                <div>
+                  <div class="guide-title">Hazardous</div>
+                  <div class="guide-pts gp-hazardous">+2 PTS PER DROP</div>
+                </div>
+              </div>
+              <div class="guide-desc">Items that are dangerous, toxic, or need special handling — never mix these with regular waste.</div>
+              <div class="guide-examples">
+                <span class="gx-chip">Batteries</span>
+                <span class="gx-chip">Medicines</span>
+                <span class="gx-chip">Paint / chemicals</span>
+                <span class="gx-chip">Bulbs &amp; e-waste</span>
+              </div>
+              <div class="guide-bin">🪣 Drop in the <strong style="color:#c8dde8;margin-left:3px;">Hazardous&nbsp;bin</strong></div>
+            </div>
+          </div>
+
+          <!-- STEPS -->
+          <div class="guide-steps">
+            <div class="gstep-card">
+              <div class="gstep-num">1</div>
               <div>
-                <div class="how-title">Segregate Waste</div>
-                <div class="how-desc">Separate your waste into General, Recyclable, Organic, and Hazardous bins at home before disposal.</div>
+                <div class="gstep-title">Sort At Home</div>
+                <div class="gstep-desc">Keep separate bags/bins for General, Recyclable, Organic and Hazardous waste. Use the category cards above if unsure where something goes.</div>
               </div>
             </div>
-            <div class="how-card">
-              <div class="how-icon">
-                <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-              </div>
+            <div class="gstep-card">
+              <div class="gstep-num">2</div>
               <div>
-                <div class="how-title">Dispose at Bin</div>
-                <div class="how-desc">Drop segregated waste in the correct QuantCraft smart bin. Each proper disposal logs 2 Green Points automatically.</div>
+                <div class="gstep-title">Drop At The Right Bin</div>
+                <div class="gstep-desc">Find your nearest QuantCraft smart bin on the <a href="map.html" style="color:#00e896;text-decoration:none;">Live Map</a> and place each item in its matching bin.</div>
+                <span class="gstep-pts">Not sure what an item is? Use the Live Scanner →</span>
               </div>
             </div>
-            <div class="how-card">
-              <div class="how-icon">
-                <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-              </div>
+            <div class="gstep-card">
+              <div class="gstep-num">3</div>
               <div>
-                <div class="how-title">Redeem Rewards</div>
-                <div class="how-desc">Reach point milestones and claim real rewards — grocery discounts, bus passes, utility bill savings and more.</div>
+                <div class="gstep-title">Log It &amp; Earn</div>
+                <div class="gstep-desc">Tap "Log Proper Disposal" above, pick the category you used, and confirm — 2 Green Points land in your account instantly.</div>
+                <span class="gstep-pts">+2 pts · instant credit</span>
               </div>
             </div>
           </div>
@@ -443,6 +540,9 @@ html,body{height:100%;background:#0f1923;font-family:'Rajdhani',sans-serif;color
   <div class="modal">
     <div class="modal-title">Log Proper Disposal — +2 Green Points</div>
     <div class="modal-sub">Select the type of waste you are disposing properly and segregated:</div>
+    <div id="qrBinBanner" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.25);border-radius:10px;font-size:13px;color:#00e896;font-weight:600;">
+      📍 Scanned at <span id="qrBinLabel"></span>
+    </div>
     <div class="modal-bin-types">
       <div class="bin-type-btn" onclick="selectBin(this,'General')">
         <div class="btn-icon">🗑️</div>
@@ -484,6 +584,84 @@ let points = 0;
 let disposals = 0;
 let todayPts = 0;
 let selectedBinType = '';
+
+/* ========== QR SCAN DETECTION ========== */
+const FIREBASE_DB_URL = 'https://ecoroute-a871a-default-rtdb.firebaseio.com';
+const BIN_NAMES = {
+  'B-01':'ESP32 Live Sensor 1','B-02':'ESP32 Live Sensor 2','B-03':'ESP32 Live Sensor 3','B-04':'ESP32 Live Sensor 4',
+  'BIN-001':'Pathankot Bus Stand','BIN-002':'Railway Station','BIN-003':'Dalhousie Road Market','BIN-004':'Chakki Bank',
+  'BIN-005':'Mamun Road','BIN-006':'Civil Lines Market','BIN-007':'Shahpur Kandi Road','BIN-008':'Mirthal Chowk',
+  'BIN-009':'Sujanpur Road','BIN-010':'Dunera Chowk','BIN-011':'Pathankot Fort Area','BIN-012':'Nurpur Road Junction',
+};
+/* Known bin locations — same coordinates used across dashboard/map/truck pages */
+const BIN_COORDS = {
+  'B-01':{lat:32.2770,lng:75.6510}, 'B-02':{lat:32.2700,lng:75.6600},
+  'B-03':{lat:32.2850,lng:75.6450}, 'B-04':{lat:32.2650,lng:75.6350},
+  'BIN-001':{lat:32.2748,lng:75.6520}, 'BIN-002':{lat:32.2684,lng:75.6443},
+  'BIN-003':{lat:32.2810,lng:75.6478}, 'BIN-004':{lat:32.2612,lng:75.6571},
+  'BIN-005':{lat:32.2890,lng:75.6340}, 'BIN-006':{lat:32.2762,lng:75.6598},
+  'BIN-007':{lat:32.2530,lng:75.6420}, 'BIN-008':{lat:32.3050,lng:75.6250},
+  'BIN-009':{lat:32.2680,lng:75.6670}, 'BIN-010':{lat:32.2920,lng:75.6600},
+  'BIN-011':{lat:32.2720,lng:75.6380}, 'BIN-012':{lat:32.2600,lng:75.6490},
+};
+const GEO_RADIUS_METERS = 150; /* how close the phone must be to the bin */
+let geoStatus = 'idle'; /* idle | checking | verified | failed | denied | invalid */
+const scannedBinId = new URLSearchParams(window.location.search).get('bin');
+
+/* Haversine distance in meters */
+function distMeters(a,b){
+  const R=6371000, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
+  const x=Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+function runGeoValidation(){
+  if(!scannedBinId) return;
+  if(!BIN_COORDS[scannedBinId]){
+    geoStatus='invalid';
+    renderGeoStatus();
+    return;
+  }
+  geoStatus='checking';
+  renderGeoStatus();
+  if(!navigator.geolocation){
+    geoStatus='denied';
+    renderGeoStatus();
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const me={lat:pos.coords.latitude, lng:pos.coords.longitude};
+      const d=distMeters(me, BIN_COORDS[scannedBinId]);
+      geoStatus = d<=GEO_RADIUS_METERS ? 'verified' : 'failed';
+      renderGeoStatus();
+    },
+    err=>{ geoStatus='denied'; renderGeoStatus(); },
+    {enableHighAccuracy:true, timeout:8000}
+  );
+}
+
+function renderGeoStatus(){
+  const banner=document.getElementById('qrBinBanner');
+  const confirmBtn=document.querySelector('.modal-confirm');
+  if(!scannedBinId){ banner.style.display='none'; if(confirmBtn) confirmBtn.disabled=false; return; }
+
+  const binLabel = scannedBinId + (BIN_NAMES[scannedBinId] ? ' · '+BIN_NAMES[scannedBinId] : '');
+  const cfg={
+    invalid:  {bg:'rgba(255,107,107,.08)', border:'rgba(255,107,107,.3)', color:'#ff6b6b', html:`❌ Invalid bin code — <strong>${scannedBinId}</strong> doesn't exist. Report not saved.`},
+    checking: {bg:'rgba(0,200,255,.08)', border:'rgba(0,200,255,.25)', color:'#00c8ff', html:`📡 Verifying your location at <strong>${binLabel}</strong>…`},
+    verified: {bg:'rgba(0,232,150,.08)', border:'rgba(0,232,150,.25)', color:'#00e896', html:`✅ Location verified — <strong>${binLabel}</strong>`},
+    failed:   {bg:'rgba(255,107,107,.08)', border:'rgba(255,107,107,.3)', color:'#ff6b6b', html:`❌ You don't seem to be near <strong>${binLabel}</strong>. Move closer and rescan the QR — this report can't be logged from here.<br/><button onclick="runGeoValidation()" style="margin-top:8px;background:none;border:1px solid currentColor;color:inherit;padding:5px 12px;border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:12px;cursor:pointer;">↻ Recheck Location</button>`},
+    denied:   {bg:'rgba(255,180,0,.08)', border:'rgba(255,180,0,.3)', color:'#ffb400', html:`⚠️ Location permission needed to verify <strong>${binLabel}</strong> — allow location access and try again.<br/><button onclick="runGeoValidation()" style="margin-top:8px;background:none;border:1px solid currentColor;color:inherit;padding:5px 12px;border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:12px;cursor:pointer;">↻ Try Again</button>`},
+  }[geoStatus] || {};
+
+  banner.style.display='block';
+  banner.style.background=cfg.bg; banner.style.borderColor=cfg.border; banner.style.color=cfg.color;
+  banner.innerHTML = cfg.html || '';
+
+  if(confirmBtn) confirmBtn.disabled = geoStatus!=='verified';
+}
 
 const TIERS = [
   {pts:500,  svgPath:'<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>', name:'Grocery Discount',   desc:'10% off at partner grocery stores in Pathankot',          color:'#00e896', claimed:false},
@@ -587,6 +765,12 @@ function openModal(){
   selectedBinType = '';
   document.querySelectorAll('.bin-type-btn').forEach(b=>b.classList.remove('selected'));
   document.getElementById('logModal').style.display='flex';
+  if(scannedBinId){
+    geoStatus='idle';
+    runGeoValidation();
+  } else {
+    document.getElementById('qrBinBanner').style.display='none';
+  }
 }
 function closeModal(){ document.getElementById('logModal').style.display='none'; }
 
@@ -599,6 +783,10 @@ function selectBin(el, type){
 /* ========== CONFIRM DISPOSAL ========== */
 function confirmDisposal(){
   if(!selectedBinType){ toast('Please select a waste type first','warning'); return; }
+  if(scannedBinId && geoStatus!=='verified'){
+    toast('Location not verified yet — this report can\'t be saved','error');
+    return;
+  }
   closeModal();
 
   const prevPoints = points;
@@ -614,12 +802,27 @@ function confirmDisposal(){
   ACTIVITY_LOG.unshift({
     icon: iconMap[selectedBinType],
     iconClass: classMap[selectedBinType],
-    name: selectedBinType+' Waste',
-    detail: 'Disposed at Pathankot · Properly segregated',
+    name: selectedBinType+' Waste' + (scannedBinId ? ' · '+scannedBinId : ''),
+    detail: scannedBinId
+      ? `Scanned QR at ${scannedBinId}${BIN_NAMES[scannedBinId] ? ' ('+BIN_NAMES[scannedBinId]+')' : ''} · Properly segregated`
+      : 'Disposed at Pathankot · Properly segregated',
     pts: '+2',
     time: timeStr
   });
   if(ACTIVITY_LOG.length > 8) ACTIVITY_LOG.pop();
+
+  /* Log to Firebase for real bin-level tracking (QR-based waste tracking) */
+  const disposalId = 'd_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  fetch(`${FIREBASE_DB_URL}/disposals/${disposalId}.json`, {
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      binId: scannedBinId || 'MANUAL',
+      type: selectedBinType,
+      pts: 2,
+      ts: Date.now()
+    })
+  }).catch(()=>{});
 
   const hit = TIERS.find(t => !t.claimed && points >= t.pts && prevPoints < t.pts);
 
@@ -676,6 +879,9 @@ function toast(msg,type){
 /* ========== INIT ========== */
 renderTiers();
 renderActivity();
+if(scannedBinId){
+  setTimeout(()=>{ openModal(); toast('QR scanned — confirm your waste type to earn points', 'info'); }, 400);
+}
 </script>
 </body>
 </html>

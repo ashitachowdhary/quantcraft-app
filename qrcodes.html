@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantCraft — Bin QR Codes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;z-index:10;}
+.logo{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#00e896;letter-spacing:1px;text-decoration:none;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-link{font-size:13px;font-weight:600;color:#5a7a8a;text-decoration:none;padding:6px 12px;border-radius:7px;transition:all .2s;}
+.tb-link:hover{color:#c8dde8;background:rgba(255,255,255,.05);}
+.print-btn{padding:8px 18px;background:linear-gradient(135deg,#00e896,#00c87a);border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#080e1c;cursor:pointer;}
+
+.wrap{max-width:1100px;margin:0 auto;padding:24px 28px 60px;}
+.page-title{font-family:'Share Tech Mono',monospace;font-size:14px;color:#00e896;letter-spacing:2px;margin-bottom:6px;}
+.page-sub{font-size:13px;color:#4a6a7a;margin-bottom:22px;}
+
+.section-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a7a8a;letter-spacing:2px;margin:24px 0 12px;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07);}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;}
+.qr-card{background:#0d1525;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;text-align:center;}
+.qr-card.live{border-color:rgba(0,232,150,.35);box-shadow:0 0 20px rgba(0,232,150,.08);}
+.qr-box{background:#fff;border-radius:10px;padding:10px;display:inline-block;margin-bottom:10px;}
+.qr-id{font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;color:#eaf4ff;}
+.qr-name{font-size:11px;color:#5a7a8a;margin-top:3px;}
+.qr-live-tag{display:inline-block;margin-top:6px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#00e896;background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.25);padding:2px 8px;border-radius:20px;}
+.qr-url{font-size:9px;color:#2a4a5a;margin-top:6px;word-break:break-all;font-family:'Share Tech Mono',monospace;}
+
+@media print{
+  .topbar, .print-btn{display:none;}
+  body{background:#fff;color:#000;}
+  .qr-card{border:1px solid #ccc;break-inside:avoid;background:#fff;}
+  .qr-id, .qr-name, .qr-url{color:#000;}
+  .page-title,.page-sub,.section-label{color:#000;}
+  .section-label::after{background:#ccc;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="admin.html" class="logo">QuantCraft</a>
+  <div class="tb-right">
+    <a class="tb-link" href="admin.html">← Back to Admin</a>
+    <button class="print-btn" onclick="window.print()">🖨️ Print All QR Codes</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="page-title">BIN QR CODES</div>
+  <div class="page-sub">Each code opens the citizen Rewards page with the bin pre-selected — scan it after disposal to log the drop and earn points instantly.</div>
+
+  <div class="section-label">LIVE ESP32 SENSOR BINS</div>
+  <div class="grid" id="liveGrid"></div>
+
+  <div class="section-label">CITYWIDE BINS</div>
+  <div class="grid" id="demoGrid"></div>
+</div>
+
+<script>
+const LIVE_BINS = [
+  {id:'B-01', name:'ESP32 Live Sensor 1'},
+  {id:'B-02', name:'ESP32 Live Sensor 2'},
+  {id:'B-03', name:'ESP32 Live Sensor 3'},
+  {id:'B-04', name:'ESP32 Live Sensor 4'},
+];
+
+const DEMO_BINS = [
+  {id:'BIN-001', name:'Pathankot Bus Stand'},
+  {id:'BIN-002', name:'Railway Station'},
+  {id:'BIN-003', name:'Dalhousie Road Market'},
+  {id:'BIN-004', name:'Chakki Bank'},
+  {id:'BIN-005', name:'Mamun Road'},
+  {id:'BIN-006', name:'Civil Lines Market'},
+  {id:'BIN-007', name:'Shahpur Kandi Road'},
+  {id:'BIN-008', name:'Mirthal Chowk'},
+  {id:'BIN-009', name:'Sujanpur Road'},
+  {id:'BIN-010', name:'Dunera Chowk'},
+  {id:'BIN-011', name:'Pathankot Fort Area'},
+  {id:'BIN-012', name:'Nurpur Road Junction'},
+];
+
+/* Always point QR codes at the live deployed site, so they work when
+   scanned from a phone — regardless of whether this admin page itself
+   is opened via localhost, Live Server, or the live URL. */
+const DEPLOYED_BASE_URL = 'https://ecoroute-a871a.web.app/reward.html';
+
+function baseUrl(){
+  return DEPLOYED_BASE_URL;
+}
+
+function renderGrid(containerId, bins, isLive){
+  const container = document.getElementById(containerId);
+  bins.forEach(b=>{
+    const url = `${baseUrl()}?bin=${b.id}`;
+    const card = document.createElement('div');
+    card.className = 'qr-card' + (isLive ? ' live' : '');
+    card.innerHTML = `
+      <div class="qr-box" id="qr-${b.id}"></div>
+      <div class="qr-id">${b.id}</div>
+      <div class="qr-name">${b.name}</div>
+      ${isLive ? '<div class="qr-live-tag">🔴 LIVE SENSOR</div>' : ''}
+      <div class="qr-url">${url}</div>
+    `;
+    container.appendChild(card);
+    new QRCode(document.getElementById(`qr-${b.id}`), {
+      text: url,
+      width: 140,
+      height: 140,
+      colorDark: '#0a1020',
+      colorLight: '#ffffff',
+    });
+  });
+}
+
+renderGrid('liveGrid', LIVE_BINS, true);
+renderGrid('demoGrid', DEMO_BINS, false);
+</script>
+</body>
+</html>

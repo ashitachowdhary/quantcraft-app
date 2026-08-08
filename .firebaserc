@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "smart-waste-management-4d819"
-  }
+    "default": "ecoroute-a871a"
+  },
+  "targets": {},
+  "etags": {}
 }
