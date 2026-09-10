@@ -5,343 +5,371 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>QuantCraft — Admin</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;overflow:hidden;}
-.shell{display:flex;flex-direction:column;height:100vh;}
+html,body{height:100%;background:#0a0e18;font-family:'Rajdhani',sans-serif;color:#e5edf5;overflow:hidden;}
+.mono{font-family:'Share Tech Mono',monospace;}
 
-/* TOP NAV */
-.topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
-.logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;margin-right:20px;text-decoration:none;}
-.tnav{display:flex;align-items:flex-end;height:100%;}
-.tnav-item{padding:0 18px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:#4a6a7a;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;text-decoration:none;letter-spacing:.3px;}
-.tnav-item:hover{color:#c8dde8;}
-.tnav-item.active{color:#00e896;border-bottom-color:#00e896;}
-.tnav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
-.admin-badge{font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(176,107,255,.12);color:#b06bff;border:1px solid rgba(176,107,255,.25);padding:4px 10px;border-radius:5px;letter-spacing:1px;}
-.avatar{width:32px;height:32px;border-radius:50%;background:#1a2a3a;border:2px solid rgba(176,107,255,.3);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.shell{display:flex;height:100vh;}
 
-.body{display:flex;flex:1;overflow:hidden;}
+/* ===== SIDEBAR ===== */
+.sidebar{width:260px;flex-shrink:0;background:#0d121f;border-right:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;padding:20px 0;}
+.brand{display:flex;align-items:center;gap:10px;padding:0 20px 20px;}
+.brand-icon{width:34px;height:34px;border-radius:9px;background:rgba(0,232,150,.12);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#00e896;}
+.brand-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.brand-text{display:flex;flex-direction:column;gap:1px;}
+.brand-name{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:700;color:#f2f6fa;}
+.brand-dot{width:6px;height:6px;border-radius:50%;background:#00e896;box-shadow:0 0 6px #00e896;}
+.brand-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#4a5a6a;letter-spacing:1.5px;}
 
-/* SIDEBAR */
-.sidebar{width:230px;flex-shrink:0;background:#0d1525;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;padding:28px 0 0;}
-.sidebar-logo{padding:0 24px 28px;}
-.logo-name{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;}
-.logo-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:#2a5050;margin-top:3px;letter-spacing:2px;}
-.sidebar-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:2px;}
-.nav-item{display:flex;align-items:center;gap:14px;padding:12px 14px;cursor:pointer;transition:all .2s;font-size:15px;font-weight:600;color:#4a6a7a;border-left:3px solid transparent;border-radius:0 8px 8px 0;margin-right:8px;text-decoration:none;}
-.nav-item:hover{color:#eaf4ff;background:rgba(255,255,255,.04);}
-.nav-item.active{color:#00e896;background:rgba(0,232,150,.12);border-left-color:#00e896;}
-.nav-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
-.nav-badge{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(255,180,0,.15);color:#ffb400;border:1px solid rgba(255,180,0,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
-.nav-badge-violet{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(176,107,255,.15);color:#b06bff;border:1px solid rgba(176,107,255,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
-.sidebar-mid{padding:16px 12px;}
-.gen-btn{width:100%;padding:13px 16px;border-radius:10px;background:linear-gradient(135deg,#00e896,#00c87a);border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a1a10;letter-spacing:.3px;transition:all .2s;box-shadow:0 4px 18px rgba(0,232,150,.25);}
-.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,232,150,.35);}
-.sidebar-footer{padding:8px 12px 20px;display:flex;flex-direction:column;gap:2px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;}
-.footer-item{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;cursor:pointer;color:#3a5a6a;font-size:14px;font-weight:600;transition:all .2s;text-decoration:none;border:none;background:none;width:100%;text-align:left;font-family:'Rajdhani',sans-serif;}
-.footer-item:hover{color:#eaf4ff;background:rgba(255,255,255,.04);}
-.footer-item.red{color:#e05050;}
-.footer-item.red:hover{background:rgba(200,50,50,.07);}
-.footer-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.sidenav{flex:1;padding:6px 12px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.snav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;text-decoration:none;color:#8a97a8;font-size:14px;font-weight:600;transition:all .15s;}
+.snav-item:hover{color:#e5edf5;background:rgba(255,255,255,.03);}
+.snav-item.active{color:#eafff5;background:rgba(0,232,150,.12);}
+.snav-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
+.snav-item .lbl{flex:1;}
+.snav-badge{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;padding:2px 7px;border-radius:9px;letter-spacing:.4px;}
+.snav-badge.green{background:rgba(0,232,150,.15);color:#00e896;}
+.snav-badge.count{background:rgba(255,255,255,.06);color:#8a97a8;}
+.snav-item.active .snav-dot{width:6px;height:6px;border-radius:50%;background:#00e896;box-shadow:0 0 6px #00e896;}
 
-/* MAIN */
+.side-footer{padding:14px 20px 4px;border-top:1px solid rgba(255,255,255,.05);margin-top:8px;display:flex;flex-direction:column;gap:8px;}
+.sf-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;}
+.sf-lbl{color:#4a5a6a;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+.sf-val{color:#c8d4e0;font-weight:600;}
+.sf-val.green{color:#00e896;}
+.sf-dot{width:6px;height:6px;border-radius:50%;background:#b06bff;box-shadow:0 0 5px #b06bff;}
+.sf-divider{border-top:1px solid rgba(255,255,255,.05);margin:4px 0;}
+.sf-ver{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a4656;padding-top:6px;}
+
+/* ===== MAIN ===== */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.page-header{padding:12px 22px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
-.ph-title{font-family:'Share Tech Mono',monospace;font-size:13px;color:#b06bff;letter-spacing:2px;}
-.ph-sub{font-size:12px;color:#4a6a7a;margin-top:2px;}
-.conn-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.4px;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.08);color:#4a6a7a;}
-.conn-status.ok{color:#00e896;border-color:rgba(0,232,150,.3);}
-.conn-status.err{color:#ff6b6b;border-color:rgba(255,107,107,.3);}
-.conn-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 32px;flex-shrink:0;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.tb-title{font-size:19px;font-weight:700;color:#f2f6fa;letter-spacing:.3px;}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:#4a5a6a;}
+.tb-sub{font-size:13px;color:#5a6a7a;}
+.conn-pill{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:20px;background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.2);font-size:13px;color:#e5edf5;font-weight:600;}
+.conn-pill.err{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.2);}
+.conn-pill.pending{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
+.conn-pill-dot{width:7px;height:7px;border-radius:50%;background:#00e896;animation:pulse 1.6s infinite;}
+.conn-pill.err .conn-pill-dot{background:#ff6b6b;}
+.conn-pill.pending .conn-pill-dot{background:#5a6a7a;animation:none;}
 
-/* CONTENT */
-.content{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px;}
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:#080e1c;}
-::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
+.content{flex:1;overflow-y:auto;padding:0 32px 32px;display:flex;flex-direction:column;gap:16px;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#1e2736;border-radius:3px;}
 
-/* SUMMARY STRIP */
-.summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex-shrink:0;}
-.sum-card{background:#0d1525;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;}
-.sum-num{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;line-height:1;}
-.sum-lbl{font-size:10px;color:#3a5a6a;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+/* ===== KPI ROW ===== */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;flex-shrink:0;}
+.kpi-card{background:#10151f;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:18px 20px;}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.kpi-lbl{font-size:13px;color:#8a97a8;font-weight:600;}
+.kpi-icon{color:#4a5a6a;flex-shrink:0;}
+.kpi-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.kpi-num{font-size:34px;font-weight:700;color:#f2f6fa;line-height:1;margin-bottom:8px;}
+.kpi-status{font-size:13px;font-weight:600;}
+.kpi-status.red{color:#ff6b6b;}
+.kpi-status.amber{color:#ffb400;}
+.kpi-status.cyan{color:#00c8ff;}
+.kpi-status.green{color:#00e896;}
 
-/* DUAL GRID */
-.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+/* ===== SECTION CARDS ===== */
+.panel{background:#10151f;border:1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+.panel-head{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.05);}
+.panel-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;}
+.panel-head-text{flex:1;min-width:0;}
+.panel-title{font-size:15px;font-weight:700;color:#f2f6fa;}
+.panel-sub{font-size:12px;color:#5a6a7a;margin-top:2px;}
+.panel-action{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:#8a97a8;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:6px 12px;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.panel-action:hover{color:#e5edf5;border-color:rgba(255,255,255,.2);}
+.panel-body{flex:1;overflow-y:auto;min-height:0;}
 
-/* SECTION CARD */
-.sec-card{background:#0d1525;border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
-.sec-head{display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;}
-.sec-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
-.si-violet{background:rgba(176,107,255,.12);border:1px solid rgba(176,107,255,.18);}
-.si-amber{background:rgba(255,180,0,.10);border:1px solid rgba(255,180,0,.18);}
-.si-blue{background:rgba(0,200,255,.10);border:1px solid rgba(0,200,255,.18);}
-.si-red{background:rgba(255,107,107,.10);border:1px solid rgba(255,107,107,.18);}
-.sec-head-text{flex:1;}
-.sec-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;font-weight:700;}
-.st-violet{color:#b06bff;} .st-amber{color:#ffb400;} .st-blue{color:#00c8ff;} .st-red{color:#ff6b6b;}
-.sec-sub{font-size:10px;color:#3a5a6a;margin-top:1px;}
-.sec-action{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:#3a5a6a;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:3px 8px;cursor:pointer;transition:all .2s;white-space:nowrap;}
-.sec-action:hover{color:#c8dde8;border-color:rgba(255,255,255,.15);}
-.sec-body{flex:1;overflow-y:auto;min-height:0;}
+/* Notify Drivers */
+.notify-body{padding:20px 22px;display:flex;flex-direction:column;gap:12px;}
+.notify-row{display:flex;gap:10px;}
+.notify-select{flex:1;background:#0a0e18;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#e5edf5;font-family:'Rajdhani',sans-serif;font-size:14px;padding:11px 14px;}
+.notify-textarea{width:100%;resize:vertical;min-height:70px;background:#0a0e18;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#e5edf5;font-family:'Share Tech Mono',monospace;font-size:12px;padding:12px 14px;line-height:1.6;}
+.notify-textarea::placeholder{color:#3a4656;}
+.notify-send{align-self:flex-end;padding:11px 22px;background:#e5484d;border:none;border-radius:9px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
+.notify-send:hover{background:#f2545a;}
 
-/* SHARED ROW STYLE */
-.list-row{display:flex;align-items:center;gap:9px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.03);transition:background .15s;}
-.list-row:hover{background:rgba(255,255,255,.02);}
-.list-row:last-child{border-bottom:none;}
-.list-row.live-row{background:rgba(0,232,150,.04);}
+/* Two-column grid */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 
-/* BADGES */
-.badge{display:inline-flex;align-items:center;font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid;font-weight:700;letter-spacing:.4px;white-space:nowrap;}
-.badge-admin{color:#b06bff;border-color:rgba(176,107,255,.25);background:rgba(176,107,255,.08);}
+/* List rows */
+.row{display:flex;align-items:center;gap:10px;padding:12px 22px;border-bottom:1px solid rgba(255,255,255,.04);}
+.row:last-child{border-bottom:none;}
+.row:hover{background:rgba(255,255,255,.015);}
+.row-main{font-size:13px;font-weight:600;color:#e5edf5;}
+.row-sub{font-size:11px;color:#5a6a7a;margin-top:2px;}
+
+/* Request row (multiline for e-waste) */
+.req-row{padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);}
+.req-row:last-child{border-bottom:none;}
+.req-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.req-assign-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.req-select{flex:1;min-width:140px;background:#0a0e18;border:1px solid rgba(255,255,255,.08);border-radius:7px;color:#e5edf5;font-family:'Rajdhani',sans-serif;font-size:12px;padding:7px 10px;}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 9px;border-radius:20px;border:1px solid;font-weight:700;letter-spacing:.4px;white-space:nowrap;flex-shrink:0;}
+.badge-pending{color:#ffb400;border-color:rgba(255,180,0,.3);background:rgba(255,180,0,.1);}
+.badge-verified{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
+.badge-rejected{color:#ff6b6b;border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1);}
+.badge-assigned{color:#00c8ff;border-color:rgba(0,200,255,.3);background:rgba(0,200,255,.1);}
+.badge-completed{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
 .badge-live{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
 
-/* STATUS PILLS */
-.pill{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;border:1px solid;white-space:nowrap;}
-.pill-full{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.08);}
-.pill-half{color:#ffb400;border-color:rgba(255,180,0,.25);background:rgba(255,180,0,.08);}
-.pill-ok{color:#00e896;border-color:rgba(0,232,150,.25);background:rgba(0,232,150,.08);}
-.pill-offline{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.08);}
-.pill-noreport{color:#5a7a8a;border-color:rgba(90,122,138,.2);background:rgba(90,122,138,.05);}
-.pill-running{color:#00e896;border-color:rgba(0,232,150,.25);background:rgba(0,232,150,.08);}
-.pill-stuck{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.08);animation:blink 1.2s infinite;}
-.pill-idle{color:#ffb400;border-color:rgba(255,180,0,.25);background:rgba(255,180,0,.08);}
+.pill{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid;white-space:nowrap;flex-shrink:0;}
+.pill-full{color:#ff6b6b;border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1);}
+.pill-half{color:#ffb400;border-color:rgba(255,180,0,.3);background:rgba(255,180,0,.1);}
+.pill-ok{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
+.pill-running{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
+.pill-stuck{color:#ff6b6b;border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1);animation:pulse 1.2s infinite;}
+.pill-idle{color:#ffb400;border-color:rgba(255,180,0,.3);background:rgba(255,180,0,.1);}
 
-/* ROW ELEMENTS */
-.row-btn{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:#3a5a6a;cursor:pointer;background:none;border:none;transition:color .2s;flex-shrink:0;}
-.row-btn:hover{color:#b06bff;}
-.row-main{font-size:12px;font-weight:600;color:#c8dde8;}
-.row-sub{font-size:10px;color:#3a5a6a;margin-top:1px;}
-.fill-bar-wrap{width:52px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;flex-shrink:0;}
+/* Action buttons */
+.btn-approve{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid rgba(0,232,150,.3);background:rgba(0,232,150,.1);color:#00e896;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-approve:hover{background:rgba(0,232,150,.2);}
+.btn-reject{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid rgba(255,107,107,.3);background:rgba(255,107,107,.1);color:#ff6b6b;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-reject:hover{background:rgba(255,107,107,.2);}
+.btn-reset{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:#5a6a7a;background:none;border:none;cursor:pointer;transition:color .15s;}
+.btn-reset:hover{color:#8a97a8;}
+.btn-assign{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid rgba(0,200,255,.3);background:rgba(0,200,255,.1);color:#00c8ff;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-assign:hover{background:rgba(0,200,255,.2);}
+.btn-complete{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid rgba(0,232,150,.3);background:rgba(0,232,150,.1);color:#00e896;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-complete:hover{background:rgba(0,232,150,.2);}
+.notify-bell{background:none;border:none;color:#4a5a6a;cursor:pointer;font-size:14px;transition:color .15s;flex-shrink:0;}
+.notify-bell:hover{color:#8a97a8;}
+
+.fill-bar-wrap{width:50px;height:4px;background:rgba(255,255,255,.06);border-radius:2px;flex-shrink:0;}
 .fill-bar{height:4px;border-radius:2px;}
 
-/* HEALTH */
-.h-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.dot-green{background:#00e896;box-shadow:0 0 5px rgba(0,232,150,.5);animation:blink 2.5s infinite;}
-.dot-amber{background:#ffb400;box-shadow:0 0 5px rgba(255,180,0,.4);}
-.dot-red{background:#ff6b6b;box-shadow:0 0 5px rgba(255,107,107,.5);animation:blink 1s infinite;}
-.h-val{font-family:'Share Tech Mono',monospace;font-size:10px;flex-shrink:0;}
+/* Empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;color:#3a4656;text-align:center;}
+.empty-state svg{width:38px;height:38px;stroke:#2a3444;fill:none;stroke-width:1.5;margin-bottom:14px;}
+.empty-state-text{font-size:14px;color:#5a6a7a;font-weight:600;}
 
-/* COLORS */
-.c-green{color:#00e896;} .c-red{color:#ff6b6b;} .c-amber{color:#ffb400;} .c-violet{color:#b06bff;} .c-blue{color:#00c8ff;}
+/* Toast */
+#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;background:#10151f;border:1px solid rgba(0,232,150,.2);border-radius:10px;padding:11px 16px;min-width:220px;font-size:13px;color:#e5edf5;box-shadow:0 10px 30px rgba(0,0,0,.5);}
 
-/* STATUS BAR */
-.status-bar{padding:8px 22px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:24px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
-.sb-item{display:flex;flex-direction:column;gap:1px;}
-.sb-lbl{color:#2a4a5a;letter-spacing:1px;font-size:9px;}
-.sb-val{color:#eaf4ff;font-size:11px;}
-.sb-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#b06bff;margin-right:4px;animation:blink 2s infinite;}
-.sb-right{margin-left:auto;color:#2a4a5a;}
-
-/* TOAST */
-#toast-wrap{position:fixed;bottom:50px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
-.toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(176,107,255,.2);border-radius:9px;padding:9px 14px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:opacity .3s;}
-
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 </style>
 </head>
 <body>
 <div class="shell">
 
-  <!-- TOP NAV -->
-  <div class="topnav">
-    <a href="index.html" class="logo">QuantCraft</a>
-    <div class="tnav">
-      <a class="tnav-item" href="index.html">Home</a>
-      <a class="tnav-item" href="map.html">Map View</a>
-      <a class="tnav-item" href="analytics.html">Analytics</a>
-      <a class="tnav-item" href="truck.html">Trucks</a>
-      <a class="tnav-item" href="reports.html">Reports</a>
-      <a class="tnav-item active" href="admin.html">Admin</a>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.293 13.596 7.196 9.5 3.1 10.598"/><path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 12 3a1.784 1.784 0 0 1 1.545.888l3.943 6.843"/><path d="m13.378 9.633 4.096 1.098 1.097-4.096"/></svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">QuantCraft <span class="brand-dot"></span></div>
+        <div class="brand-sub">MISSION CONTROL</div>
+      </div>
     </div>
-    <div class="tnav-right">
-      <span class="admin-badge">SUPER ADMIN</span>
-      <div class="avatar">👤</div>
+
+    <div class="sidenav">
+      <a class="snav-item" href="index.html">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        <span class="lbl">Home</span>
+      </a>
+      <a class="snav-item" href="map.html">
+        <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        <span class="lbl">Map View</span>
+      </a>
+      <a class="snav-item" href="analytics.html">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        <span class="lbl">Analytics</span>
+      </a>
+      <a class="snav-item" href="truck.html">
+        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        <span class="lbl">Trucks</span>
+        <span class="snav-badge count">42</span>
+      </a>
+      <a class="snav-item" href="reports.html">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span class="lbl">Reports</span>
+      </a>
+      <a class="snav-item" href="kabadiwala.html">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span class="lbl">Kabadiwala</span>
+        <span class="snav-badge green">NEW</span>
+      </a>
+      <a class="snav-item active" href="admin.html">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="lbl">Admin</span>
+        <span class="snav-dot"></span>
+      </a>
+    </div>
+
+    <div class="side-footer">
+      <div class="sf-row">
+        <span class="sf-lbl"><span class="sf-dot"></span>Root Admin</span>
+        <span class="sf-val green">Active</span>
+      </div>
+      <div class="sf-row">
+        <span class="sf-lbl">Last Sync</span>
+        <span class="sf-val mono" id="sb-time" style="font-size:11px;">--:--:-- UTC</span>
+      </div>
+      <div class="sf-row">
+        <span class="sf-lbl">Bins Online</span>
+        <span class="sf-val green" id="sb-online">16 / 16</span>
+      </div>
+      <div class="sf-divider"></div>
+      <div class="sf-ver">
+        <span>VER 4.2.0-STABLE</span>
+        <span>Pathankot</span>
+      </div>
     </div>
   </div>
 
-  <div class="body">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-name">QuantCraft</div>
-        <div class="logo-sub">MISSION CONTROL</div>
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-title">ADMIN PANEL</div>
+        <span class="tb-dot"></span>
+        <div class="tb-sub">Live data • Pathankot • syncs every 5s</div>
       </div>
-      <div class="sidebar-nav">
-        <a class="nav-item" href="index.html">
-          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
-        </a>
-        <a class="nav-item" href="map.html">
-          <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map View
-        </a>
-        <a class="nav-item" href="analytics.html">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
-        </a>
-        <a class="nav-item" href="truck.html">
-          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trucks
-        </a>
-        <a class="nav-item" href="scan.html">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><line x1="21" y1="21" x2="21" y2="21"/></svg>Live Scanner
-        </a>
-        <a class="nav-item" href="reports.html">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports
-        </a>
-        <a class="nav-item" href="reward.html">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Rewards
-          <span class="nav-badge">NEW</span>
-        </a>
-        <a class="nav-item active" href="admin.html">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin
-          <span class="nav-badge-violet">ROOT</span>
-        </a>
-        <a class="nav-item" href="qrcodes.html">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="21" y2="14"/><line x1="14" y1="21" x2="21" y2="21"/><line x1="17.5" y1="14" x2="17.5" y2="21"/></svg>QR Codes
-        </a>
-      </div>
-      <div class="sidebar-mid">
-        <button class="gen-btn" onclick="location.href='reports.html'">Generate Report</button>
-      </div>
-      <div class="sidebar-footer">
-        <a class="footer-item" href="#" onclick="toast('Settings','info');return false;">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
-        </a>
-        <a class="footer-item" href="#" onclick="toast('All systems nominal','info');return false;">
-          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>System Status
-        </a>
-        <button class="footer-item red" onclick="toast('Logging out…','warning')">
-          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout
-        </button>
-      </div>
+      <span class="conn-pill pending" id="connStatus"><span class="conn-pill-dot"></span>Connecting to Firebase…</span>
     </div>
 
-    <!-- MAIN -->
-    <div class="main">
-      <div class="page-header">
-        <div>
-          <div class="ph-title">ADMIN PANEL</div>
-          <div class="ph-sub">Live data · Pathankot · syncs every 5s</div>
+    <div class="content">
+
+      <!-- KPI ROW -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-lbl">Full Bins ≥80%</div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
+          </div>
+          <div class="kpi-num" id="kpi-full">0</div>
+          <div class="kpi-status red">Critical</div>
         </div>
-        <span class="conn-status" id="connStatus"><span class="conn-dot"></span>Connecting to Firebase…</span>
-      </div>
-
-      <div class="content">
-
-        <!-- SUMMARY STRIP -->
-        <div class="summary-strip" style="grid-template-columns:repeat(3,1fr);">
-          <div class="sum-card">
-            <div style="font-size:18px;">🔴</div>
-            <div>
-              <div class="sum-num c-red" id="kpi-full">0</div>
-              <div class="sum-lbl">Full Bins ≥80%</div>
-            </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-lbl">Half Bins 40–79%</div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
           </div>
-          <div class="sum-card">
-            <div style="font-size:18px;">🟡</div>
-            <div>
-              <div class="sum-num c-amber" id="kpi-half">0</div>
-              <div class="sum-lbl">Half Bins 40–79%</div>
-            </div>
-          </div>
-          <div class="sum-card">
-            <div style="font-size:18px;">🚛</div>
-            <div>
-              <div class="sum-num c-amber" id="kpi-stuck">1</div>
-              <div class="sum-lbl">Truck Issues</div>
-            </div>
-          </div>
+          <div class="kpi-num" id="kpi-half">0</div>
+          <div class="kpi-status amber">Elevated</div>
         </div>
-
-        <!-- DRIVER NOTIFICATION COMPOSER -->
-        <div class="sec-card" style="flex-shrink:0;">
-          <div class="sec-head">
-            <div class="sec-icon si-red">📢</div>
-            <div class="sec-head-text">
-              <div class="sec-title st-red">NOTIFY DRIVERS</div>
-              <div class="sec-sub">Reaches truck panel in real time</div>
-            </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-lbl">Truck Issues</div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/></svg></div>
           </div>
-          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;gap:8px;">
-              <select id="notifyTarget" style="flex:1;background:#0d1525;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:13px;padding:8px;">
-                <option value="ALL">All Trucks</option>
-                <option value="TRK-001">TRK-001 · Amarjit Singh</option>
-                <option value="TRK-002">TRK-002 · Gurpreet Kaur</option>
-                <option value="TRK-003">TRK-003 · Rajinder Pal</option>
-                <option value="TRK-004">TRK-004 · Mandeep Bajwa</option>
-              </select>
-              <select id="notifyPrio" style="background:#0d1525;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:13px;padding:8px;">
-                <option value="info">ℹ️ Info</option>
-                <option value="warn">⚠️ Warning</option>
-                <option value="alert">🚨 Alert</option>
-              </select>
-            </div>
-            <textarea id="notifyMsg" rows="2" placeholder="e.g. BIN-006 is 91% full — take Route RT-01 (Depot → BIN-003 → BIN-001 → BIN-006 → BIN-010)"
-              style="width:100%;resize:vertical;background:#0d1525;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:13px;padding:9px;"></textarea>
-            <button onclick="sendNotification()" style="align-self:flex-end;padding:8px 18px;background:linear-gradient(135deg,#ff6b6b,#e05050);border:none;border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Send to Drivers</button>
-          </div>
+          <div class="kpi-num" id="kpi-stuck">0</div>
+          <div class="kpi-status cyan">Telemetry</div>
         </div>
-
-        <!-- TWO PANELS -->
-        <div class="quad-grid" style="flex:1;min-height:0;">
-
-          <!-- PROBLEMATIC BINS -->
-          <div class="sec-card">
-            <div class="sec-head">
-              <div class="sec-icon si-amber">🗑️</div>
-              <div class="sec-head-text">
-                <div class="sec-title st-amber">PROBLEMATIC BINS</div>
-                <div class="sec-sub" id="bin-sub">Live · Pathankot</div>
-              </div>
-              <button class="sec-action" onclick="window.location.href='map.html'">Map →</button>
-            </div>
-            <div class="sec-body" id="bin-list"></div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-lbl">Pending Kabadiwalas</div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
           </div>
-
-          <!-- TRUCKS -->
-          <div class="sec-card">
-            <div class="sec-head">
-              <div class="sec-icon si-blue">🚛</div>
-              <div class="sec-head-text">
-                <div class="sec-title st-blue">TRUCKS RUNNING?</div>
-                <div class="sec-sub">4 routes · Pathankot</div>
-              </div>
-              <button class="sec-action" onclick="window.location.href='truck.html'">Details →</button>
-            </div>
-            <div class="sec-body" id="truck-list"></div>
-          </div>
-
+          <div class="kpi-num" id="kpi-kabadiwala-pending">0</div>
+          <div class="kpi-status green">Clear</div>
         </div>
-
-        <!-- TIMELINE / AUDIT LOG (Bounty 2) -->
-        <div class="sec-card" style="flex-shrink:0;max-height:260px;">
-          <div class="sec-head">
-            <div class="sec-icon si-violet">🕒</div>
-            <div class="sec-head-text">
-              <div class="sec-title st-violet">TIMELINE / AUDIT LOG</div>
-              <div class="sec-sub">Every fill reading, collection &amp; notification — append-only, never edited or deleted</div>
-            </div>
-            <button class="sec-action" onclick="pollAuditLog()">↻ Refresh</button>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-lbl">Pending E-Waste</div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
           </div>
-          <div class="sec-body" id="audit-list" style="max-height:200px;"></div>
+          <div class="kpi-num" id="kpi-ewaste-pending">0</div>
+          <div class="kpi-status green">Clear</div>
         </div>
       </div>
 
-      <!-- STATUS BAR -->
-      <div class="status-bar">
-        <div class="sb-item">
-          <div class="sb-lbl">SESSION</div>
-          <div class="sb-val"><span class="sb-dot"></span>Root Admin · Active</div>
+      <!-- NOTIFY DRIVERS -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-icon" style="background:rgba(255,107,107,.1);">📢</div>
+          <div class="panel-head-text">
+            <div class="panel-title">Notify Drivers</div>
+            <div class="panel-sub">Reaches truck panel in real time</div>
+          </div>
         </div>
-        <div class="sb-item">
-          <div class="sb-lbl">LAST SYNC</div>
-          <div class="sb-val" id="sb-time">--:--:-- UTC</div>
+        <div class="notify-body">
+          <div class="notify-row">
+            <select class="notify-select" id="notifyTarget">
+              <option value="ALL">All Trucks</option>
+              <option value="TRK-001">TRK-001 · Amarjit Singh</option>
+              <option value="TRK-002">TRK-002 · Gurpreet Kaur</option>
+              <option value="TRK-003">TRK-003 · Rajinder Pal</option>
+              <option value="TRK-004">TRK-004 · Mandeep Bajwa</option>
+            </select>
+            <select class="notify-select" id="notifyPrio" style="flex:0 0 140px;">
+              <option value="info">ℹ️ Info</option>
+              <option value="warn">⚠️ Warning</option>
+              <option value="alert">🚨 Alert</option>
+            </select>
+          </div>
+          <textarea class="notify-textarea" id="notifyMsg" rows="2" placeholder="e.g. BIN-006 is 91% full — take Route RT-01 (Depot → BIN-003 → BIN-001 → BIN-006 → BIN-010)"></textarea>
+          <button class="notify-send" onclick="sendNotification()">SEND TO DRIVERS</button>
         </div>
-        <div class="sb-item">
-          <div class="sb-lbl">BINS ONLINE</div>
-          <div class="sb-val c-green" id="sb-online">16 / 16</div>
+      </div>
+
+      <!-- TWO COLUMN: KABADIWALA + E-WASTE -->
+      <div class="two-col">
+
+        <div class="panel" style="max-height:420px;">
+          <div class="panel-head">
+            <div class="panel-icon" style="background:rgba(0,232,150,.1);">♻️</div>
+            <div class="panel-head-text">
+              <div class="panel-title">Kabadiwala Approvals</div>
+              <div class="panel-sub" id="kabadiwala-sub">0 pending · 0 total registrations</div>
+            </div>
+            <button class="panel-action" onclick="pollKabadiwalas()">↻ Refresh</button>
+          </div>
+          <div class="panel-body" id="kabadiwala-list"></div>
         </div>
-        <div class="sb-right">VER 4.2.0-STABLE</div>
+
+        <div class="panel" style="max-height:420px;">
+          <div class="panel-head">
+            <div class="panel-icon" style="background:rgba(0,200,255,.1);">📦</div>
+            <div class="panel-head-text">
+              <div class="panel-title">E-Waste Pickup Requests</div>
+              <div class="panel-sub" id="ewaste-sub">0 pending · 0 total requests</div>
+            </div>
+            <button class="panel-action" onclick="pollEwasteRequests()">↻ Refresh</button>
+          </div>
+          <div class="panel-body" id="ewaste-list"></div>
+        </div>
+
+      </div>
+
+      <!-- TWO COLUMN: BINS + TRUCKS -->
+      <div class="two-col" style="flex:1;min-height:0;">
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-icon" style="background:rgba(255,180,0,.1);">🗑️</div>
+            <div class="panel-head-text">
+              <div class="panel-title">Problematic Bins</div>
+              <div class="panel-sub" id="bin-sub">Live · Pathankot</div>
+            </div>
+            <button class="panel-action" onclick="window.location.href='map.html'">Map →</button>
+          </div>
+          <div class="panel-body" id="bin-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-icon" style="background:rgba(0,200,255,.1);">🚛</div>
+            <div class="panel-head-text">
+              <div class="panel-title">Trucks Running?</div>
+              <div class="panel-sub">4 routes · Pathankot</div>
+            </div>
+            <button class="panel-action" onclick="window.location.href='truck.html'">Details →</button>
+          </div>
+          <div class="panel-body" id="truck-list"></div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -389,34 +417,6 @@ const TRUCKS = [
   {id:'TRK-004', driver:'Mandeep Bajwa',  route:'RT-04', status:'running', eta:'8m'},
 ];
 
-const lastKnownFill = {};
-const binStatusCat = f => f>=80?'FULL':f>=40?'HALF':'OK';
-
-function logAuditEvent(binId, newFill, isLive){
-  const prev = lastKnownFill[binId];
-  lastKnownFill[binId] = newFill;
-  if(prev === undefined) return;
-  if(newFill === prev) return;
-
-  let event = null;
-  if(prev >= 40 && newFill < 15){
-    event = 'collected';
-    autoAlerted.delete(binId);
-  } else if(binStatusCat(newFill) !== binStatusCat(prev)){
-    event = 'reading';
-  }
-  if(!event) return;
-
-  const id = 'a_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
-  fetch(`${FIREBASE_DB_URL}/auditlog/${binId}/${id}.json`, {
-    method:'PUT',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ event, fillLevel:newFill, isLive: !!isLive, ts: Date.now() })
-  }).catch(()=>{});
-
-  checkAutoAlert(binId, newFill);
-}
-
 const autoAlerted = new Set();
 const sensorAlerted = new Set();
 const escalated = new Set();
@@ -461,6 +461,7 @@ async function checkEscalations(){
     const now = Date.now();
     for(const [id, n] of Object.entries(data)){
       if(escalated.has(id)) continue;
+      if(n.retryOf) continue;
       if(n.prio!=='warn' && n.prio!=='alert') continue;
       const unread = !n.read || n.read.length===0;
       if(unread && (now - n.ts) > 30000){
@@ -472,51 +473,194 @@ async function checkEscalations(){
   } catch(err){}
 }
 
-async function pollAuditLog(){
+/* ===== KABADIWALA APPROVALS ===== */
+let verifiedKabadiwalas = [];
+
+async function pollKabadiwalas(){
   try{
-    const [auditRes, notifRes] = await Promise.all([
-      fetch(`${FIREBASE_DB_URL}/auditlog.json`),
-      fetch(`${FIREBASE_DB_URL}/notifications.json`)
-    ]);
-    const auditData = await auditRes.json() || {};
-    const notifData = await notifRes.json() || {};
+    const res = await fetch(`${FIREBASE_DB_URL}/kabadiwalas.json`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json() || {};
 
-    const entries = [];
-    Object.entries(auditData).forEach(([binId, events])=>{
-      Object.values(events || {}).forEach(e=>{
-        entries.push({
-          ts: e.ts,
-          icon: e.event==='collected' ? '🚛' : '📊',
-          text: e.event==='collected'
-            ? `${binId} was collected (fill dropped to ${e.fillLevel}%)`
-            : `${binId} reading crossed into ${binStatusCat(e.fillLevel)} (${e.fillLevel}%)`,
-          color: e.event==='collected' ? '#00e896' : '#00c8ff'
-        });
-      });
-    });
-    Object.values(notifData).forEach(n=>{
-      entries.push({
-        ts: n.ts,
-        icon: n.prio==='alert'?'🚨':n.prio==='warn'?'⚠️':'📢',
-        text: `Notification sent to ${n.target}: "${n.msg}"`,
-        color: n.prio==='alert'?'#ff6b6b':n.prio==='warn'?'#ffb400':'#b06bff'
-      });
+    const entries = Object.entries(data).map(([id, k]) => ({ id, ...k }));
+    entries.sort((a,b) => {
+      const order = { pending: 0, verified: 1, rejected: 2 };
+      const ao = order[a.status] ?? 3, bo = order[b.status] ?? 3;
+      if(ao !== bo) return ao - bo;
+      return (b.registeredAt || '').localeCompare(a.registeredAt || '');
     });
 
-    entries.sort((a,b)=>b.ts-a.ts);
-    const top = entries.slice(0,30);
+    verifiedKabadiwalas = entries.filter(e => e.status === 'verified');
 
-    document.getElementById('audit-list').innerHTML = top.length
-      ? top.map(e=>`<div class="list-row">
-          <span style="font-size:14px;flex-shrink:0;">${e.icon}</span>
-          <div style="flex:1;min-width:0;">
-            <div class="row-main" style="color:${e.color};white-space:normal;">${e.text}</div>
-            <div class="row-sub">${new Date(e.ts).toLocaleString()}</div>
-          </div>
-        </div>`).join('')
-      : `<div class="list-row" style="justify-content:center;color:#3a5a6a;font-size:12px;">No events logged yet</div>`;
+    const pendingCount = entries.filter(e => e.status === 'pending').length;
+    document.getElementById('kpi-kabadiwala-pending').textContent = pendingCount;
+    document.getElementById('kabadiwala-sub').textContent =
+      `${pendingCount} pending · ${entries.length} total registrations`;
+
+    const box = document.getElementById('kabadiwala-list');
+    box.innerHTML = entries.length
+      ? entries.map(k => {
+          const statusBadge = k.status === 'verified'
+            ? `<span class="badge badge-verified">✓ VERIFIED</span>`
+            : k.status === 'rejected'
+              ? `<span class="badge badge-rejected">✕ REJECTED</span>`
+              : `<span class="badge badge-pending">⏳ PENDING</span>`;
+          const actions = k.status === 'pending'
+            ? `<button class="btn-approve" onclick="setKabadiwalaStatus('${k.id}','verified')">Approve</button>
+               <button class="btn-reject" onclick="setKabadiwalaStatus('${k.id}','rejected')">Reject</button>`
+            : `<button class="btn-reset" onclick="setKabadiwalaStatus('${k.id}','pending')">Reset</button>`;
+          return `<div class="row">
+            <div style="flex:1;min-width:0;">
+              <div class="row-main">${k.name || 'Unnamed'} · ${k.phone || '—'}</div>
+              <div class="row-sub">${k.area || '—'} · ${k.idType || '—'} · ${k.experienceYears ?? 0} yrs exp</div>
+            </div>
+            ${statusBadge}
+            <div style="display:flex;gap:6px;">${actions}</div>
+          </div>`;
+        }).join('')
+      : `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><div class="empty-state-text">No registrations yet</div></div>`;
+
+    renderEwasteList();
   } catch(err){
-    document.getElementById('audit-list').innerHTML = `<div class="list-row" style="justify-content:center;color:#ff6b6b;font-size:12px;">Couldn't load audit log</div>`;
+    document.getElementById('kabadiwala-list').innerHTML = `<div class="empty-state"><div class="empty-state-text" style="color:#ff6b6b;">Couldn't load kabadiwala registrations</div></div>`;
+  }
+}
+
+async function setKabadiwalaStatus(id, status){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/kabadiwalas/${id}.json`, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status })
+    });
+    if(!res.ok) throw new Error('failed');
+    toast(
+      status === 'verified' ? 'Kabadiwala verified' : status === 'rejected' ? 'Registration rejected' : 'Status reset to pending',
+      status === 'rejected' ? 'warning' : 'success'
+    );
+    pollKabadiwalas();
+  } catch(err){
+    toast('Could not update status — check connection', 'error');
+  }
+}
+
+/* ===== E-WASTE PICKUP REQUESTS ===== */
+let ewasteEntries = [];
+
+async function pollEwasteRequests(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/ewaste_requests.json`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json() || {};
+
+    ewasteEntries = Object.entries(data).map(([id, r]) => ({ id, ...r }));
+    ewasteEntries.sort((a,b) => {
+      const order = { pending: 0, assigned: 1, completed: 2 };
+      const ao = order[a.status] ?? 3, bo = order[b.status] ?? 3;
+      if(ao !== bo) return ao - bo;
+      return (b.requestedAt || '').localeCompare(a.requestedAt || '');
+    });
+
+    const pendingCount = ewasteEntries.filter(e => e.status === 'pending').length;
+    document.getElementById('kpi-ewaste-pending').textContent = pendingCount;
+    document.getElementById('ewaste-sub').textContent =
+      `${pendingCount} pending · ${ewasteEntries.length} total requests`;
+
+    renderEwasteList();
+  } catch(err){
+    document.getElementById('ewaste-list').innerHTML = `<div class="empty-state"><div class="empty-state-text" style="color:#ff6b6b;">Couldn't load e-waste requests</div></div>`;
+  }
+}
+
+function renderEwasteList(){
+  const box = document.getElementById('ewaste-list');
+  if(!ewasteEntries.length){
+    box.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><div class="empty-state-text">No e-waste requests yet</div></div>`;
+    return;
+  }
+
+  box.innerHTML = ewasteEntries.map(r => {
+    const statusBadge = r.status === 'completed'
+      ? `<span class="badge badge-completed">✓ COMPLETED</span>`
+      : r.status === 'assigned'
+        ? `<span class="badge badge-assigned">🚚 ASSIGNED</span>`
+        : `<span class="badge badge-pending">⏳ PENDING</span>`;
+
+    let actionHtml = '';
+    if(r.status === 'pending'){
+      if(verifiedKabadiwalas.length){
+        const options = verifiedKabadiwalas.map(k=>`<option value="${k.id}">${k.name} · ${k.area}</option>`).join('');
+        actionHtml = `
+          <div class="req-assign-row">
+            <select class="req-select" id="assign-${r.id}">
+              <option value="">Select verified kabadiwala…</option>
+              ${options}
+            </select>
+            <button class="btn-assign" onclick="assignKabadiwala('${r.id}')">Assign</button>
+          </div>`;
+      } else {
+        actionHtml = `<div class="req-assign-row"><span style="font-size:11px;color:#ff6b6b;">No verified kabadiwalas available yet — approve one first</span></div>`;
+      }
+    } else if(r.status === 'assigned'){
+      actionHtml = `<div class="req-assign-row">
+        <span style="font-size:11px;color:#00c8ff;">Assigned to: ${r.assignedKabadiwalaName || r.assignedKabadiwala || '—'}</span>
+        <button class="btn-complete" onclick="completeEwasteRequest('${r.id}')">Mark Picked Up</button>
+      </div>`;
+    } else {
+      actionHtml = `<div class="req-assign-row"><span style="font-size:11px;color:#00e896;">Collected by: ${r.assignedKabadiwalaName || r.assignedKabadiwala || '—'}</span></div>`;
+    }
+
+    return `<div class="req-row">
+      <div class="req-top">
+        <div style="flex:1;min-width:0;">
+          <div class="row-main">${r.itemType || 'Item'} · ${r.id}</div>
+          <div class="row-sub">${r.area || '—'} · ${r.phone || '—'}${r.description ? ' · '+r.description : ''}</div>
+        </div>
+        ${statusBadge}
+      </div>
+      ${actionHtml}
+    </div>`;
+  }).join('');
+}
+
+async function assignKabadiwala(requestId){
+  const select = document.getElementById(`assign-${requestId}`);
+  const kabadiwalaId = select ? select.value : '';
+  if(!kabadiwalaId){ toast('Select a kabadiwala first', 'warning'); return; }
+
+  const kabadiwala = verifiedKabadiwalas.find(k => k.id === kabadiwalaId);
+  if(!kabadiwala){ toast('Selected kabadiwala not found', 'error'); return; }
+
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/ewaste_requests/${requestId}.json`, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        status: 'assigned',
+        assignedKabadiwala: kabadiwala.id,
+        assignedKabadiwalaName: kabadiwala.name
+      })
+    });
+    if(!res.ok) throw new Error('failed');
+    toast(`Assigned to ${kabadiwala.name}`, 'success');
+    pollEwasteRequests();
+  } catch(err){
+    toast('Could not assign — check connection', 'error');
+  }
+}
+
+async function completeEwasteRequest(requestId){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/ewaste_requests/${requestId}.json`, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status: 'completed' })
+    });
+    if(!res.ok) throw new Error('failed');
+    toast('Marked as picked up', 'success');
+    pollEwasteRequests();
+  } catch(err){
+    toast('Could not update — check connection', 'error');
   }
 }
 
@@ -524,7 +668,7 @@ setInterval(()=>{
   BINS.forEach(b=>{
     if(Math.random()>.7){
       b.fill = Math.min(100, b.fill+1);
-      logAuditEvent(b.id, b.fill, false);
+      checkAutoAlert(b.id, b.fill);
     }
   });
   renderBins();
@@ -535,14 +679,14 @@ let pollFirebaseCount = 0;
 function setConnStatus(state){
   const el = document.getElementById('connStatus');
   if(state==='ok'){
-    el.className = 'conn-status ok';
-    el.innerHTML = '<span class="conn-dot"></span>Firebase Connected';
+    el.className = 'conn-pill';
+    el.innerHTML = '<span class="conn-pill-dot"></span>Firebase Connected';
   } else if(state==='err'){
-    el.className = 'conn-status err';
-    el.innerHTML = '<span class="conn-dot" style="animation:none;"></span>Connection Error';
+    el.className = 'conn-pill err';
+    el.innerHTML = '<span class="conn-pill-dot"></span>Connection Error';
   } else {
-    el.className = 'conn-status';
-    el.innerHTML = '<span class="conn-dot" style="animation:none;"></span>Connecting to Firebase…';
+    el.className = 'conn-pill pending';
+    el.innerHTML = '<span class="conn-pill-dot"></span>Connecting to Firebase…';
   }
 }
 
@@ -557,7 +701,7 @@ async function pollFirebase(){
       const val = entry && typeof entry.fillLevel === 'number' ? entry.fillLevel : null;
       if(pollFirebaseCount > 3) checkSensorHealth(b.id, val !== null);
       if(val !== null){
-        logAuditEvent(b.id, val, true);
+        checkAutoAlert(b.id, val);
         b.fill = val;
       }
     });
@@ -575,7 +719,7 @@ function binPillLabel(f){ return f>=80?'FULL':f>=40?'HALF':'OK'; }
 
 function routeColor(routeId){
   const r = ROUTES.find(x=>x.id===routeId);
-  return r?r.color:'#5a7a8a';
+  return r?r.color:'#5a6a7a';
 }
 function routeLabel(routeId){
   const r = ROUTES.find(x=>x.id===routeId);
@@ -616,22 +760,22 @@ function renderBins(){
         const routeDot = route
           ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${route.color};margin-right:4px;flex-shrink:0;"></span>`
           : '';
-        return `<div class="list-row ${b.isLive?'live-row':''}">
-          <div class="fill-bar-wrap" style="flex-shrink:0;">
+        return `<div class="row">
+          <div class="fill-bar-wrap">
             <div class="fill-bar" style="width:${b.fill}%;background:${c};"></div>
           </div>
           <div style="flex:1;min-width:0;">
             <div class="row-main" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.id} · ${b.name}</div>
             <div class="row-sub" style="display:flex;align-items:center;">${routeDot}${route?route.id+' · ':''} ${b.area}</div>
           </div>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${c};margin-right:6px;">${b.fill}%</span>
+          <span class="mono" style="font-size:10px;color:${c};">${b.fill}%</span>
           ${b.isLive
             ? `<span class="badge badge-live">🔴 LIVE</span>`
             : `<span class="pill ${pClass}">${pLabel}</span>`}
-          <button class="row-btn" title="Notify driver about this bin" onclick="quickNotify('${b.id}')" style="margin-left:6px;">🔔</button>
+          <button class="notify-bell" title="Notify driver about this bin" onclick="quickNotify('${b.id}')">🔔</button>
         </div>`;
       }).join('')
-    : `<div class="list-row" style="justify-content:center;color:#3a5a6a;font-size:12px;">All bins under 40% ✓</div>`;
+    : `<div class="empty-state"><div class="empty-state-text">All bins under 40% ✓</div></div>`;
 }
 
 function renderTrucks(){
@@ -640,14 +784,14 @@ function renderTrucks(){
     const pillLabel = t.status.toUpperCase();
     const c = routeColor(t.route);
     const rLabel = routeLabel(t.route);
-    return `<div class="list-row">
+    return `<div class="row">
       <div style="width:6px;height:6px;border-radius:50%;background:${c};flex-shrink:0;"></div>
       <div style="flex:1;min-width:0;">
         <div class="row-main">${t.id} · ${t.driver}</div>
         <div class="row-sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.route} · ${rLabel}</div>
       </div>
       <span class="pill ${pillClass}">${pillLabel}</span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a6a7a;margin-left:6px;width:36px;text-align:right;flex-shrink:0;">${t.eta}</span>
+      <span class="mono" style="font-size:10px;color:#5a6a7a;min-width:36px;text-align:right;">${t.eta}</span>
     </div>`;
   }).join('');
 }
@@ -723,8 +867,10 @@ renderTrucks();
 renderSummary();
 pollFirebase();
 setInterval(pollFirebase, 3000);
-pollAuditLog();
-setInterval(pollAuditLog, 5000);
+pollKabadiwalas();
+setInterval(pollKabadiwalas, 5000);
+pollEwasteRequests();
+setInterval(pollEwasteRequests, 5000);
 checkEscalations();
 setInterval(checkEscalations, 15000);
 </script>

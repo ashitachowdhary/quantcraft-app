@@ -179,16 +179,9 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
       <a class="tnav-item" href="map.html">Map View</a>
       <a class="tnav-item active" href="analytics.html">Analytics</a>
       <a class="tnav-item" href="truck.html">Trucks</a>
-      <a class="tnav-item" href="scan.html">Scanner</a>
       <a class="tnav-item" href="reports.html">Reports</a>
-      <a class="tnav-item" href="reward.html">Rewards</a>
+      <a class="tnav-item" href="kabadiwala.html">Kabadiwala</a>
       <a class="tnav-item" href="admin.html">Admin</a>
-    </div>
-    <div class="search-wrap">
-      <span class="search-icon">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </span>
-      <input type="text" placeholder="Search mission data…"/>
     </div>
     <div class="tnav-right">
       <button class="ti-btn" onclick="toast('No new alerts','info')">
@@ -220,15 +213,11 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
         <a class="nav-item" href="truck.html">
           <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trucks
         </a>
-        <a class="nav-item" href="scan.html">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><line x1="21" y1="21" x2="21" y2="21"/></svg>Live Scanner
-        </a>
         <a class="nav-item" href="reports.html">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports
         </a>
-        <a class="nav-item" href="reward.html">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Rewards
-          <span class="nav-badge">NEW</span>
+        <a class="nav-item" href="kabadiwala.html">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Kabadiwala
         </a>
         <a class="nav-item" href="admin.html">
           <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin
@@ -567,7 +556,7 @@ function renderBinTable(){
     const c=binColor(b.fill);
     return `<div class="bin-row ${b.isLive?'live':''}">
       <span class="bin-dot" style="background:${c}"></span>
-      <span class="bin-name">${b.isLive?'🔴 '+b.name:b.name}</span>
+      <span class="bin-name">${b.name}${b.isLive?' <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:#00e896;border:1px solid rgba(0,232,150,.3);background:rgba(0,232,150,.1);padding:1px 6px;border-radius:4px;margin-left:6px;letter-spacing:.5px;">LIVE</span>':''}</span>
       <span class="bin-area">${b.type}</span>
       <div class="bin-fill-bar"><div class="bin-fill-inner" style="width:${b.fill}%;background:${c}"></div></div>
       <span class="bin-pct" style="color:${c}">${b.fill}%</span>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantCraft — Kabadiwala Registration</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;}
+
+.topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);}
+.logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;text-decoration:none;}
+.tnav{display:flex;align-items:flex-end;height:100%;margin-left:20px;}
+.tnav-item{padding:0 16px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:#4a6a7a;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;text-decoration:none;}
+.tnav-item:hover{color:#c8dde8;}
+.tnav-item.active{color:#00e896;border-bottom-color:#00e896;}
+
+.wrap{max-width:520px;margin:0 auto;padding:50px 20px;}
+.page-title{font-family:'Share Tech Mono',monospace;font-size:13px;color:#00e896;letter-spacing:2px;margin-bottom:6px;}
+.page-sub{font-size:14px;color:#4a6a7a;margin-bottom:28px;}
+
+.card{background:#0d1525;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:26px;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:13px;color:#5a7a8a;margin-bottom:6px;display:block;}
+.form-input,.form-select{width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
+.form-input:focus,.form-select:focus{border-color:rgba(0,232,150,.4);}
+.form-select{background:#0a1020;cursor:pointer;}
+.form-hint{font-size:11px;color:#3a5a6a;margin-top:5px;}
+
+.submit-btn{width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,#00e896,#00c87a);border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#0a1a10;margin-top:8px;transition:all .2s;}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,232,150,.3);}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+.status-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 10px;border-radius:20px;background:rgba(255,180,0,.1);border:1px solid rgba(255,180,0,.25);color:#ffb400;margin-top:18px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+.success-box{display:none;text-align:center;padding:20px 0;}
+.success-icon{font-size:40px;margin-bottom:12px;}
+.success-title{font-family:'Share Tech Mono',monospace;font-size:14px;color:#00e896;margin-bottom:8px;}
+.success-sub{font-size:13px;color:#5a7a8a;}
+
+#toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(0,232,150,.2);border-radius:9px;padding:10px 14px;min-width:220px;font-size:13px;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:opacity .3s;}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="index.html" class="logo">QuantCraft</a>
+  <div class="tnav">
+    <a class="tnav-item" href="index.html">Home</a>
+    <a class="tnav-item" href="map.html">Map View</a>
+    <a class="tnav-item active" href="kabadiwala.html">Kabadiwala</a>
+    <a class="tnav-item" href="admin.html">Admin</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="page-title">KABADIWALA REGISTRATION</div>
+  <div class="page-sub">Join the formal e-waste recycling network — verified collectors get direct requests from citizens.</div>
+
+  <div class="card">
+    <div id="formBox">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="fName" placeholder="e.g. Ramesh Kumar"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input class="form-input" type="tel" id="fPhone" placeholder="10-digit mobile number"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Area / Locality</label>
+        <input class="form-input" type="text" id="fArea" placeholder="e.g. Mission Road, Pathankot"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ID Proof Type</label>
+        <select class="form-select" id="fIdType">
+          <option value="">Select ID type</option>
+          <option value="Aadhaar">Aadhaar Card</option>
+          <option value="Voter ID">Voter ID</option>
+          <option value="Driving License">Driving License</option>
+        </select>
+        <div class="form-hint">Only the ID type is stored for the demo — no document upload needed.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Years of Experience (Scrap Collection)</label>
+        <input class="form-input" type="number" id="fExp" placeholder="e.g. 5" min="0"/>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitForm()">Register</button>
+
+      <div class="status-badge">
+        <span class="status-dot"></span>PENDING VERIFICATION AFTER SUBMIT
+      </div>
+    </div>
+
+    <div class="success-box" id="successBox">
+      <div class="success-icon">✅</div>
+      <div class="success-title">REGISTRATION SUBMITTED</div>
+      <div class="success-sub">Your application is pending verification. You'll be notified once approved and can start receiving pickup requests.</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+const FIREBASE_URL = 'https://ecoroute-a871a-default-rtdb.firebaseio.com';
+
+function toast(msg,type='info'){
+  const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),350);},2500);
+}
+
+async function submitForm(){
+  const name = document.getElementById('fName').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const area = document.getElementById('fArea').value.trim();
+  const idType = document.getElementById('fIdType').value;
+  const exp = document.getElementById('fExp').value;
+
+  if(!name || !phone || !area || !idType){
+    toast('Please fill all required fields','error');
+    return;
+  }
+  if(!/^\d{10}$/.test(phone)){
+    toast('Enter a valid 10-digit phone number','error');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const id = 'KB-' + Date.now();
+  const payload = {
+    name, phone, area,
+    idType,
+    experienceYears: exp ? parseInt(exp) : 0,
+    status: 'pending',
+    registeredAt: new Date().toISOString()
+  };
+
+  try{
+    const res = await fetch(`${FIREBASE_URL}/kabadiwalas/${id}.json`, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('write failed');
+
+    document.getElementById('formBox').style.display = 'none';
+    document.getElementById('successBox').style.display = 'block';
+    toast('Registration saved successfully','success');
+  }catch(e){
+    toast('Could not submit — check connection and try again','error');
+    btn.disabled = false;
+    btn.textContent = 'Register';
+  }
+}
+</script>
+</body>
+</html>
