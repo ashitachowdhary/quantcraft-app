@@ -3,108 +3,1492 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>QuantCraft — Environment Reports</title>
+<title>EcoRoute — Environment Reports</title>
 <link rel="stylesheet" href="style.css"/>
 <style>
-  body { padding-top:64px; }
-  .page-header { background:rgba(0,255,150,.02); border-bottom:1px solid var(--border); padding:24px 0; }
-  .page-header-inner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
-  .page-header h1 { font-size:24px; }
-  .toolbar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-  .search-input { background:rgba(0,255,150,.04); border:1px solid var(--border); border-radius:8px; padding:9px 16px; color:var(--white); font-family:var(--font-body); font-size:14px; outline:none; min-width:220px; }
-  .search-input:focus { border-color:var(--green); }
-  .filter-select { background:rgba(0,255,150,.04); border:1px solid var(--border); border-radius:8px; padding:9px 14px; color:var(--text); font-family:var(--font-body); font-size:14px; outline:none; cursor:pointer; }
-  .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin:24px 0; }
-  .kpi { padding:20px; }
-  .kpi .k-val { font-family:var(--font-head); font-size:28px; font-weight:900; color:var(--green); }
-  .kpi .k-lbl { font-size:12px; color:var(--muted); margin-top:4px; }
+  * { box-sizing: border-box; }
 
-  .reports-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:20px; }
-  .report-card { position:relative; overflow:hidden; cursor:pointer; }
-  .report-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:10px; }
-  .report-title { font-family:var(--font-head); font-size:14px; color:var(--white); line-height:1.4; }
-  .report-cat { font-size:12px; color:var(--muted); margin-top:4px; }
-  .report-desc { font-size:13px; color:var(--text); line-height:1.5; margin-bottom:14px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .report-meta { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,.05); font-size:12px; color:var(--muted); align-items:center; }
-  .attach-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.2); color:var(--cyan); padding:3px 9px; border-radius:20px; }
-  .attach-thumb { width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:12px; border:1px solid var(--border); }
+  :root{
+    --bg:#070b0a;
+    --surface:#0d1412;
+    --surface2:#111a17;
+    --surface3:#16221e;
+  
+    --border:rgba(220,235,226,.10);
+    --border-hover:rgba(220,235,226,.20);
+  
+    --text:#f3f5f1;
+    --muted:#84938b;
+    --soft:#b7c2bc;
+  
+    --green:#63d79b;
+    --green-dark:#1d6748;
+  
+    --gold:#c7a467;
+    --red:#e66b65;
+    --yellow:#d4aa58;
+    --blue:#5aa8e8;
+  
+    --sidebar-w:250px;
+  }
+  
+  body { 
+    padding-top: 0;
+    background: linear-gradient(135deg, #0a0e18 0%, #0d1525 100%);
+    display: flex;
+    margin: 0;
+  }
+  
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
 
-  .status-open { border-color:rgba(255,196,0,.3); }
-  .status-review { border-color:rgba(0,229,255,.3); }
-  .status-resolved { border-color:rgba(0,255,150,.3); }
+html body #navbar,
+html body nav#navbar{
 
-  /* MODAL (detail view only) */
-  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:2000; display:none; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
-  .modal-overlay.open { display:flex; }
-  .modal { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:28px; width:100%; max-width:560px; max-height:88vh; overflow-y:auto; }
-  .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-  .modal-close { background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer; }
-  .modal-close:hover { color:var(--red); }
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  bottom:0 !important;
+  right:auto !important;
 
-  /* DETAIL VIEW */
-  .detail-attachment { margin-top:16px; }
-  .detail-attachment img { width:100%; border-radius:10px; border:1px solid var(--border); }
-  .detail-attachment a.file-link { display:flex; align-items:center; gap:10px; background:rgba(0,255,150,.05); border:1px solid var(--border); border-radius:8px; padding:12px 14px; color:var(--green); text-decoration:none; font-size:13px; }
-  .detail-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13px; }
-  .detail-row:last-child { border-bottom:none; }
-  .detail-row span:first-child { color:var(--muted); }
-  .detail-row span:last-child { color:var(--white); text-align:right; }
+  width:var(--sidebar-w) !important;
+  min-width:var(--sidebar-w) !important;
+  max-width:var(--sidebar-w) !important;
+  height:100vh !important;
 
-  .empty-msg { text-align:center; padding:60px 20px; color:var(--muted); grid-column:1/-1; }
+  z-index:9999 !important;
 
-  /* ROLE-AWARE FILTER TABS */
-  .role-tabs-wrap { margin-bottom:18px; }
-  .role-tabs-label { font-family:var(--font-head); font-size:10px; letter-spacing:1.5px; color:var(--muted); margin-bottom:10px; }
-  .role-tabs { display:flex; gap:8px; flex-wrap:wrap; }
-  .role-tab { display:flex; align-items:center; gap:7px; padding:8px 16px; border-radius:20px; border:1px solid var(--border); background:rgba(255,255,255,.02); cursor:pointer; font-size:13px; font-weight:600; color:var(--muted); transition:all .2s; font-family:var(--font-body); }
-  .role-tab:hover { color:var(--text); border-color:rgba(255,255,255,.2); }
-  .role-tab.active { color:#050d18; background:var(--green); border-color:var(--green); box-shadow:var(--glow-sm); }
-  .role-tab .rt-count { font-family:var(--font-head); font-size:10px; background:rgba(255,255,255,.08); padding:1px 7px; border-radius:10px; }
-  .role-tab.active .rt-count { background:rgba(0,0,0,.2); }
-  .visible-count { font-size:12px; color:var(--muted); margin-bottom:14px; }
-  .visible-count strong { color:var(--green); }
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:0 !important;
 
-  .export-row { margin-top:18px; padding-top:16px; border-top:1px solid rgba(255,255,255,.05); }
-  .export-label { font-family:var(--font-head); font-size:10px; letter-spacing:1.5px; color:var(--green); margin-bottom:10px; }
-  .export-btns { display:flex; gap:10px; flex-wrap:wrap; }
-  .export-btns .btn { flex:1; justify-content:center; min-width:100px; }
+  padding:26px 18px !important;
 
-  @media(max-width:768px){ .kpi-row{grid-template-columns:repeat(2,1fr)} }
+  background:var(--surface) !important;
+
+  border-right:1px solid var(--border) !important;
+  border-bottom:none !important;
+
+  backdrop-filter:none !important;
+
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+
+/* LOGO */
+
+#navbar .nav-logo{
+
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:10px;
+
+  color:var(--text) !important;
+
+  text-decoration:none;
+
+  font-size:0 !important;
+  font-weight:400 !important;
+  letter-spacing:normal !important;
+  white-space:normal !important;
+
+  margin-bottom:6px;
+}
+
+.nav-logo .leaf-mark{
+
+  width:34px;
+  height:34px;
+
+  border-radius:9px;
+
+  background:
+    linear-gradient(150deg,var(--green),var(--green-dark));
+
+  display:grid;
+  place-items:center;
+
+  flex:none;
+}
+
+.nav-logo .leaf-mark svg{
+  width:18px;
+  height:18px;
+}
+
+.nav-logo-text{
+  display:flex;
+  flex-direction:column;
+  line-height:1.15;
+}
+
+.nav-logo-text b{
+  font-size:17px !important;
+  font-weight:700 !important;
+  letter-spacing:.3px;
+}
+
+.nav-logo-text b span{
+  color:var(--green) !important;
+}
+
+.nav-logo-tagline{
+  margin-top:2px;
+  font-size:8px !important;
+  letter-spacing:1.4px;
+  color:var(--muted) !important;
+  text-transform:uppercase;
+}
+
+
+/* NAV LINKS */
+
+#navbar .nav-links{
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  flex:1 !important;
+
+  gap:3px;
+  justify-content:space-evenly !important;
+
+  margin:26px 0 0 !important;
+  padding:0 !important;
+  list-style:none;
+}
+
+#navbar .nav-links a{
+
+  display:flex !important;
+  align-items:center !important;
+  gap:11px;
+  flex:none !important;
+
+  text-decoration:none;
+
+  color:#8b978f !important;
+
+  font-size:13px !important;
+  font-weight:500;
+
+  padding:13px 14px !important;
+
+  border-radius:9px;
+
+  transition:.2s;
+}
+
+.nav-links a svg{
+  width:16px;
+  height:16px;
+  flex:none;
+  opacity:.8;
+}
+
+.nav-links a:hover{
+
+  color:#edf5ef !important;
+
+  background:rgba(99,215,155,.07);
+}
+
+.nav-links a.active{
+
+  color:var(--text) !important;
+
+  background:rgba(99,215,155,.12) !important;
+
+  box-shadow:inset 2px 0 0 var(--green);
+}
+
+.nav-links a.active svg{
+  opacity:1;
+}
+
+
+/* SIDEBAR FOOTER */
+
+.sidebar-footer{
+
+  margin-top:auto;
+
+  padding-top:24px;
+
+  color:var(--soft);
+
+  font-size:20px;
+
+  font-weight:600;
+
+  line-height:1.25;
+
+  position:relative;
+
+  overflow:hidden;
+}
+
+.sidebar-footer .foot-leaf{
+
+  position:absolute;
+  right:-18px;
+  bottom:-10px;
+
+  width:110px;
+  height:110px;
+
+  opacity:.12;
+}
+
+.sidebar-footer .rule{
+
+  width:34px;
+  height:2px;
+  background:var(--green);
+
+  margin-top:12px;
+}
+
+
+/* MOBILE */
+
+.hamburger{
+  display:none;
+  flex-direction:column;
+  gap:4px;
+  width:34px;
+  height:34px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#0b1210;
+  cursor:pointer;
+}
+
+.hamburger span{
+  width:16px;
+  height:1.5px;
+  background:#d0d8d3;
+}
+
+
+/* =========================================================
+   MAIN WRAPPER
+   ========================================================= */
+
+.main-wrap{
+  margin-left:var(--sidebar-w) !important;
+  width:calc(100% - var(--sidebar-w)) !important;
+}
+
+
+/* =========================================================
+   TOP HEADER
+   ========================================================= */
+
+.top-header{
+
+  position:sticky !important;
+  top:0 !important;
+  z-index:900;
+
+  height:72px;
+
+  padding:0 32px !important;
+
+  display:flex;
+  align-items:center;
+  gap:18px;
+
+  background:rgba(7,11,10,.94) !important;
+
+  border-bottom:1px solid var(--border) !important;
+
+  backdrop-filter:blur(18px);
+}
+
+
+/* SEARCH */
+
+.header-search{
+
+  position:relative;
+
+  flex:1;
+  max-width:420px;
+}
+
+.header-search svg{
+  position:absolute;
+  left:13px;
+  top:50%;
+  transform:translateY(-50%);
+  width:15px;
+  height:15px;
+  color:var(--muted);
+}
+
+.topbar-search-input{
+
+  width:100% !important;
+
+  min-width:0 !important;
+
+  height:40px;
+
+  padding:0 44px 0 38px !important;
+
+  border-radius:10px !important;
+
+  background:#0c1411 !important;
+
+  border:1px solid var(--border) !important;
+
+  color:var(--text) !important;
+
+  outline:none;
+}
+
+.topbar-search-input:focus{
+
+  border-color:rgba(99,215,155,.55) !important;
+}
+
+.kbd-hint{
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:10px;
+  color:var(--muted);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:2px 6px;
+  pointer-events:none;
+}
+
+
+/* LOCATION BADGE */
+
+.location-badge{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  height:40px;
+  padding:0 13px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#0b1210;
+  color:var(--soft);
+  font-size:12.5px;
+  white-space:nowrap;
+}
+
+.location-badge svg{
+  width:14px;
+  height:14px;
+  color:var(--green);
+}
+
+
+.header-spacer{
+  flex:1;
+}
+
+
+/* NOTIFICATION */
+
+.notif-btn{
+
+  width:40px;
+  height:40px;
+
+  border:1px solid var(--border) !important;
+
+  border-radius:9px !important;
+
+  background:#0b1210 !important;
+
+  color:#d0d8d3;
+
+  position:relative;
+
+  cursor:pointer;
+
+  flex:none;
+}
+
+.notif-badge{
+
+  position:absolute;
+
+  right:4px;
+  top:4px;
+
+  width:15px;
+  height:15px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:50%;
+
+  background:var(--red) !important;
+
+  color:#fff;
+
+  font-size:8px;
+}
+
+
+/* PROFILE */
+
+.profile-wrap{
+  position:relative;
+}
+
+.profile-trigger{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  height:40px;
+  padding:0 6px 0 6px;
+  border-radius:10px;
+  cursor:default;
+}
+
+.profile-avatar{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:linear-gradient(150deg,var(--green),var(--green-dark));
+  display:grid;
+  place-items:center;
+  font-size:12.5px;
+  font-weight:700;
+  color:#04140c;
+  flex:none;
+}
+
+.profile-name{
+  font-size:12.5px;
+  color:var(--soft);
+  white-space:nowrap;
+}
+
+.profile-logout{
+  margin-left:4px;
+  font-size:11px;
+  color:var(--muted);
+  text-decoration:none;
+  border:1px solid var(--border-hover);
+  border-radius:7px;
+  padding:5px 9px;
+  white-space:nowrap;
+}
+
+.profile-logout:hover{
+  color:var(--green);
+  border-color:var(--green);
+}
+
+
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:1100px){
+
+  #navbar{
+    transform:translateX(-100%);
+    transition:transform .25s ease;
+  }
+
+  #navbar.open{
+    transform:translateX(0);
+  }
+
+  .main-wrap{
+    margin-left:0;
+  }
+
+  .hamburger{
+    display:flex !important;
+  }
+
+  .hero{
+    margin:16px;
+  }
+
+  .top-header{
+    padding:0 16px !important;
+  }
+
+  .dash-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .bins-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+}
+
+@media(max-width:720px){
+
+  .top-header{
+    gap:10px;
+  }
+
+  .location-badge{
+    display:none;
+  }
+
+  .hero{
+    padding:30px 22px;
+  }
+
+  .hero h1{
+    font-size:30px;
+  }
+
+  .toolbar{
+    grid-template-columns:1fr;
+  }
+
+  .kpi-row{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+
+  .bins-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .profile-name{
+    display:none;
+  }
+
+}
+
+
+
+  /* MAIN LAYOUT */
+  .main-wrap {
+    flex: 1;
+    margin-left: var(--sidebar-w) !important;
+    width: calc(100% - var(--sidebar-w)) !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER SECTION */
+  .page-header {
+    position: relative;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 100%), 
+                url('hero-city.jpg') center/cover;
+    border-bottom: 1px solid rgba(0,255,150,.1);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+  }
+
+  .header-left {
+    flex: 1;
+  }
+
+  .header-breadcrumb {
+    font-size: 12px;
+    color: rgba(0,255,150,.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .header-left h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    line-height: 1.1;
+  }
+
+  .header-left h1 .neon {
+    background: linear-gradient(135deg, #00ff96, #00e5ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-left p {
+    font-size: 14px;
+    color: rgba(200, 221, 232, 0.7);
+    margin: 0;
+  }
+
+  .header-right {
+    text-align: right;
+    color: rgba(200, 221, 232, 0.7);
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.6;
+    max-width: 200px;
+  }
+
+  .header-divider {
+    width: 3px;
+    height: 60px;
+    background: linear-gradient(180deg, #00ff96, #00e5ff);
+    margin-bottom: 8px;
+  }
+
+  /* MAIN CONTENT */
+  .main-content {
+    flex: 1;
+    display: flex;
+    gap: 30px;
+    padding: 40px;
+  }
+
+  .center-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  /* KPI CARDS */
+  .kpi-section {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .kpi-card {
+    background: linear-gradient(135deg, rgba(13,21,37,.8) 0%, rgba(20,32,56,.6) 100%);
+    border: 1px solid rgba(0,255,150,.15);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .kpi-card:hover {
+    border-color: rgba(0,255,150,.3);
+    transform: translateY(-4px);
+  }
+
+  .kpi-icon {
+    font-size: 28px;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kpi-icon.total { 
+    background: rgba(0,255,150,.2);
+    border-radius: 8px;
+  }
+
+  .kpi-icon.open {
+    background: rgba(255,196,0,.2);
+    border-radius: 8px;
+  }
+
+  .kpi-icon.review {
+    background: rgba(255,140,0,.2);
+    border-radius: 8px;
+  }
+
+  .kpi-icon.resolved {
+    background: rgba(0,255,150,.2);
+    border-radius: 8px;
+  }
+
+  .kpi-content h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: #00ff96;
+  }
+
+  .kpi-content p {
+    font-size: 12px;
+    color: rgba(200, 221, 232, 0.6);
+    margin: 4px 0 0 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* FILTERS & SEARCH */
+  .filters-section {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .search-input {
+    flex: 1;
+    background: rgba(0,255,150,.04);
+    border: 1px solid rgba(0,255,150,.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  .search-input:focus {
+    border-color: #00ff96;
+    background: rgba(0,255,150,.08);
+  }
+
+  .search-input::placeholder {
+    color: rgba(200, 221, 232, 0.4);
+  }
+
+  .filter-select {
+    background: rgba(0,255,150,.04);
+    border: 1px solid rgba(0,255,150,.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: rgba(200, 221, 232, 0.8);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .filter-select:hover, .filter-select:focus {
+    border-color: #00ff96;
+    background: rgba(0,255,150,.08);
+  }
+
+  /* Fix: dropdown option list was rendering with invisible/low-contrast text
+     in most browsers because only the closed <select> had a color set.
+     Explicitly color the options too so the open dropdown is readable. */
+  .filter-select option {
+    background-color: #0d1525;
+    color: #c8dde8;
+  }
+
+  .filter-select option:checked,
+  .filter-select option:hover {
+    background-color: #142238;
+    color: #00ff96;
+  }
+
+  .btn-reset {
+    background: rgba(0,255,150,.1);
+    border: 1px solid rgba(0,255,150,.3);
+    border-radius: 8px;
+    padding: 11px 16px;
+    color: #00ff96;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-reset:hover {
+    background: rgba(0,255,150,.15);
+    border-color: #00ff96;
+  }
+
+  .btn-new-report {
+    background: linear-gradient(135deg, #00ff96, #00e5ff);
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    color: #050d18;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-new-report:hover {
+    box-shadow: 0 8px 20px rgba(0,255,150, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .showing-text {
+    font-size: 13px;
+    color: rgba(200, 221, 232, 0.6);
+  }
+
+  .showing-text strong {
+    color: #00ff96;
+  }
+
+  /* REPORT CARDS */
+  .reports-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .report-card {
+    background: linear-gradient(135deg, rgba(13,21,37,.8) 0%, rgba(20,32,56,.6) 100%);
+    border: 1px solid rgba(0,255,150,.15);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .report-card:hover {
+    border-color: rgba(0,255,150,.3);
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(0,255,150, 0.15);
+  }
+
+  .report-card-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    position: relative;
+  }
+
+  .report-card-status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-transform: capitalize;
+  }
+
+  .status-open {
+    background: rgba(255,196,0,.3);
+    color: #ffc400;
+    border: 1px solid rgba(255,196,0,.5);
+  }
+
+  .status-review {
+    background: rgba(255,140,0,.3);
+    color: #ff8c00;
+    border: 1px solid rgba(255,140,0,.5);
+  }
+
+  .status-resolved {
+    background: rgba(0,255,150,.3);
+    color: #00ff96;
+    border: 1px solid rgba(0,255,150,.5);
+  }
+
+  .report-card-body {
+    padding: 20px;
+  }
+
+  .report-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+  }
+
+  .report-card-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(200, 221, 232, 0.6);
+    margin-bottom: 12px;
+  }
+
+  .report-card-desc {
+    font-size: 13px;
+    color: rgba(200, 221, 232, 0.75);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .report-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    font-size: 12px;
+  }
+
+  .report-card-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(200, 221, 232, 0.6);
+  }
+
+  .report-card-time {
+    color: rgba(200, 221, 232, 0.5);
+    font-size: 11px;
+  }
+
+  .report-card-meta {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    color: rgba(200, 221, 232, 0.5);
+  }
+
+  .report-card-action {
+    width: 100%;
+    text-align: center;
+    padding: 12px 0;
+    border-top: 1px solid rgba(0,255,150,.1);
+    color: #00ff96;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .report-card-action:hover {
+    background: rgba(0,255,150,.05);
+  }
+
+  /* RIGHT SIDEBAR */
+  .right-sidebar {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .sidebar-widget {
+    background: linear-gradient(135deg, rgba(13,21,37,.6) 0%, rgba(20,32,56,.4) 100%);
+    border: 1px solid rgba(0,255,150,.1);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .widget-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 0;
+  }
+
+  .widget-link {
+    font-size: 11px;
+    color: #00ff96;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+
+  .category-item:last-child {
+    border-bottom: none;
+  }
+
+  .category-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(200, 221, 232, 0.8);
+  }
+
+  .category-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .category-count {
+    color: rgba(200, 221, 232, 0.5);
+    font-size: 12px;
+  }
+
+  .activity-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    font-size: 12px;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-icon {
+    font-size: 18px;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,255,150,.1);
+    border-radius: 6px;
+  }
+
+  .activity-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .activity-text {
+    color: rgba(200, 221, 232, 0.8);
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .activity-time {
+    color: rgba(200, 221, 232, 0.4);
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.85);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: linear-gradient(135deg, rgba(13,21,37,.95) 0%, rgba(20,32,56,.9) 100%);
+    border: 1px solid rgba(0,255,150,.2);
+    border-radius: 16px;
+    padding: 36px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 80px rgba(0,0,0,.5);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(0,255,150,.15);
+  }
+
+  .modal-header h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #00ff96;
+    margin: 0;
+  }
+
+  .modal-close {
+    background: rgba(255,50,50,.1);
+    border: 1px solid rgba(255,50,50,.2);
+    color: rgba(200, 221, 232, 0.6);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover {
+    background: rgba(255,50,50,.2);
+    color: #ff3232;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    font-size: 13px;
+  }
+
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row span:first-child {
+    color: rgba(200, 221, 232, 0.5);
+    font-weight: 600;
+  }
+  .detail-row span:last-child {
+    color: rgba(200, 221, 232, 0.9);
+    text-align: right;
+  }
+
+  /* NEW REPORT FORM */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(200, 221, 232, 0.7);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100%;
+    background: rgba(0,255,150,.04);
+    border: 1px solid rgba(0,255,150,.2);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    border-color: #00ff96;
+    background: rgba(0,255,150,.08);
+  }
+
+  .form-select option {
+    background-color: #0d1525;
+    color: #c8dde8;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .btn-submit-report {
+    width: 100%;
+    justify-content: center;
+    margin-top: 6px;
+  }
+
+  @media(max-width: 1200px) {
+    .reports-section { grid-template-columns: repeat(2, 1fr); }
+    .right-sidebar { width: 240px; }
+  }
+
+  @media(max-width: 768px) {
+    .main-content { flex-direction: column; }
+    .kpi-section { grid-template-columns: repeat(2, 1fr); }
+    .reports-section { grid-template-columns: 1fr; }
+    .right-sidebar { width: 100%; }
+  }
 </style>
 </head>
 <body>
 
 <nav id="navbar">
-  <a href="index.html" class="nav-logo">QUANT<span>CRAFT</span></a>
+
+  <a href="index.html" class="nav-logo">
+
+    <span class="leaf-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#04140c" stroke-width="2"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
+    </span>
+
+    <span class="nav-logo-text">
+      <b>Eco<span>Route</span></b>
+      <span class="nav-logo-tagline">Cleaner cities · Brighter tomorrows</span>
+    </span>
+
+  </a>
+
+
   <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="dashboard.html">Dashboard</a></li>
-    <li><a href="map.html">Map</a></li>
-    <li><a href="analytics.html">Analytics</a></li>
-    <li><a href="reports.html">Reports</a></li>
-    <li><a href="admin.html">Admin</a></li>
+
+    <li>
+      <a href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        Home
+      </a>
+    </li>
+
+    <li>
+      <a href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+    </li>
+
+    <li>
+      <a href="map.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6l6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
+        Live Map
+      </a>
+    </li>
+
+    <li>
+      <a href="analytics.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        Analytics
+      </a>
+    </li>
+
+    <li>
+      <a href="reports.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+        Reports
+      </a>
+    </li>
+
+    <li>
+      <a href="kabadiwala.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M2 5h3l2.4 11.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+        Kabadiwala
+      </a>
+    </li>
+
+    <li>
+      <a href="admin.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4Z"/></svg>
+        Admin
+      </a>
+    </li>
+
+    <li>
+      <a href="about.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        About
+      </a>
+    </li>
+
+    <li>
+      <a href="contact.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        Contact
+      </a>
+    </li>
+
   </ul>
-  <div class="nav-right" style="position:relative">
-    <button class="notif-btn" id="notif-btn">🔔<span class="notif-badge" id="notif-badge">3</span></button>
-    <div class="notif-dropdown" id="notif-dropdown"><div class="notif-head"><h4>ALERTS</h4></div><div id="notif-list"></div></div>
-    <a href="login.html" class="btn btn-ghost btn-sm">Logout</a>
+
+
+  <div class="sidebar-footer">
+
+    Small
+    Steps
+    Big
+    Impact
+
+    <div class="rule"></div>
+
+    <svg class="foot-leaf" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
+
   </div>
-  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+
 </nav>
+
+
+<!-- MOBILE NAV (toggled by app.js via #hamburger) -->
+
 <div class="mobile-nav" id="mobileNav">
-  <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="map.html">Map</a>
-  <a href="analytics.html">Analytics</a><a href="reports.html">Reports</a><a href="admin.html">Admin</a>
+
+  <a href="index.html">Home</a>
+
+  <a href="dashboard.html">Dashboard</a>
+
+  <a href="map.html">Map</a>
+
+  <a href="analytics.html">Analytics</a>
+
+  <a href="reports.html">Reports</a>
+
+  <a href="kabadiwala.html">Kabadiwala</a>
+
+  <a href="admin.html">Admin</a>
+
 </div>
 
-<div class="page-header">
-  <div class="container">
-    <div class="page-header-inner">
-      <div>
-        <h1>Environment <span class="neon">Reports</span></h1>
-        <p style="color:var(--muted);font-size:14px;margin-top:4px">Community-submitted environmental incidents · evidence attached · synced live</p>
+
+<!-- MAIN WRAP -->
+<div class="main-wrap">
+
+<div class="top-header">
+
+  <button class="hamburger" id="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+
+  <div class="header-search">
+
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+
+    <input
+      class="topbar-search-input"
+      id="topbarSearchInput"
+      placeholder="Search reports, locations…"
+      oninput="document.getElementById('searchInput').value=this.value; renderReports();"
+    >
+
+    <span class="kbd-hint">Ctrl K</span>
+
+  </div>
+
+
+  <span class="location-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+    Pathankot
+  </span>
+
+
+  <div class="header-spacer"></div>
+
+
+  <div style="position:relative">
+
+    <button class="notif-btn" id="notif-btn">
+      🔔
+      <span class="notif-badge" id="notif-badge">3</span>
+    </button>
+
+
+    <div class="notif-dropdown" id="notif-dropdown">
+
+      <div class="notif-head">
+        <h4>ALERTS</h4>
       </div>
-      <div class="toolbar">
-        <input class="search-input" id="searchInput" placeholder="🔍 Search title or location…" oninput="renderReports()"/>
+
+      <div id="notif-list"></div>
+
+    </div>
+
+  </div>
+
+
+  <div class="profile-wrap">
+
+    <div class="profile-trigger">
+
+      <span class="profile-avatar">A</span>
+
+      <span class="profile-name">Admin</span>
+
+      <a href="login.html" class="profile-logout">Logout</a>
+
+    </div>
+
+  </div>
+
+</div>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="header-breadcrumb">Reports / Pathankot</div>
+        <h1>Environment <span class="neon">Reports</span></h1>
+        <p>Community-submitted environmental incidents · Evidence attached · Real-time updates</p>
+      </div>
+      <div class="header-right">
+        <div class="header-divider"></div>
+        "A cleaner Pathankot today, a healthier tomorrow."
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- CENTER COLUMN -->
+    <div class="center-column">
+      <!-- KPI CARDS -->
+      <div class="kpi-section">
+        <div class="kpi-card">
+          <div class="kpi-icon total">📋</div>
+          <div class="kpi-content">
+            <h3 id="kTotal">0</h3>
+            <p>Total Reports</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon open">⚠️</div>
+          <div class="kpi-content">
+            <h3 id="kOpen" style="color:#ffc400">0</h3>
+            <p>Open</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon review">⏱️</div>
+          <div class="kpi-content">
+            <h3 id="kReview" style="color:#ff8c00">0</h3>
+            <p>In Review</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon resolved">✅</div>
+          <div class="kpi-content">
+            <h3 id="kResolved">0</h3>
+            <p>Resolved</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="filters-section">
+        <input class="search-input" id="searchInput" placeholder="🔍 Search reports, locations, keywords…" oninput="renderReports()"/>
         <select class="filter-select" id="catFilter" onchange="renderReports()">
           <option value="all">All Categories</option>
           <option>Illegal Dumping</option>
@@ -121,26 +1505,48 @@
           <option>In Review</option>
           <option>Resolved</option>
         </select>
+        <button class="btn-reset" onclick="resetFilters()">🔄 Reset</button>
+        <button class="btn-new-report" onclick="openNewReportModal()">➕ New Report</button>
+      </div>
+
+      <!-- SHOWING COUNT -->
+      <div class="showing-text" id="visibleCount"></div>
+
+      <!-- REPORT CARDS -->
+      <div class="reports-section" id="reportsGrid"></div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="right-sidebar">
+      <!-- REPORT CATEGORIES -->
+      <div class="sidebar-widget">
+        <div class="widget-header">
+          <h3 class="widget-title">Report Categories</h3>
+          <a href="#" class="widget-link">View All</a>
+        </div>
+        <div id="categoriesWidget"></div>
+      </div>
+
+      <!-- RECENT ACTIVITY -->
+      <div class="sidebar-widget">
+        <div class="widget-header">
+          <h3 class="widget-title">Recent Activity</h3>
+          <a href="#" class="widget-link">View All</a>
+        </div>
+        <div id="activityWidget"></div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="container section" style="padding-top:24px;padding-bottom:60px;">
-  <div class="kpi-row">
-    <div class="card kpi"><div class="k-val" id="kTotal">0</div><div class="k-lbl">Total Reports</div></div>
-    <div class="card kpi"><div class="k-val" id="kOpen" style="color:var(--yellow)">0</div><div class="k-lbl">Open</div></div>
-    <div class="card kpi"><div class="k-val" id="kReview" style="color:var(--cyan)">0</div><div class="k-lbl">In Review</div></div>
-    <div class="card kpi"><div class="k-val" id="kResolved">0</div><div class="k-lbl">Resolved</div></div>
-  </div>
-
-  <div class="visible-count" id="visibleCount"></div>
-  <div class="reports-grid" id="reportsGrid"></div>
-</div>
-
 <!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detailModal">
   <div class="modal" id="detailModalBody"></div>
+</div>
+
+<!-- NEW REPORT MODAL -->
+<div class="modal-overlay" id="newReportModal">
+  <div class="modal" id="newReportModalBody"></div>
 </div>
 
 <div id="toast-container"></div>
@@ -149,7 +1555,6 @@
 const FIREBASE_DB_URL = 'https://ecoroute-a871a-default-rtdb.firebaseio.com';
 let REPORTS = {};
 
-/* ---------- SEED (only used if Firebase has nothing yet — demo data for the monitoring view) ---------- */
 const SEED_SVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="300">
   <rect width="480" height="300" fill="#0d1525"/>
@@ -170,33 +1575,33 @@ function seedIfEmpty(){
       const seeds = [
         {
           title: 'Illegal dumping behind Chakki Bank',
-          category: 'Illegal Dumping', location: 'Chakki Bank',
-          description: 'Construction debris and mixed household waste dumped along the riverbank, blocking the drainage channel.',
-          reportedBy: 'Amarjit Singh', role: 'Citizen', status: 'Open',
+          category: 'Illegal Dumping', location: 'Chakki Bank, Pathankot',
+          description: 'Large pile of construction and household waste dumped illegally.',
+          reportedBy: 'Rohit Sharma', role: 'Citizen', status: 'Open',
           recommendations: 'Dispatch a collection truck and place a signboard prohibiting dumping.',
           notes: 'Reported after repeated occurrences over 2 weeks.',
           attachment: { type:'upload', mime:'image/svg+xml', name:'evidence.svg', data:SEED_SVG },
-          ts: now
+          ts: now - 7200000
         },
         {
           title: 'Smoke haze near Mirthal Chowk',
-          category: 'Air Pollution', location: 'Mirthal',
-          description: 'Thick smoke from open burning of waste, affecting nearby residents and a primary school.',
-          reportedBy: 'Dr. Neha Sharma', role: 'Hospital', status: 'In Review',
+          category: 'Air Pollution', location: 'Mirthal Chowk, Pathankot',
+          description: 'Frequent burning of plastic waste causing air pollution.',
+          reportedBy: 'Neha Verma', role: 'Hospital', status: 'In Review',
           recommendations: 'Health advisory for the area; enforcement visit to identify the burning source.',
           notes: 'Two respiratory-complaint cases logged at the nearest clinic this week.',
           attachment: { type:'link', url:'https://example.com/reports/mirthal-smoke.jpg' },
-          ts: now - 3600000
+          ts: now - 18000000
         },
         {
           title: 'Leaking drum near Dunera Chowk',
-          category: 'Hazardous Spill', location: 'Dunera',
+          category: 'Hazardous Spill', location: 'Dunera Chowk, Pathankot',
           description: 'An unmarked chemical drum found leaking near a storm drain; contents unknown.',
-          reportedBy: 'Investigator Rao', role: 'Investigator', status: 'Resolved',
+          reportedBy: 'Anonymous', role: 'Citizen', status: 'Resolved',
           recommendations: 'Drum was safely removed by the hazardous-waste contractor; site tested clean.',
           notes: 'Closed after follow-up site visit — no further contamination detected.',
           attachment: null,
-          ts: now - 7200000
+          ts: now - 86400000
         }
       ];
       return Promise.all(seeds.map((seed,i)=>
@@ -207,19 +1612,19 @@ function seedIfEmpty(){
     }).catch(()=>{});
 }
 
-/* ---------- LOAD ---------- */
 async function loadReports(){
   try{
     const res = await fetch(`${FIREBASE_DB_URL}/envreports.json`);
     const data = await res.json() || {};
     REPORTS = data;
     renderReports();
+    updateCategoriesWidget();
+    updateActivityWidget();
   }catch(err){
-    showToast('Could not load reports — check connection','error');
+    console.error('Error loading reports');
   }
 }
 
-/* ---------- RENDER ---------- */
 function renderReports(){
   const search = (document.getElementById('searchInput').value||'').toLowerCase();
   const cat = document.getElementById('catFilter').value;
@@ -237,7 +1642,7 @@ function renderReports(){
 
   const totalReports = Object.keys(REPORTS).length;
   document.getElementById('visibleCount').innerHTML =
-    `Showing <strong>${list.length}</strong> of <strong>${totalReports}</strong> reports${(search||cat!=='all'||status!=='all')?' (filtered)':''}`;
+    `Showing <strong>${list.length}</strong> of <strong>${totalReports}</strong> reports`;
 
   document.getElementById('kTotal').textContent = Object.keys(REPORTS).length;
   document.getElementById('kOpen').textContent = Object.values(REPORTS).filter(r=>r.status==='Open').length;
@@ -245,194 +1650,264 @@ function renderReports(){
   document.getElementById('kResolved').textContent = Object.values(REPORTS).filter(r=>r.status==='Resolved').length;
 
   const grid = document.getElementById('reportsGrid');
-  if(!list.length){ grid.innerHTML = '<div class="empty-msg">No reports match your filters.</div>'; return; }
+  if(!list.length){ grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:rgba(200, 221, 232, 0.5)">No reports found</div>'; return; }
 
   grid.innerHTML = list.map(r=>{
     const statusCls = r.status==='Open'?'status-open':r.status==='In Review'?'status-review':'status-resolved';
-    const statusBadge = r.status==='Open'?'badge-yellow':r.status==='In Review'?'badge-cyan':'badge-green';
     const thumb = (r.attachment && r.attachment.type==='upload' && r.attachment.mime && r.attachment.mime.startsWith('image/'))
-      ? `<img class="attach-thumb" src="${r.attachment.data}" alt="evidence"/>` : '';
-    const attachChip = r.attachment
-      ? `<span class="attach-chip">📎 ${r.attachment.type==='link'?'Linked evidence':'Attachment'}</span>`
-      : '';
-    return `<div class="card report-card ${statusCls}" onclick="openDetail('${r.id}')">
-      <div class="report-card-header">
-        <div>
-          <div class="report-title">${escapeHtml(r.title)}</div>
-          <div class="report-cat">${r.category} · ${r.location||'—'}</div>
-        </div>
-        <span class="badge ${statusBadge}">${r.status}</span>
+      ? r.attachment.data : 'data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%230d1525%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%22200%22 y=%22150%22 fill=%22%2300ff96%22 text-anchor=%22middle%22 font-size=%2220%22%3ENo Image%3C/text%3E%3C/svg%3E';
+    const timeAgo = getTimeAgo(r.ts);
+    return `<div class="report-card" onclick="openDetail('${r.id}')">
+      <div style="position:relative">
+        <img src="${thumb}" alt="evidence" class="report-card-image"/>
+        <span class="report-card-status ${statusCls}">${r.status}</span>
       </div>
-      ${thumb}
-      <div class="report-desc">${escapeHtml(r.description||'')}</div>
-      <div class="report-meta">
-        <span>${r.reportedBy||'Anonymous'} · ${r.role||''}</span>
-        ${attachChip}
+      <div class="report-card-body">
+        <h3 class="report-card-title">${escapeHtml(r.title)}</h3>
+        <div class="report-card-location">📍 ${escapeHtml(r.location)}</div>
+        <div class="report-card-desc">${escapeHtml(r.description||'')}</div>
+        <div class="report-card-footer">
+          <div class="report-card-author">👤 ${r.reportedBy||'Anonymous'}</div>
+          <div class="report-card-time">${timeAgo}</div>
+        </div>
+        <div style="text-align:center;padding:12px 0;border-top:1px solid rgba(0,255,150,.1);color:#00ff96;font-weight:600;font-size:12px;cursor:pointer">View Details →</div>
       </div>
     </div>`;
   }).join('');
 }
 
+function getTimeAgo(ts) {
+  const now = Date.now();
+  const diff = now - ts;
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (mins < 60) return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  return `${days}d ago`;
+}
+
+function updateCategoriesWidget(){
+  const cats = {};
+  Object.values(REPORTS).forEach(r => {
+    cats[r.category] = (cats[r.category] || 0) + 1;
+  });
+  
+  const colors = ['#ffc400', '#0099ff', '#00e5ff', '#ff6b6b', '#ff8c00', '#9933ff', '#33ff99'];
+  const catList = Object.entries(cats).map(([cat, count], i) => `
+    <div class="category-item">
+      <span class="category-label">
+        <span class="category-dot" style="background:${colors[i % colors.length]}"></span>
+        ${cat}
+      </span>
+      <span class="category-count">${count}</span>
+    </div>
+  `).join('');
+  
+  document.getElementById('categoriesWidget').innerHTML = catList;
+}
+
+function updateActivityWidget(){
+  const sorted = Object.entries(REPORTS)
+    .map(([id,r])=>({id,...r}))
+    .sort((a,b)=>(b.ts||0)-(a.ts||0))
+    .slice(0, 4);
+  
+  const activity = sorted.map(r => `
+    <div class="activity-item">
+      <div class="activity-icon">${r.status==='Open'?'📋':r.status==='In Review'?'⏱️':'✅'}</div>
+      <div class="activity-content">
+        <div class="activity-text"><strong>New report submitted</strong><br>${r.category} - ${r.location}</div>
+        <div class="activity-time">${getTimeAgo(r.ts)}</div>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('activityWidget').innerHTML = activity;
+}
+
 function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 
-/* ---------- DETAIL VIEW ---------- */
-let currentDetailId = null;
+function resetFilters(){
+  document.getElementById('searchInput').value = '';
+  document.getElementById('catFilter').value = 'all';
+  document.getElementById('statusFilter').value = 'all';
+  renderReports();
+}
+
 function openDetail(id){
   const r = REPORTS[id];
   if(!r) return;
-  currentDetailId = id;
+  
   let attachHtml = '';
   if(r.attachment){
     if(r.attachment.type==='upload' && (r.attachment.mime||'').startsWith('image/')){
-      attachHtml = `<div class="detail-attachment"><img src="${r.attachment.data}" alt="evidence"/></div>`;
-    } else if(r.attachment.type==='upload'){
-      attachHtml = `<div class="detail-attachment"><a class="file-link" href="${r.attachment.data}" download="${r.attachment.name}">📎 ${r.attachment.name} — click to download</a></div>`;
+      attachHtml = `<div style="margin-top:20px"><img src="${r.attachment.data}" alt="evidence" style="width:100%;border-radius:8px;border:1px solid rgba(0,255,150,.2)"/></div>`;
     } else if(r.attachment.type==='link'){
-      const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(r.attachment.url);
-      attachHtml = isImg
-        ? `<div class="detail-attachment"><img src="${r.attachment.url}" alt="evidence"/></div>`
-        : `<div class="detail-attachment"><a class="file-link" href="${r.attachment.url}" target="_blank" rel="noopener">🔗 ${r.attachment.url}</a></div>`;
+      attachHtml = `<div style="margin-top:20px"><a href="${r.attachment.url}" target="_blank" style="color:#00ff96">View Evidence →</a></div>`;
     }
-  } else {
-    attachHtml = `<div class="detail-attachment"><div style="font-size:13px;color:var(--muted)">No evidence attached to this report.</div></div>`;
   }
 
   document.getElementById('detailModalBody').innerHTML = `
     <div class="modal-header">
       <h3>${escapeHtml(r.title)}</h3>
-      <button class="modal-close" onclick="closeDetail()">×</button>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
     </div>
     <div class="detail-row"><span>Category</span><span>${r.category}</span></div>
-    <div class="detail-row"><span>Location</span><span>${r.location||'—'}</span></div>
+    <div class="detail-row"><span>Location</span><span>${r.location}</span></div>
     <div class="detail-row"><span>Status</span><span>${r.status}</span></div>
     <div class="detail-row"><span>Reported By</span><span>${r.reportedBy} (${r.role})</span></div>
-    <div class="detail-row"><span>Description</span><span>${escapeHtml(r.description)||'—'}</span></div>
+    <div class="detail-row"><span>Description</span><span>${escapeHtml(r.description)}</span></div>
     ${r.recommendations ? `<div class="detail-row"><span>Recommendations</span><span>${escapeHtml(r.recommendations)}</span></div>` : ''}
     ${r.notes ? `<div class="detail-row"><span>Notes</span><span>${escapeHtml(r.notes)}</span></div>` : ''}
     <div class="detail-row"><span>Submitted</span><span>${new Date(r.ts).toLocaleString()}</span></div>
     ${attachHtml}
-    <div class="export-row">
-      <div class="export-label">EXPORT THIS REPORT</div>
-      <div class="export-btns">
-        <button class="btn btn-ghost btn-sm" onclick="exportReportCSV('${id}')">📄 CSV</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportReportHTML('${id}')">🌐 HTML</button>
-        <button class="btn btn-primary btn-sm" onclick="exportReportPDF('${id}')">🖨️ PDF</button>
-      </div>
-    </div>
   `;
   document.getElementById('detailModal').classList.add('open');
 }
-function closeDetail(){ document.getElementById('detailModal').classList.remove('open'); }
 
-/* ---------- EXPORT ---------- */
-function csvEscape(v){
-  const s = (v===undefined || v===null) ? '' : String(v);
-  return '"' + s.replace(/"/g,'""') + '"';
+function closeDetail(){
+  document.getElementById('detailModal').classList.remove('open');
 }
 
-function downloadBlob(content, filename, mime){
-  const blob = new Blob([content], {type:mime});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
+/* =========================================================
+   NEW REPORT MODAL
+   ========================================================= */
+
+function openNewReportModal(){
+  document.getElementById('newReportModalBody').innerHTML = `
+    <div class="modal-header">
+      <h3>New Report</h3>
+      <button class="modal-close" onclick="closeNewReportModal()">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" class="form-input" id="nrTitle" placeholder="Short title for the issue"/>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select class="form-select" id="nrCategory">
+          <option>Illegal Dumping</option>
+          <option>Air Pollution</option>
+          <option>Water Contamination</option>
+          <option>Overflowing Bin</option>
+          <option>Hazardous Spill</option>
+          <option>Noise Pollution</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-select" id="nrStatus">
+          <option>Open</option>
+          <option>In Review</option>
+          <option>Resolved</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Location</label>
+      <input type="text" class="form-input" id="nrLocation" placeholder="e.g. Chakki Bank, Pathankot"/>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea class="form-textarea" id="nrDescription" placeholder="Describe what you observed…"></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Reported By</label>
+        <input type="text" class="form-input" id="nrReportedBy" placeholder="Your name (optional)"/>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select class="form-select" id="nrRole">
+          <option>Citizen</option>
+          <option>Hospital</option>
+          <option>Municipal Staff</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Evidence Link (optional)</label>
+      <input type="text" class="form-input" id="nrLink" placeholder="https://…"/>
+    </div>
+
+    <button class="btn-new-report btn-submit-report" onclick="submitNewReport()">➕ Submit Report</button>
+  `;
+  document.getElementById('newReportModal').classList.add('open');
 }
 
-function reportFields(r){
-  return [
-    ['Title', r.title],
-    ['Category', r.category],
-    ['Location', r.location||'—'],
-    ['Status', r.status],
-    ['Reported By', r.reportedBy],
-    ['Role', r.role],
-    ['Description', r.description||'—'],
-    ['Recommendations', r.recommendations||'—'],
-    ['Notes', r.notes||'—'],
-    ['Attachment', r.attachment ? (r.attachment.type==='link' ? r.attachment.url : r.attachment.name) : 'None'],
-    ['Submitted', new Date(r.ts).toLocaleString()],
-  ];
+function closeNewReportModal(){
+  document.getElementById('newReportModal').classList.remove('open');
 }
 
-function exportReportCSV(id){
-  const r = REPORTS[id];
-  if(!r) return;
-  const fields = reportFields(r);
-  const csv = fields.map(([k,v])=>`${csvEscape(k)},${csvEscape(v)}`).join('\n');
-  downloadBlob(csv, `envreport-${id}.csv`, 'text/csv');
-  showToast('CSV exported','success');
-}
+async function submitNewReport(){
+  const title = document.getElementById('nrTitle').value.trim();
+  const category = document.getElementById('nrCategory').value;
+  const status = document.getElementById('nrStatus').value;
+  const location = document.getElementById('nrLocation').value.trim();
+  const description = document.getElementById('nrDescription').value.trim();
+  const reportedBy = document.getElementById('nrReportedBy').value.trim() || 'Anonymous';
+  const role = document.getElementById('nrRole').value;
+  const link = document.getElementById('nrLink').value.trim();
 
-function exportReportHTML(id){
-  const r = REPORTS[id];
-  if(!r) return;
-  const fields = reportFields(r);
-  const rowsHtml = fields.map(([k,v])=>`<tr><th>${escapeHtml(k)}</th><td>${escapeHtml(String(v))}</td></tr>`).join('');
-  let attachBlock = '';
-  if(r.attachment && r.attachment.type==='upload' && (r.attachment.mime||'').startsWith('image/')){
-    attachBlock = `<h3>Evidence</h3><img src="${r.attachment.data}" style="max-width:100%;border-radius:8px;border:1px solid #223"/>`;
-  } else if(r.attachment && r.attachment.type==='link'){
-    attachBlock = `<h3>Evidence</h3><a href="${r.attachment.url}">${r.attachment.url}</a>`;
+  if(!title || !location){
+    alert('Please fill in at least Title and Location.');
+    return;
   }
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
-<title>QuantCraft Environment Report — ${escapeHtml(r.title)}</title>
-<style>
-  body{background:#050d18;color:#c8dde8;font-family:Arial,sans-serif;padding:40px;}
-  h1{color:#00ff96;font-size:22px;}
-  h3{color:#00e5ff;font-size:14px;margin-top:24px;}
-  table{width:100%;border-collapse:collapse;margin-top:16px;}
-  th{text-align:left;color:#5a7a8a;padding:8px 12px;width:180px;vertical-align:top;border-bottom:1px solid #223;}
-  td{padding:8px 12px;border-bottom:1px solid #223;}
-  .footer{margin-top:30px;font-size:11px;color:#3a5a6a;}
-</style></head>
-<body>
-  <h1>QuantCraft — Environment Report</h1>
-  <table>${rowsHtml}</table>
-  ${attachBlock}
-  <div class="footer">Generated by QuantCraft on ${new Date().toLocaleString()}</div>
-</body></html>`;
-  downloadBlob(html, `envreport-${id}.html`, 'text/html');
-  showToast('HTML report exported','success');
-}
 
-function exportReportPDF(id){
-  const r = REPORTS[id];
-  if(!r) return;
-  const fields = reportFields(r);
-  const rowsHtml = fields.map(([k,v])=>`<tr><th>${escapeHtml(k)}</th><td>${escapeHtml(String(v))}</td></tr>`).join('');
-  let attachBlock = '';
-  if(r.attachment && r.attachment.type==='upload' && (r.attachment.mime||'').startsWith('image/')){
-    attachBlock = `<h3>Evidence</h3><img src="${r.attachment.data}" style="max-width:100%;border:1px solid #ccc;"/>`;
-  } else if(r.attachment && r.attachment.type==='link'){
-    attachBlock = `<h3>Evidence</h3><a href="${r.attachment.url}">${r.attachment.url}</a>`;
+  const payload = {
+    title, category, location, description,
+    reportedBy, role, status,
+    recommendations: '',
+    notes: '',
+    attachment: link ? { type:'link', url:link } : null,
+    ts: Date.now()
+  };
+
+  const submitBtn = document.querySelector('#newReportModalBody .btn-submit-report');
+  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
+
+  try{
+    await fetch(`${FIREBASE_DB_URL}/envreports.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    closeNewReportModal();
+    loadReports();
+  }catch(err){
+    alert('Could not submit the report. Please check your connection and try again.');
+    if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = '➕ Submit Report'; }
   }
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
-<title>QuantCraft Environment Report — ${escapeHtml(r.title)}</title>
-<style>
-  body{font-family:Arial,sans-serif;color:#111;padding:36px;}
-  h1{color:#00996a;font-size:20px;border-bottom:2px solid #00996a;padding-bottom:8px;}
-  h3{color:#0088aa;font-size:13px;margin-top:22px;}
-  table{width:100%;border-collapse:collapse;margin-top:14px;}
-  th{text-align:left;color:#555;padding:7px 10px;width:170px;vertical-align:top;border-bottom:1px solid #ddd;font-size:13px;}
-  td{padding:7px 10px;border-bottom:1px solid #ddd;font-size:13px;}
-  .footer{margin-top:26px;font-size:10px;color:#888;}
-</style></head>
-<body>
-  <h1>QuantCraft — Environment Report</h1>
-  <table>${rowsHtml}</table>
-  ${attachBlock}
-  <div class="footer">Generated by QuantCraft on ${new Date().toLocaleString()}</div>
-  <script>window.onload=()=>{window.print();}<\/script>
-</body></html>`);
-  win.document.close();
-  showToast('Opening print dialog — choose "Save as PDF"','info');
 }
 
-/* ---------- INIT ---------- */
 seedIfEmpty().then(loadReports);
 setInterval(loadReports, 8000);
+
+/* =========================================================
+   MOBILE SIDEBAR TOGGLE (matches dashboard.html behavior)
+   ========================================================= */
+
+const hamburgerBtn = document.getElementById('hamburger');
+
+if(hamburgerBtn && !hamburgerBtn.dataset.bound){
+
+  hamburgerBtn.addEventListener('click', () => {
+
+    document.getElementById('navbar').classList.toggle('open');
+
+  });
+
+}
 </script>
 </body>
 </html>
