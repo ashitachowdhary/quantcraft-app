@@ -3,91 +3,156 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QuantCraft — Mission Control</title>
+  <title>EcoRoute — Mission Control</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
 
     :root {
-      --green:#00e896; --green-dim:rgba(0,232,150,.12); --green-glow:rgba(0,232,150,.25);
-      --cyan:#00c8ff;  --cyan-dim:rgba(0,200,255,.1);
-      --amber:#ffb400; --amber-dim:rgba(255,180,0,.1);
-      --red:#ff6b6b;   --red-dim:rgba(255,107,107,.1);
-      --violet:#b06bff;--violet-dim:rgba(176,107,255,.1);
-      --bg:#080e1c; --surface:#0d1525; --surface2:#0f1c2e;
-      --border:rgba(255,255,255,.06); --text:#c8dde8; --muted:#4a6a7a; --bright:#eaf4ff;
+      --green:#63d79b; --green-dark:#1d6748; --green-dim:rgba(99,215,155,.12); --green-glow:rgba(99,215,155,.25);
+      --cyan:#5aa8e8;  --cyan-dim:rgba(90,168,232,.1);
+      --amber:#d4aa58; --amber-dim:rgba(212,170,88,.1);
+      --red:#e66b65;   --red-dim:rgba(230,107,101,.1);
+      --violet:#a78bfa;--violet-dim:rgba(167,139,250,.1);
+      --bg:#070b0a; --surface:#0d1412; --surface2:#111a17;
+      --border:rgba(220,235,226,.10); --text:#c8d8d0; --muted:#84938b; --bright:#f3f5f1;
+      --sidebar-w:250px;
     }
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
     html,body{height:100%;background:var(--bg);font-family:'Rajdhani',sans-serif;color:var(--text);overflow:hidden;}
 
     .app-shell{display:flex;height:100vh;}
 
-    /* SIDEBAR */
-    .sidebar{width:230px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 0 0;z-index:100;}
-    .sidebar-logo{padding:0 24px 28px;}
-    .logo-name{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:var(--green);letter-spacing:1px;}
-    .logo-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:#2a5050;margin-top:3px;letter-spacing:2px;}
+    /* ===== SIDEBAR (identical markup/CSS to dashboard.html) ===== */
+    html body #navbar,
+    html body nav#navbar{
+      position:fixed !important;
+      top:0 !important; left:0 !important; bottom:0 !important; right:auto !important;
+      width:var(--sidebar-w) !important; min-width:var(--sidebar-w) !important; max-width:var(--sidebar-w) !important;
+      height:100vh !important;
+      z-index:9999 !important;
+      display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:0 !important;
+      padding:26px 18px !important;
+      background:var(--surface) !important;
+      border-right:1px solid var(--border) !important;
+      border-bottom:none !important;
+      backdrop-filter:none !important;
+      overflow-y:auto !important; overflow-x:hidden !important;
+    }
 
-    .sidebar-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:2px;}
-    .nav-item{display:flex;align-items:center;gap:14px;padding:12px 14px;cursor:pointer;transition:all .2s;font-size:15px;font-weight:600;color:var(--muted);border-left:3px solid transparent;border-radius:0 8px 8px 0;margin-right:8px;text-decoration:none;}
-    .nav-item:hover{color:var(--bright);background:rgba(255,255,255,.04);}
-    .nav-item.active{color:var(--green);background:var(--green-dim);border-left-color:var(--green);}
-    .nav-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
-    .nav-badge{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(255,180,0,.15);color:var(--amber);border:1px solid rgba(255,180,0,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
-    .nav-badge-violet{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(176,107,255,.15);color:var(--violet);border:1px solid rgba(176,107,255,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
-    .nav-badge-green{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(0,232,150,.15);color:var(--green);border:1px solid rgba(0,232,150,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
+    #navbar .nav-logo{
+      display:flex !important; flex-direction:row !important; align-items:center !important; gap:10px;
+      color:var(--bright) !important; text-decoration:none;
+      font-size:0 !important; font-weight:400 !important; letter-spacing:normal !important; white-space:normal !important;
+      margin-bottom:6px;
+    }
+    .nav-logo .leaf-mark{
+      width:34px; height:34px; border-radius:9px;
+      background:linear-gradient(150deg,var(--green),var(--green-dark));
+      display:grid; place-items:center; flex:none;
+    }
+    .nav-logo .leaf-mark svg{width:18px;height:18px;}
+    .nav-logo-text{display:flex;flex-direction:column;line-height:1.15;}
+    .nav-logo-text b{font-size:17px !important;font-weight:700 !important;letter-spacing:.3px;}
+    .nav-logo-text b span{color:var(--green) !important;}
+    .nav-logo-tagline{
+      margin-top:2px; font-size:8px !important; letter-spacing:1.4px;
+      color:var(--muted) !important; text-transform:uppercase;
+    }
 
-    .sidebar-mid{padding:16px 12px;}
-    .gen-btn{width:100%;padding:13px 16px;border-radius:10px;background:linear-gradient(135deg,var(--green),#00c87a);border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a1a10;letter-spacing:.3px;transition:all .2s;box-shadow:0 4px 18px var(--green-glow);}
-    .gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,232,150,.35);}
+    #navbar .nav-links{
+      display:flex !important; flex-direction:column !important; align-items:stretch !important; flex:1 !important;
+      gap:3px; justify-content:space-evenly !important;
+      margin:26px 0 0 !important; padding:0 !important; list-style:none;
+    }
+    #navbar .nav-links a{
+      display:flex !important; align-items:center !important; gap:11px; flex:none !important;
+      text-decoration:none; color:#8b978f !important;
+      font-size:13px !important; font-weight:500;
+      padding:13px 14px !important; border-radius:9px; transition:.2s;
+    }
+    .nav-links a svg{width:16px;height:16px;flex:none;opacity:.8;}
+    .nav-links a:hover{color:#edf5ef !important;background:rgba(99,215,155,.07);}
+    .nav-links a.active{
+      color:var(--bright) !important;
+      background:rgba(99,215,155,.12) !important;
+      box-shadow:inset 2px 0 0 var(--green);
+    }
+    .nav-links a.active svg{opacity:1;}
 
-    .sidebar-footer{padding:8px 12px 20px;display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--border);margin-top:4px;}
-    .footer-item{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;cursor:pointer;color:#3a5a6a;font-size:14px;font-weight:600;transition:all .2s;text-decoration:none;}
-    .footer-item:hover{color:var(--bright);background:rgba(255,255,255,.04);}
-    .footer-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;}
+    .sidebar-footer{
+      margin-top:auto; padding-top:24px; color:#b7c2bc;
+      font-size:20px; font-weight:600; line-height:1.25;
+      position:relative; overflow:hidden;
+    }
+    .sidebar-footer .foot-leaf{
+      position:absolute; right:-18px; bottom:-10px; width:110px; height:110px; opacity:.12;
+    }
+    .sidebar-footer .rule{width:34px;height:2px;background:var(--green);margin-top:12px;}
 
-    /* MAIN */
-    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    /* ===== MAIN ===== */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;margin-left:var(--sidebar-w);}
 
-    .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;}
-    .top-nav{display:flex;align-items:center;gap:4px;}
-    .top-nav-item{padding:8px 16px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:8px;transition:all .2s;border-bottom:2px solid transparent;background:none;border:none;font-family:'Rajdhani',sans-serif;text-decoration:none;letter-spacing:.2px;display:inline-flex;align-items:center;}
-    .top-nav-item:hover{color:var(--bright);}
-    .top-nav-item.active{color:var(--green);border-bottom:2px solid var(--green);}
-    .search-wrap{position:relative;margin-left:8px;}
-    .search-wrap input{padding:8px 16px 8px 36px;width:210px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.08);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
-    .search-wrap input::placeholder{color:#3a5a6a;}
-    .search-wrap input:focus{border-bottom-color:rgba(0,232,150,.4);}
-    .search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#3a5a6a;}
-    .topbar-right{display:flex;align-items:center;gap:16px;}
-    .ti{color:#5a7a8a;cursor:pointer;transition:color .2s;background:none;border:none;padding:4px;}
-    .ti:hover{color:var(--green);}
-    .admin-info{text-align:right;}
-    .admin-name{font-size:13px;font-weight:700;color:var(--bright);}
-    .admin-role{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6070;letter-spacing:1px;}
-    .avatar{width:36px;height:36px;border-radius:50%;background:#1a2a3a;border:2px solid rgba(0,232,150,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;}
+    /* ===== TOP BAR (search / location / bell / admin / logout) ===== */
+    .top-bar{display:flex;align-items:center;gap:16px;padding:16px 32px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;}
+    .search-box{flex:1;max-width:620px;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;transition:border-color .2s;}
+    .search-box:focus-within{border-color:rgba(99,215,155,.3);}
+    .search-box svg{flex:none;color:var(--muted);}
+    .search-box input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:500;}
+    .search-box input::placeholder{color:#5a7a70;}
+    .kbd-hint{font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a7a70;border:1px solid var(--border);padding:3px 7px;border-radius:5px;flex:none;}
+    .loc-pill{display:flex;align-items:center;gap:7px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;flex:none;cursor:pointer;}
+    .loc-pill svg{color:var(--green);flex:none;}
+    .topbar-right{display:flex;align-items:center;gap:16px;margin-left:auto;flex:none;}
+    .bell-btn{position:relative;background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;transition:color .2s;}
+    .bell-btn:hover{color:var(--green);}
+    .bell-badge{position:absolute;top:0;right:0;background:var(--red);color:#fff;font-size:9px;font-weight:700;border-radius:50%;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;}
+    .admin-chip{display:flex;align-items:center;gap:9px;}
+    .admin-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(99,215,155,.35);display:flex;align-items:center;justify-content:center;color:var(--green);font-weight:700;font-size:13px;font-family:'Rajdhani',sans-serif;flex:none;}
+    .admin-label{font-size:13px;font-weight:700;color:var(--bright);white-space:nowrap;}
+    .logout-btn{padding:9px 16px;border:1px solid var(--border);border-radius:9px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:'Rajdhani',sans-serif;transition:.2s;white-space:nowrap;}
+    .logout-btn:hover{border-color:rgba(230,107,101,.4);color:var(--red);}
 
     /* CONTENT */
     .content{flex:1;overflow-y:auto;}
     ::-webkit-scrollbar{width:5px;}
     ::-webkit-scrollbar-track{background:var(--bg);}
-    ::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
+    ::-webkit-scrollbar-thumb{background:#1a2e26;border-radius:3px;}
 
-    /* HERO */
-    .hero{padding:36px 40px 28px;position:relative;overflow:hidden;}
-    .hero-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-    .hero-ring{position:absolute;border-radius:50%;border:1px solid;opacity:.07;animation:spin-slow linear infinite;}
+    /* ===== HERO (photo background) ===== */
+    .hero{margin:22px 40px 0;border-radius:18px;overflow:hidden;position:relative;min-height:340px;display:flex;flex-direction:column;justify-content:center;padding:36px 40px;}
+    .hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
+    .hero-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(100deg,rgba(6,10,9,.94) 0%,rgba(6,10,9,.72) 38%,rgba(6,10,9,.28) 68%,rgba(6,10,9,.08) 100%);}
+    .hero-content{position:relative;z-index:2;max-width:580px;}
     .hero-tag{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green);letter-spacing:3px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
     .hero-tag::before{content:'';display:inline-block;width:20px;height:1px;background:var(--green);}
-    .hero h1{font-family:'Rajdhani',sans-serif;font-size:46px;font-weight:800;color:var(--bright);line-height:1.08;margin-bottom:14px;}
+    .hero h1{font-family:'Rajdhani',sans-serif;font-size:46px;font-weight:800;color:var(--bright);line-height:1.1;margin-bottom:14px;}
     .hero h1 .accent{color:var(--green);}
-    .hero h1 .line2{display:block;font-size:38px;font-weight:600;color:var(--muted);}
-    .hero-desc{font-size:15px;color:#6a8a9a;max-width:580px;line-height:1.7;margin-bottom:22px;}
-    .hero-stats{display:flex;gap:28px;}
-    .hstat{display:flex;flex-direction:column;gap:3px;}
-    .hstat-val{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:var(--bright);}
-    .hstat-val span{font-size:13px;font-weight:400;color:var(--green);}
-    .hstat-lbl{font-size:11px;color:var(--muted);letter-spacing:.3px;}
-    .hstat-div{width:1px;background:var(--border);align-self:stretch;margin:4px 0;}
+    .hero h1 .line2{display:block;font-size:38px;font-weight:600;color:var(--bright);}
+    .hero-desc{font-size:15px;color:#c3d2cb;max-width:520px;line-height:1.65;margin-bottom:24px;}
+    .hero-actions{display:flex;gap:12px;}
+    .btn-primary,.btn-secondary{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:10px;font-weight:700;font-size:14px;font-family:'Rajdhani',sans-serif;cursor:pointer;text-decoration:none;border:none;transition:.2s;}
+    .btn-primary{background:var(--green);color:#04140c;}
+    .btn-primary:hover{background:#7ee0ac;}
+    .btn-secondary{background:rgba(13,20,18,.75);border:1px solid var(--border);color:var(--bright);}
+    .btn-secondary:hover{border-color:rgba(99,215,155,.3);}
+    .btn-primary svg,.btn-secondary svg{width:16px;height:16px;flex:none;}
+    .hero-float{position:absolute;right:34px;bottom:26px;z-index:2;background:rgba(11,17,15,.82);border:1px solid rgba(99,215,155,.25);backdrop-filter:blur(10px);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:12px;text-decoration:none;transition:.2s;}
+    .hero-float:hover{border-color:rgba(99,215,155,.5);}
+    .hero-float .leaf-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(150deg,var(--green),var(--green-dark));display:flex;align-items:center;justify-content:center;flex:none;}
+    .hero-float .leaf-mark svg{width:16px;height:16px;}
+    .hero-float-text{font-size:13px;font-weight:600;color:var(--bright);line-height:1.35;}
+
+    /* ===== STAT CARDS (new, sits under hero) ===== */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 40px 0;}
+    .stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+    .stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+    .stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;}
+    .stat-delta{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px;}
+    .stat-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
+    .stat-val{font-size:26px;font-weight:800;color:var(--bright);line-height:1;}
+    .stat-lbl{font-size:12px;color:var(--muted);margin-top:6px;}
+    .stat-spark{display:flex;align-items:flex-end;gap:3px;height:22px;flex:none;}
+    .stat-spark i{width:4px;border-radius:2px;display:block;}
 
     /* FEATURE CARDS */
     .section-wrap{padding:0 40px 20px;}
@@ -100,28 +165,28 @@
     .feat-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4);}
     .feat-card:hover::before{opacity:1;}
 
-    .card-green{border-color:rgba(0,232,150,.1);}
-    .card-green:hover{border-color:rgba(0,232,150,.3);}
-    .card-green::before{background:radial-gradient(ellipse at top left,rgba(0,232,150,.06),transparent 60%);}
-    .card-cyan{border-color:rgba(0,200,255,.1);}
-    .card-cyan:hover{border-color:rgba(0,200,255,.3);}
-    .card-cyan::before{background:radial-gradient(ellipse at top left,rgba(0,200,255,.06),transparent 60%);}
-    .card-amber{border-color:rgba(255,180,0,.1);}
-    .card-amber:hover{border-color:rgba(255,180,0,.3);}
-    .card-amber::before{background:radial-gradient(ellipse at top left,rgba(255,180,0,.07),transparent 60%);}
-    .card-violet{border-color:rgba(176,107,255,.1);}
-    .card-violet:hover{border-color:rgba(176,107,255,.3);}
-    .card-violet::before{background:radial-gradient(ellipse at top left,rgba(176,107,255,.06),transparent 60%);}
-    .card-red{border-color:rgba(255,107,107,.1);}
-    .card-red:hover{border-color:rgba(255,107,107,.3);}
-    .card-red::before{background:radial-gradient(ellipse at top left,rgba(255,107,107,.06),transparent 60%);}
+    .card-green{border-color:rgba(99,215,155,.1);}
+    .card-green:hover{border-color:rgba(99,215,155,.3);}
+    .card-green::before{background:radial-gradient(ellipse at top left,rgba(99,215,155,.06),transparent 60%);}
+    .card-cyan{border-color:rgba(90,168,232,.1);}
+    .card-cyan:hover{border-color:rgba(90,168,232,.3);}
+    .card-cyan::before{background:radial-gradient(ellipse at top left,rgba(90,168,232,.06),transparent 60%);}
+    .card-amber{border-color:rgba(212,170,88,.1);}
+    .card-amber:hover{border-color:rgba(212,170,88,.3);}
+    .card-amber::before{background:radial-gradient(ellipse at top left,rgba(212,170,88,.07),transparent 60%);}
+    .card-violet{border-color:rgba(167,139,250,.1);}
+    .card-violet:hover{border-color:rgba(167,139,250,.3);}
+    .card-violet::before{background:radial-gradient(ellipse at top left,rgba(167,139,250,.06),transparent 60%);}
+    .card-red{border-color:rgba(230,107,101,.1);}
+    .card-red:hover{border-color:rgba(230,107,101,.3);}
+    .card-red::before{background:radial-gradient(ellipse at top left,rgba(230,107,101,.06),transparent 60%);}
 
     .feat-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
     .feat-header{display:flex;align-items:flex-start;justify-content:space-between;}
     .feat-arrow{color:var(--muted);font-size:18px;transition:transform .2s;}
     .feat-card:hover .feat-arrow{transform:translate(3px,-3px);}
     .feat-title{font-size:18px;font-weight:700;color:var(--bright);margin-bottom:5px;}
-    .feat-desc{font-size:13px;color:#5a7a8a;line-height:1.6;flex:1;}
+    .feat-desc{font-size:13px;color:#7a9088;line-height:1.6;flex:1;}
     .feat-link{font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-decoration:none;display:flex;align-items:center;gap:6px;margin-top:4px;}
     .feat-link::after{content:'→';transition:margin .2s;}
     .feat-card:hover .feat-link::after{margin-left:4px;}
@@ -129,17 +194,17 @@
     /* HOW IT WORKS */
     .how-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
     .how-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;display:flex;flex-direction:column;gap:10px;position:relative;}
-    .how-num{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:rgba(0,232,150,.1);line-height:1;position:absolute;top:12px;right:14px;}
+    .how-num{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:rgba(99,215,155,.1);line-height:1;position:absolute;top:12px;right:14px;}
     .how-icon{font-size:22px;}
     .how-title{font-size:14px;font-weight:700;color:var(--bright);}
     .how-desc{font-size:12px;color:var(--muted);line-height:1.5;}
     .how-pts{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green);margin-top:4px;letter-spacing:.5px;}
 
     /* MINI MAP */
-    .map-strip{background:#0d1828;border:1px solid var(--border);border-radius:14px;height:110px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .2s;}
-    .map-strip:hover{border-color:rgba(0,232,150,.2);}
-    .map-strip-label{position:absolute;bottom:10px;right:16px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(0,232,150,.6);letter-spacing:1px;}
-    .map-strip-badge{position:absolute;top:10px;left:14px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--green);background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.15);padding:4px 10px;border-radius:6px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+    .map-strip{background:#0d1412;border:1px solid var(--border);border-radius:14px;height:110px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .2s;}
+    .map-strip:hover{border-color:rgba(99,215,155,.2);}
+    .map-strip-label{position:absolute;bottom:10px;right:16px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(99,215,155,.6);letter-spacing:1px;}
+    .map-strip-badge{position:absolute;top:10px;left:14px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--green);background:rgba(99,215,155,.08);border:1px solid rgba(99,215,155,.15);padding:4px 10px;border-radius:6px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
     .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.8s infinite;}
     canvas#miniMap{position:absolute;inset:0;width:100%;height:100%;}
 
@@ -151,8 +216,8 @@
     .conn-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:5px;}
     .conn-sub{font-size:13px;color:var(--muted);}
 
-    .reward-preview{background:linear-gradient(135deg,rgba(255,180,0,.06),rgba(0,232,150,.04));border:1px solid rgba(255,180,0,.15);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:20px;cursor:pointer;text-decoration:none;transition:all .25s;}
-    .reward-preview:hover{border-color:rgba(255,180,0,.3);transform:translateY(-2px);}
+    .reward-preview{background:linear-gradient(135deg,rgba(212,170,88,.06),rgba(99,215,155,.04));border:1px solid rgba(212,170,88,.15);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:20px;cursor:pointer;text-decoration:none;transition:all .25s;}
+    .reward-preview:hover{border-color:rgba(212,170,88,.3);transform:translateY(-2px);}
     .rp-icon{font-size:40px;flex-shrink:0;}
     .rp-body{flex:1;}
     .rp-title{font-size:17px;font-weight:700;color:var(--bright);margin-bottom:5px;}
@@ -164,12 +229,12 @@
     .rp-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
 
     /* STATUS BAR */
-    .status-bar{padding:10px 40px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:32px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:11px;}
+    .status-bar{padding:10px 40px;border-top:1px solid rgba(220,235,226,.05);background:#080c0a;display:flex;align-items:center;gap:32px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:11px;}
     .stat-item{display:flex;flex-direction:column;gap:3px;}
-    .stat-lbl{color:#3a6070;letter-spacing:1.5px;font-size:9px;}
-    .stat-val{color:var(--bright);font-weight:700;font-size:12px;}
+    .stat-lbl2{color:#4a6a5a;letter-spacing:1.5px;font-size:9px;}
+    .stat-val2{color:var(--bright);font-weight:700;font-size:12px;}
     .stat-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;animation:blink 1.8s infinite;}
-    .status-right{margin-left:auto;display:flex;gap:24px;color:#3a5a6a;font-size:10px;letter-spacing:1px;align-items:center;}
+    .status-right{margin-left:auto;display:flex;gap:24px;color:#3a5a4a;font-size:10px;letter-spacing:1px;align-items:center;}
 
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
     @keyframes spin-slow{to{transform:rotate(360deg)}}
@@ -182,83 +247,122 @@
     .fadein-5{animation-delay:.33s;}
 
     #toast-container{position:fixed;bottom:70px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+
+    @media(max-width:1100px){
+      #navbar{transform:translateX(-100%);transition:transform .25s ease;}
+      #navbar.open{transform:translateX(0);}
+      .main{margin-left:0;}
+    }
   </style>
 </head>
 <body>
 <div class="app-shell">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-name">QuantCraft</div>
-      <div class="logo-sub">MISSION CONTROL</div>
-    </div>
+  <!-- ===== SIDEBAR (identical to dashboard.html) ===== -->
+  <nav id="navbar">
 
-    <div class="sidebar-nav">
-      <a class="nav-item active" href="index.html">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-        Home
-      </a>
-      <a class="nav-item" href="map.html">
-        <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-        Map View
-      </a>
-      <a class="nav-item" href="analytics.html">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Analytics
-      </a>
-      <a class="nav-item" href="truck.html">
-        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-        Trucks
-      </a>
-      <a class="nav-item" href="reports.html">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
-        Reports
-      </a>
-      <a class="nav-item" href="kabadiwala.html">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        Kabadiwala
-      </a>
-      <a class="nav-item" href="admin.html">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Admin
-        <span class="nav-badge-violet">ROOT</span>
-      </a>
+    <a href="index.html" class="nav-logo">
+      <span class="leaf-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#04140c" stroke-width="2"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
+      </span>
+      <span class="nav-logo-text">
+        <b>Eco<span>Route</span></b>
+        <span class="nav-logo-tagline">Cleaner cities · Brighter tomorrows</span>
+      </span>
+    </a>
 
-    </div>
-
-    <div class="sidebar-mid">
-      <button class="gen-btn" onclick="location.href='reports.html'">Generate Report</button>
-    </div>
+    <ul class="nav-links">
+      <li>
+        <a href="index.html" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+          Home
+        </a>
+      </li>
+      <li>
+        <a href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="map.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6l6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
+          Live Map
+        </a>
+      </li>
+      <li>
+        <a href="analytics.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+          Analytics
+        </a>
+      </li>
+      <li>
+        <a href="reports.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+          Reports
+        </a>
+      </li>
+      <li>
+        <a href="kabadiwala.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M2 5h3l2.4 11.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+          Kabadiwala
+        </a>
+      </li>
+      <li>
+        <a href="admin.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4Z"/></svg>
+          Admin
+        </a>
+      </li>
+      <li>
+        <a href="about.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+          About
+        </a>
+      </li>
+      <li>
+        <a href="contact.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          Contact
+        </a>
+      </li>
+    </ul>
 
     <div class="sidebar-footer">
-      <a class="footer-item" href="#" onclick="showToast('All systems nominal','info');return false;">
-        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-        System Status
-      </a>
+      Small
+      Steps
+      Big
+      Impact
+      <div class="rule"></div>
+      <svg class="foot-leaf" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
     </div>
-  </div>
+
+  </nav>
 
   <!-- MAIN -->
   <div class="main">
 
+    <!-- TOP BAR -->
     <div class="top-bar">
-      <div class="top-nav">
-        <a class="top-nav-item active" href="index.html">Dashboard</a>
-        <a class="top-nav-item" href="analytics.html">Analytics</a>
-        <a class="top-nav-item" href="map.html">Map</a>
-        <a class="top-nav-item" href="truck.html">Trucks</a>
-        <a class="top-nav-item" href="reports.html">Reports</a>
-        <a class="top-nav-item" href="kabadiwala.html">Kabadiwala</a>
-        <a class="top-nav-item" href="admin.html">Admin</a>
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search bin ID, location...">
+        <span class="kbd-hint">Ctrl K</span>
+      </div>
+      <div class="loc-pill">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-9 8-14a8 8 0 0 0-16 0c0 5 8 14 8 14Z"/><circle cx="12" cy="8" r="3"/></svg>
+        Pathankot
       </div>
       <div class="topbar-right">
-        <button class="ti"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
-        <div class="admin-info">
-          <div class="admin-name">Admin</div>
-          <div class="admin-role">MISSION CONTROL</div>
+        <button class="bell-btn" onclick="showToast('No new alerts','info')">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="bell-badge">3</span>
+        </button>
+        <div class="admin-chip">
+          <div class="admin-avatar">A</div>
+          <span class="admin-label">Admin</span>
         </div>
-        <div class="avatar">👤</div>
+        <button class="logout-btn" onclick="if(confirm('Log out of EcoRoute?')) location.href='index.html';">Logout</button>
       </div>
     </div>
 
@@ -266,48 +370,127 @@
 
       <!-- HERO -->
       <div class="hero fadein fadein-1">
-        <div class="hero-bg">
-          <div class="hero-ring" style="width:300px;height:300px;top:-120px;right:60px;border-color:rgba(0,232,150,.15);animation-duration:40s;"></div>
-          <div class="hero-ring" style="width:180px;height:180px;top:-50px;right:160px;border-color:rgba(0,200,255,.1);animation-duration:28s;animation-direction:reverse;"></div>
+        <img class="hero-photo" src="hero-city.jpg" alt="Pathankot city at dusk">
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <div class="hero-tag">PATHANKOT SMART WASTE SYSTEM</div>
+          <h1>Cleaner Cities<span class="line2"><span class="accent">Brighter Tomorrows</span></span></h1>
+          <p class="hero-desc">Real-time monitoring, smarter collection and a cleaner Pathankot for a healthier tomorrow.</p>
+          <div class="hero-actions">
+            <a class="btn-primary" href="map.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              View Live Map
+            </a>
+            <a class="btn-secondary" href="reports.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Generate Report
+            </a>
+          </div>
         </div>
-        <div class="hero-tag">PATHANKOT SMART WASTE SYSTEM</div>
-        <h1>
-          Mission Control<br>
-          <span class="line2">for <span class="accent">Cleaner Cities</span></span>
-        </h1>
-        <p class="hero-desc">QuantCraft monitors every smart bin, optimises truck routes in real-time, and rewards citizens who segregate waste — turning Pathankot's waste management into a precision operation.</p>
-        <div class="hero-stats">
-          <div class="hstat">
-            <div class="hstat-val">12,400 <span>bins</span></div>
-            <div class="hstat-lbl">Monitored citywide</div>
+        <a class="hero-float" href="about.html">
+          <span class="leaf-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#04140c" stroke-width="2"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
+          </span>
+          <span class="hero-float-text">Together for<br>a Sustainable Pathankot →</span>
+        </a>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stats-row fadein fadein-2">
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:rgba(99,215,155,.1);">
+              <svg width="19" height="19" fill="none" stroke="#63d79b" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </div>
+            <span class="stat-delta" style="color:#63d79b;">↑ +12%</span>
           </div>
-          <div class="hstat-div"></div>
-          <div class="hstat">
-            <div class="hstat-val">4 <span>trucks</span></div>
-            <div class="hstat-lbl">Smart-routed fleet</div>
+          <div class="stat-bottom">
+            <div>
+              <div class="stat-val">12,400</div>
+              <div class="stat-lbl">Total Bins</div>
+            </div>
+            <div class="stat-spark">
+              <i style="height:6px;background:rgba(99,215,155,.3);"></i>
+              <i style="height:10px;background:rgba(99,215,155,.45);"></i>
+              <i style="height:15px;background:rgba(99,215,155,.65);"></i>
+              <i style="height:22px;background:#63d79b;"></i>
+            </div>
           </div>
-          <div class="hstat-div"></div>
-          <div class="hstat">
-            <div class="hstat-val">2 <span>pts/drop</span></div>
-            <div class="hstat-lbl">Citizen rewards</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:rgba(90,168,232,.1);">
+              <svg width="19" height="19" fill="none" stroke="#5aa8e8" stroke-width="1.8" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <span class="stat-delta" style="color:#7a9088;">↑ +0%</span>
           </div>
-          <div class="hstat-div"></div>
-          <div class="hstat">
-            <div class="hstat-val">94.2<span>%</span></div>
-            <div class="hstat-lbl">Fleet efficiency</div>
+          <div class="stat-bottom">
+            <div>
+              <div class="stat-val">4</div>
+              <div class="stat-lbl">Active Trucks</div>
+            </div>
+            <div class="stat-spark">
+              <i style="height:10px;background:rgba(90,168,232,.35);"></i>
+              <i style="height:10px;background:rgba(90,168,232,.35);"></i>
+              <i style="height:10px;background:rgba(90,168,232,.35);"></i>
+              <i style="height:10px;background:#5aa8e8;"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:rgba(212,170,88,.1);">
+              <svg width="19" height="19" fill="none" stroke="#d4aa58" stroke-width="1.8" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <span class="stat-delta" style="color:#e66b65;">↓ -50%</span>
+          </div>
+          <div class="stat-bottom">
+            <div>
+              <div class="stat-val">2</div>
+              <div class="stat-lbl">Need Collection</div>
+            </div>
+            <div class="stat-spark">
+              <i style="height:22px;background:rgba(212,170,88,.6);"></i>
+              <i style="height:16px;background:rgba(212,170,88,.5);"></i>
+              <i style="height:10px;background:rgba(212,170,88,.4);"></i>
+              <i style="height:6px;background:#d4aa58;"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:rgba(167,139,250,.1);">
+              <svg width="19" height="19" fill="none" stroke="#a78bfa" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            </div>
+            <span class="stat-delta" style="color:#63d79b;">↑ +2.1%</span>
+          </div>
+          <div class="stat-bottom">
+            <div>
+              <div class="stat-val">94.2%</div>
+              <div class="stat-lbl">Fleet Efficiency</div>
+            </div>
+            <div class="stat-spark">
+              <i style="height:8px;background:rgba(167,139,250,.35);"></i>
+              <i style="height:13px;background:rgba(167,139,250,.5);"></i>
+              <i style="height:17px;background:rgba(167,139,250,.65);"></i>
+              <i style="height:22px;background:#a78bfa;"></i>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- FEATURE CARDS -->
-      <div class="section-wrap fadein fadein-2">
+      <div class="section-wrap fadein fadein-2" style="margin-top:6px;">
         <div class="section-label">PLATFORM MODULES</div>
         <div class="cards-grid" style="grid-template-columns:repeat(3,1fr);">
 
           <a class="feat-card card-green" href="map.html">
             <div class="feat-header">
-              <div class="feat-icon" style="background:rgba(0,232,150,.1);">
-                <svg width="22" height="22" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              <div class="feat-icon" style="background:rgba(99,215,155,.1);">
+                <svg width="22" height="22" fill="none" stroke="#63d79b" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
               </div>
               <span class="feat-arrow">↗</span>
             </div>
@@ -315,13 +498,13 @@
               <div class="feat-title">Live Map</div>
               <div class="feat-desc">See all 12 smart bins across Pathankot in real-time. Colour-coded by fill level — red bins need pickup now, green bins are fine. 4 truck routes drawn on actual roads.</div>
             </div>
-            <span class="feat-link" style="color:#00e896;">OPEN MAP</span>
+            <span class="feat-link" style="color:#63d79b;">OPEN MAP</span>
           </a>
 
           <a class="feat-card card-cyan" href="analytics.html">
             <div class="feat-header">
-              <div class="feat-icon" style="background:rgba(0,200,255,.1);">
-                <svg width="22" height="22" fill="none" stroke="#00c8ff" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <div class="feat-icon" style="background:rgba(90,168,232,.1);">
+                <svg width="22" height="22" fill="none" stroke="#5aa8e8" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
               </div>
               <span class="feat-arrow">↗</span>
             </div>
@@ -329,13 +512,13 @@
               <div class="feat-title">Analytics</div>
               <div class="feat-desc">Weekly intelligence on bins emptied, areas cleaned, recycling volume, and fleet km saved. Track performance trends and spot problem zones before they overflow.</div>
             </div>
-            <span class="feat-link" style="color:#00c8ff;">VIEW ANALYTICS</span>
+            <span class="feat-link" style="color:#5aa8e8;">VIEW ANALYTICS</span>
           </a>
 
           <a class="feat-card card-amber" href="truck.html">
             <div class="feat-header">
-              <div class="feat-icon" style="background:rgba(255,180,0,.1);">
-                <svg width="22" height="22" fill="none" stroke="#ffb400" stroke-width="1.8" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              <div class="feat-icon" style="background:rgba(212,170,88,.1);">
+                <svg width="22" height="22" fill="none" stroke="#d4aa58" stroke-width="1.8" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
               </div>
               <span class="feat-arrow">↗</span>
             </div>
@@ -343,13 +526,13 @@
               <div class="feat-title">Smart Trucks</div>
               <div class="feat-desc">4 trucks are auto-assigned routes based on which bins are most full. Urgent bins (≥80%) get priority. The algorithm skips empty bins — saving fuel every single day.</div>
             </div>
-            <span class="feat-link" style="color:#ffb400;">TRUCK DISPATCH</span>
+            <span class="feat-link" style="color:#d4aa58;">TRUCK DISPATCH</span>
           </a>
 
           <a class="feat-card card-cyan" href="reports.html">
             <div class="feat-header">
-              <div class="feat-icon" style="background:rgba(0,200,255,.1);">
-                <svg width="22" height="22" fill="none" stroke="#00c8ff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <div class="feat-icon" style="background:rgba(90,168,232,.1);">
+                <svg width="22" height="22" fill="none" stroke="#5aa8e8" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
               </div>
               <span class="feat-arrow">↗</span>
             </div>
@@ -357,13 +540,13 @@
               <div class="feat-title">Environment Reports</div>
               <div class="feat-desc">Community-submitted incident reports — illegal dumping, air and water pollution, hazardous spills — with photo evidence, status tracking, and CSV/HTML/PDF export.</div>
             </div>
-            <span class="feat-link" style="color:#00c8ff;">VIEW REPORTS</span>
+            <span class="feat-link" style="color:#5aa8e8;">VIEW REPORTS</span>
           </a>
 
           <a class="feat-card card-violet" href="admin.html">
             <div class="feat-header">
-              <div class="feat-icon" style="background:rgba(176,107,255,.1);">
-                <svg width="22" height="22" fill="none" stroke="#b06bff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <div class="feat-icon" style="background:rgba(167,139,250,.1);">
+                <svg width="22" height="22" fill="none" stroke="#a78bfa" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
               <span class="feat-arrow">↗</span>
             </div>
@@ -371,7 +554,7 @@
               <div class="feat-title">Admin Panel</div>
               <div class="feat-desc">Root-level control over bins, trucks, users, and alerts. Monitor problematic bins, track truck status, and manage the full Pathankot waste network from one view.</div>
             </div>
-            <span class="feat-link" style="color:#b06bff;">OPEN ADMIN</span>
+            <span class="feat-link" style="color:#a78bfa;">OPEN ADMIN</span>
           </a>
 
         </div>
@@ -433,9 +616,9 @@
               <div class="rp-title">Green Rewards Program</div>
               <div class="rp-desc">Segregate waste at smart bins and earn points redeemable for real city benefits. 3,247 citizens enrolled in Pathankot.</div>
               <div class="rp-pts">
-                <span class="rp-tier" style="color:#00e896;border-color:rgba(0,232,150,.25);">500 pts · Grocery</span>
-                <span class="rp-tier" style="color:#00c8ff;border-color:rgba(0,200,255,.25);">1000 pts · Bus Pass</span>
-                <span class="rp-tier" style="color:#ffb400;border-color:rgba(255,180,0,.25);">1500 pts · Bill Disc.</span>
+                <span class="rp-tier" style="color:#63d79b;border-color:rgba(99,215,155,.25);">500 pts · Grocery</span>
+                <span class="rp-tier" style="color:#5aa8e8;border-color:rgba(90,168,232,.25);">1000 pts · Bus Pass</span>
+                <span class="rp-tier" style="color:#d4aa58;border-color:rgba(212,170,88,.25);">1500 pts · Bill Disc.</span>
               </div>
             </div>
             <div class="rp-right">
@@ -450,16 +633,16 @@
 
     <div class="status-bar">
       <div class="stat-item">
-        <div class="stat-lbl">ACTIVE BINS</div>
-        <div class="stat-val"><span class="stat-dot"></span>12,242 / 12,400</div>
+        <div class="stat-lbl2">ACTIVE BINS</div>
+        <div class="stat-val2"><span class="stat-dot"></span>12,242 / 12,400</div>
       </div>
       <div class="stat-item">
-        <div class="stat-lbl">FLEET STATUS</div>
-        <div class="stat-val"><span class="stat-dot"></span>All Systems Nominal</div>
+        <div class="stat-lbl2">FLEET STATUS</div>
+        <div class="stat-val2"><span class="stat-dot"></span>All Systems Nominal</div>
       </div>
       <div class="stat-item">
-        <div class="stat-lbl">EFFICIENCY</div>
-        <div class="stat-val"><span class="stat-dot"></span>94.2% Optimal</div>
+        <div class="stat-lbl2">EFFICIENCY</div>
+        <div class="stat-val2"><span class="stat-dot"></span>94.2% Optimal</div>
       </div>
       <div class="status-right">
         <span>LAST SYNC: <span id="sync-time">--:--:-- UTC</span></span>
@@ -483,24 +666,24 @@ resizeMini(); window.addEventListener('resize', resizeMini);
 function drawMini(){
   const W=mc.width, H=mc.height;
   mctx.clearRect(0,0,W,H);
-  mctx.fillStyle='#0d1828'; mctx.fillRect(0,0,W,H);
+  mctx.fillStyle='#0d1412'; mctx.fillRect(0,0,W,H);
   const cx=W*.5, cy=H*.5;
   for(let a=0;a<360;a+=20){
     const r=a*Math.PI/180;
     mctx.beginPath(); mctx.moveTo(cx,cy);
     mctx.lineTo(cx+Math.cos(r)*W*.6, cy+Math.sin(r)*H*1.2);
-    mctx.strokeStyle='rgba(0,200,160,.07)'; mctx.lineWidth=1; mctx.stroke();
+    mctx.strokeStyle='rgba(99,215,155,.08)'; mctx.lineWidth=1; mctx.stroke();
   }
   [30,70,120,180].forEach(r=>{
     mctx.beginPath(); mctx.ellipse(cx,cy,r,r*.45,0,0,Math.PI*2);
-    mctx.strokeStyle='rgba(0,200,160,.06)'; mctx.lineWidth=1; mctx.stroke();
+    mctx.strokeStyle='rgba(99,215,155,.07)'; mctx.lineWidth=1; mctx.stroke();
   });
   for(let i=0;i<8;i++){
     const angle=(mf*.01+i*(Math.PI*2/8));
     const rad=60+i*12;
     const x=cx+Math.cos(angle)*rad, y=cy+Math.sin(angle)*rad*.5;
     mctx.beginPath(); mctx.arc(x,y,2,0,Math.PI*2);
-    mctx.fillStyle=i%3===0?'#00e896':i%3===1?'#00c8ff':'#ff8060';
+    mctx.fillStyle=i%3===0?'#63d79b':i%3===1?'#5aa8e8':'#e8a06b';
     mctx.globalAlpha=.7+Math.sin(mf*.05+i)*.3; mctx.fill(); mctx.globalAlpha=1;
   }
   mf++; requestAnimationFrame(drawMini);
@@ -520,7 +703,7 @@ function showToast(msg,type){
   type=type||'info';
   const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
   const el=document.createElement('div');
-  el.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(13,21,32,.97);border:1px solid rgba(0,232,150,.2);border-radius:10px;padding:13px 18px;min-width:260px;backdrop-filter:blur(16px);font-size:14px;font-family:Rajdhani,sans-serif;color:#c8dde8;box-shadow:0 8px 32px rgba(0,0,0,.5);';
+  el.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(13,20,18,.97);border:1px solid rgba(99,215,155,.2);border-radius:10px;padding:13px 18px;min-width:260px;backdrop-filter:blur(16px);font-size:14px;font-family:Rajdhani,sans-serif;color:#c8d8d0;box-shadow:0 8px 32px rgba(0,0,0,.5);';
   el.innerHTML='<span>'+(icons[type]||'ℹ️')+'</span><span>'+msg+'</span>';
   document.getElementById('toast-container').appendChild(el);
   setTimeout(function(){ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(function(){el.remove();},300); },2500);

@@ -3,167 +3,210 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>QuantCraft — Analytics</title>
+<title>EcoRoute — Analytics</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
 
+:root{
+  --bg:#070b0a; --surface:#0d1412; --surface2:#111a17; --surface3:#16221e;
+  --border:rgba(220,235,226,.10); --border-hover:rgba(220,235,226,.20);
+  --text:#f3f5f1; --muted:#84938b; --soft:#b7c2bc;
+  --green:#63d79b; --green-dark:#1d6748;
+  --gold:#c7a467; --red:#e66b65; --yellow:#d4aa58; --blue:#5aa8e8; --violet:#a78bfa;
+  --sidebar-w:250px;
+}
+
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color:#c8dde8;overflow:hidden;}
+html,body{height:100%;background:var(--bg);font-family:'Rajdhani',sans-serif;color:var(--soft);overflow:hidden;}
 
 .shell{display:flex;flex-direction:column;height:100vh;}
 
-.topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;gap:0;z-index:1000;position:relative;}
-.logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;margin-right:20px;text-decoration:none;}
+/* ===== SIDEBAR (byte-identical markup/CSS to dashboard.html) ===== */
+#navbar{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+html body #navbar,
+html body nav#navbar{
+  position:fixed !important;
+  top:0 !important; left:0 !important; bottom:0 !important; right:auto !important;
+  width:var(--sidebar-w) !important; min-width:var(--sidebar-w) !important; max-width:var(--sidebar-w) !important;
+  height:100vh !important;
+  z-index:9999 !important;
+  display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:0 !important;
+  padding:26px 18px !important;
+  background:var(--surface) !important;
+  border-right:1px solid var(--border) !important;
+  border-bottom:none !important;
+  backdrop-filter:none !important;
+  overflow-y:auto !important; overflow-x:hidden !important;
+}
+#navbar .nav-logo{
+  display:flex !important; flex-direction:row !important; align-items:center !important; gap:10px;
+  color:var(--text) !important; text-decoration:none;
+  font-size:0 !important; font-weight:400 !important; letter-spacing:normal !important; white-space:normal !important;
+  margin-bottom:6px;
+}
+.nav-logo .leaf-mark{
+  width:34px; height:34px; border-radius:9px;
+  background:linear-gradient(150deg,var(--green),var(--green-dark));
+  display:grid; place-items:center; flex:none;
+}
+.nav-logo .leaf-mark svg{width:18px;height:18px;}
+.nav-logo-text{display:flex;flex-direction:column;line-height:1.15;}
+.nav-logo-text b{font-size:17px !important;font-weight:700 !important;letter-spacing:.3px;}
+.nav-logo-text b span{color:var(--green) !important;}
+.nav-logo-tagline{
+  margin-top:2px; font-size:8px !important; letter-spacing:1.4px;
+  color:var(--muted) !important; text-transform:uppercase;
+}
+#navbar .nav-links{
+  display:flex !important; flex-direction:column !important; align-items:stretch !important; flex:1 !important;
+  gap:3px; justify-content:space-evenly !important;
+  margin:26px 0 0 !important; padding:0 !important; list-style:none;
+}
+#navbar .nav-links a{
+  display:flex !important; align-items:center !important; gap:11px; flex:none !important;
+  text-decoration:none; color:#8b978f !important;
+  font-size:13px !important; font-weight:500;
+  padding:13px 14px !important; border-radius:9px; transition:.2s;
+}
+.nav-links a svg{width:16px;height:16px;flex:none;opacity:.8;}
+.nav-links a:hover{color:#edf5ef !important;background:rgba(99,215,155,.07);}
+.nav-links a.active{
+  color:var(--text) !important;
+  background:rgba(99,215,155,.12) !important;
+  box-shadow:inset 2px 0 0 var(--green);
+}
+.nav-links a.active svg{opacity:1;}
+.sidebar-footer{
+  margin-top:auto; padding-top:24px; color:var(--soft);
+  font-size:20px; font-weight:600; line-height:1.25;
+  position:relative; overflow:hidden;
+}
+.sidebar-footer .foot-leaf{
+  position:absolute; right:-18px; bottom:-10px; width:110px; height:110px; opacity:.12;
+}
+.sidebar-footer .rule{width:34px;height:2px;background:var(--green);margin-top:12px;}
+
+/* ===== TOP TABS (kept from original layout, recoloured) ===== */
+.topnav{display:flex;align-items:center;padding:0 20px;height:54px;background:#0a0f0d;border-bottom:1px solid var(--border);flex-shrink:0;gap:0;z-index:1000;position:relative;margin-left:var(--sidebar-w);}
+.logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:var(--green);letter-spacing:1px;margin-right:20px;text-decoration:none;}
 .tnav{display:flex;align-items:flex-end;height:100%;gap:0;}
-.tnav-item{padding:0 18px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:#4a6a7a;cursor:pointer;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;text-decoration:none;}
-.tnav-item:hover{color:#c8dde8;}
-.tnav-item.active{color:#00e896;border-bottom-color:#00e896;}
-.search-wrap{margin-left:24px;position:relative;display:flex;align-items:center;}
-.search-wrap input{padding:7px 14px 7px 36px;width:250px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
-.search-wrap input::placeholder{color:#3a5a6a;}
-.search-wrap input:focus{border-color:rgba(0,232,150,.4);}
-.search-icon{position:absolute;left:11px;color:#3a5a6a;pointer-events:none;}
+.tnav-item{padding:0 18px;height:100%;display:flex;align-items:center;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;font-family:'Rajdhani',sans-serif;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;text-decoration:none;}
+.tnav-item:hover{color:var(--text);}
+.tnav-item.active{color:var(--green);border-bottom-color:var(--green);}
 .tnav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
-.ti-btn{color:#4a6a7a;cursor:pointer;transition:color .2s;background:none;border:none;padding:4px;}
-.ti-btn:hover{color:#00e896;}
+.ti-btn{color:var(--muted);cursor:pointer;transition:color .2s;background:none;border:none;padding:4px;}
+.ti-btn:hover{color:var(--green);}
 
-.body{display:flex;flex:1;overflow:hidden;}
-
-/* ===== UNIFIED SIDEBAR (same across all pages) ===== */
-.sidebar{width:230px;flex-shrink:0;background:#0d1525;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;padding:28px 0 0;}
-.sidebar-logo{padding:0 24px 28px;}
-.logo-name{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00e896;letter-spacing:1px;}
-.logo-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:#2a5050;margin-top:3px;letter-spacing:2px;}
-.sidebar-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:2px;}
-.nav-item{display:flex;align-items:center;gap:14px;padding:12px 14px;cursor:pointer;transition:all .2s;font-size:15px;font-weight:600;color:#4a6a7a;border-left:3px solid transparent;border-radius:0 8px 8px 0;margin-right:8px;text-decoration:none;}
-.nav-item:hover{color:#eaf4ff;background:rgba(255,255,255,.04);}
-.nav-item.active{color:#00e896;background:rgba(0,232,150,.12);border-left-color:#00e896;}
-.nav-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
-.nav-badge{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(255,180,0,.15);color:#ffb400;border:1px solid rgba(255,180,0,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
-.nav-badge-violet{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;background:rgba(176,107,255,.15);color:#b06bff;border:1px solid rgba(176,107,255,.25);padding:2px 7px;border-radius:10px;letter-spacing:.5px;}
-.sidebar-mid{padding:16px 12px;}
-.gen-btn{width:100%;padding:13px 16px;border-radius:10px;background:linear-gradient(135deg,#00e896,#00c87a);border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a1a10;letter-spacing:.3px;transition:all .2s;box-shadow:0 4px 18px rgba(0,232,150,.25);}
-.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,232,150,.35);}
-.sidebar-stats{padding:0 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.stat-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;text-align:center;}
-.stat-val{font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;}
-.stat-lbl{font-size:11px;color:#3a5a6a;margin-top:2px;}
-.sidebar-footer{padding:8px 12px 20px;display:flex;flex-direction:column;gap:2px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;}
-.footer-item{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;cursor:pointer;color:#3a5a6a;font-size:14px;font-weight:600;transition:all .2s;text-decoration:none;border:none;background:none;width:100%;text-align:left;font-family:'Rajdhani',sans-serif;}
-.footer-item:hover{color:#eaf4ff;background:rgba(255,255,255,.04);}
-.footer-item.red{color:#e05050;}
-.footer-item.red:hover{background:rgba(200,50,50,.07);}
-.footer-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;}
-
+.body{display:flex;flex:1;overflow:hidden;margin-left:var(--sidebar-w);}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 
-.page-header{padding:14px 24px 12px;background:#0a1020;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
-.ph-title{font-family:'Share Tech Mono',monospace;font-size:14px;color:#00e896;letter-spacing:2px;}
-.ph-sub{font-size:12px;color:#4a6a7a;margin-top:3px;}
-.dl-btn{display:flex;align-items:center;gap:8px;padding:9px 18px;background:transparent;border:1.5px solid #00e896;border-radius:8px;color:#00e896;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;}
-.dl-btn:hover{background:rgba(0,232,150,.1);}
+.page-header{padding:14px 24px 12px;background:#0a0f0d;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.ph-title{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--green);letter-spacing:2px;}
+.ph-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.dl-btn{display:flex;align-items:center;gap:8px;padding:9px 18px;background:transparent;border:1.5px solid var(--green);border-radius:8px;color:var(--green);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;}
+.dl-btn:hover{background:rgba(99,215,155,.1);}
 .dl-btn:disabled{opacity:.5;cursor:not-allowed;}
 .dl-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;}
-.conn-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.4px;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.08);color:#4a6a7a;margin-right:12px;}
-.conn-status.ok{color:#00e896;border-color:rgba(0,232,150,.3);}
-.conn-status.err{color:#ff6b6b;border-color:rgba(255,107,107,.3);}
+.conn-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.4px;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;border:1px solid var(--border);color:var(--muted);margin-right:12px;}
+.conn-status.ok{color:var(--green);border-color:rgba(99,215,155,.3);}
+.conn-status.err{color:var(--red);border-color:rgba(230,107,101,.3);}
 .conn-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
 
 .content{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:16px;}
 ::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:#080e1c;}
-::-webkit-scrollbar-thumb{background:#1a3040;border-radius:3px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:#1a2e26;border-radius:3px;}
 
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-.kpi-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:15px 16px;transition:border-color .2s;animation:fadeUp .4s ease both;}
-.kpi-card:hover{border-color:rgba(0,232,150,.2);}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:15px 16px;transition:border-color .2s;animation:fadeUp .4s ease both;}
+.kpi-card:hover{border-color:rgba(99,215,155,.2);}
 .kpi-card:nth-child(1){animation-delay:.05s;}
 .kpi-card:nth-child(2){animation-delay:.1s;}
 .kpi-card:nth-child(3){animation-delay:.15s;}
 .kpi-card:nth-child(4){animation-delay:.2s;}
 .kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
 .kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
-.ki-green{background:rgba(0,232,150,.1);border:1px solid rgba(0,232,150,.15);}
-.ki-cyan{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.15);}
-.ki-amber{background:rgba(255,170,64,.08);border:1px solid rgba(255,170,64,.15);}
-.ki-purple{background:rgba(184,127,255,.08);border:1px solid rgba(184,127,255,.15);}
+.ki-green{background:rgba(99,215,155,.1);border:1px solid rgba(99,215,155,.15);}
+.ki-cyan{background:rgba(90,168,232,.08);border:1px solid rgba(90,168,232,.15);}
+.ki-amber{background:rgba(212,170,88,.08);border:1px solid rgba(212,170,88,.15);}
+.ki-purple{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);}
 .kpi-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;letter-spacing:.3px;}
-.kb-green{background:rgba(0,232,150,.12);color:#00e896;}
-.kb-cyan{background:rgba(0,200,255,.1);color:#00c8ff;}
-.kb-amber{background:rgba(255,170,64,.1);color:#ffaa40;}
-.kb-purple{background:rgba(184,127,255,.1);color:#b87fff;}
-.kpi-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a5a6a;letter-spacing:1.5px;margin-bottom:5px;}
-.kpi-val{font-size:28px;font-weight:700;color:#eaf4ff;line-height:1;display:flex;align-items:baseline;gap:6px;}
-.kpi-val-sub{font-size:12px;font-weight:500;color:#5a7a8a;}
+.kb-green{background:rgba(99,215,155,.12);color:var(--green);}
+.kb-cyan{background:rgba(90,168,232,.1);color:var(--blue);}
+.kb-amber{background:rgba(212,170,88,.1);color:var(--yellow);}
+.kb-purple{background:rgba(167,139,250,.1);color:var(--violet);}
+.kpi-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:5px;}
+.kpi-val{font-size:28px;font-weight:700;color:var(--text);line-height:1;display:flex;align-items:baseline;gap:6px;}
+.kpi-val-sub{font-size:12px;font-weight:500;color:var(--muted);}
 
 .mid-row{display:grid;grid-template-columns:1fr 1fr 300px;gap:12px;animation:fadeUp .4s ease .25s both;}
 
-.chart-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px 18px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
 .cc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
-.cc-title{font-size:13px;font-weight:700;color:#eaf4ff;}
-.cc-sub{font-size:11px;color:#4a6a7a;margin-top:3px;}
-.live-badge{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#00e896;background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.15);padding:3px 9px;border-radius:20px;letter-spacing:.5px;}
-.live-dot{width:6px;height:6px;border-radius:50%;background:#00e896;box-shadow:0 0 5px #00e896;animation:blink 1.8s infinite;}
+.cc-title{font-size:13px;font-weight:700;color:var(--text);}
+.cc-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.live-badge{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--green);background:rgba(99,215,155,.08);border:1px solid rgba(99,215,155,.15);padding:3px 9px;border-radius:20px;letter-spacing:.5px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:blink 1.8s infinite;}
 .chart-wrap{height:160px;position:relative;}
 
-.donut-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px 18px;}
+.donut-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
 .donut-wrap{height:160px;display:flex;align-items:center;justify-content:center;position:relative;}
 .donut-center{position:absolute;text-align:center;pointer-events:none;}
-.donut-center-val{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:#eaf4ff;}
-.donut-center-lbl{font-size:10px;color:#4a6a7a;margin-top:2px;}
+.donut-center-val{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:var(--text);}
+.donut-center-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
 .donut-legend{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
-.dl-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#5a7a8a;}
+.dl-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--soft);}
 .dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .dl-pct{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;}
 
-.community-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;}
-.impact-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:11px 12px;display:flex;gap:10px;align-items:flex-start;}
-.ii-icon{width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.ii-label{font-size:11px;font-weight:700;color:#c8dde8;margin-bottom:2px;}
-.ii-val{font-family:'Share Tech Mono',monospace;font-size:17px;font-weight:700;color:#eaf4ff;display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.community-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;}
+.impact-item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:11px 12px;display:flex;gap:10px;align-items:flex-start;}
+.ii-icon{width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ii-label{font-size:11px;font-weight:700;color:var(--soft);margin-bottom:2px;}
+.ii-val{font-family:'Share Tech Mono',monospace;font-size:17px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:2px;}
 .ii-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;}
-.iib-green{background:rgba(0,232,150,.12);color:#00e896;}
-.iib-cyan{background:rgba(0,200,255,.1);color:#00c8ff;}
-.ii-desc{font-size:11px;color:#3a5a6a;line-height:1.4;}
+.iib-green{background:rgba(99,215,155,.12);color:var(--green);}
+.iib-cyan{background:rgba(90,168,232,.1);color:var(--blue);}
+.ii-desc{font-size:11px;color:var(--muted);line-height:1.4;}
 
 .bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;animation:fadeUp .4s ease .35s both;}
-.bottom-card{background:#0d1525;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:15px 18px;}
+.bottom-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 18px;}
 .bc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.bc-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a5a6a;letter-spacing:1.5px;}
+.bc-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;}
 .bc-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.5px;}
-.bcs-green{color:#00e896;}
-.bcs-cyan{color:#00c8ff;}
+.bcs-green{color:var(--green);}
+.bcs-cyan{color:var(--blue);}
 
 .bin-table{display:flex;flex-direction:column;gap:5px;}
 .bin-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(255,255,255,.02);border-radius:7px;border:1px solid rgba(255,255,255,.04);font-size:12px;}
-.bin-row:hover{border-color:rgba(0,232,150,.15);}
-.bin-row.live{border-color:rgba(0,232,150,.25);background:rgba(0,232,150,.04);}
+.bin-row:hover{border-color:rgba(99,215,155,.15);}
+.bin-row.live{border-color:rgba(99,215,155,.25);background:rgba(99,215,155,.04);}
 .bin-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.bin-name{flex:1;color:#c8dde8;font-weight:600;}
-.bin-area{color:#4a6a7a;font-size:11px;min-width:80px;}
+.bin-name{flex:1;color:var(--soft);font-weight:600;}
+.bin-area{color:var(--muted);font-size:11px;min-width:80px;}
 .bin-fill-bar{flex:1;height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;}
 .bin-fill-inner{height:100%;border-radius:2px;}
 .bin-pct{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;min-width:34px;text-align:right;}
 
 .truck-table{display:flex;flex-direction:column;gap:5px;}
 .truck-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(255,255,255,.02);border-radius:7px;border:1px solid rgba(255,255,255,.04);font-size:12px;}
-.truck-row:hover{border-color:rgba(0,232,150,.15);}
+.truck-row:hover{border-color:rgba(99,215,155,.15);}
 .truck-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.truck-id{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8a9a;min-width:52px;}
-.truck-stops{flex:1;color:#c8dde8;font-weight:600;}
-.truck-km{font-family:'Share Tech Mono',monospace;font-size:11px;color:#4a6a7a;min-width:44px;}
-.truck-saved{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;color:#00e896;min-width:40px;text-align:right;}
+.truck-id{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--soft);min-width:52px;}
+.truck-stops{flex:1;color:var(--soft);font-weight:600;}
+.truck-km{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);min-width:44px;}
+.truck-saved{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;color:var(--green);min-width:40px;text-align:right;}
 
-.status-bar{padding:10px 24px;border-top:1px solid rgba(255,255,255,.05);background:#090e1a;display:flex;align-items:center;gap:28px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
+.status-bar{padding:10px 24px;border-top:1px solid rgba(220,235,226,.05);background:#080c0a;display:flex;align-items:center;gap:28px;flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;}
 .sb-item{display:flex;flex-direction:column;gap:2px;}
-.sb-lbl{color:#2a4a5a;letter-spacing:1px;font-size:9px;}
-.sb-val{color:#eaf4ff;font-size:12px;}
-.sb-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e896;margin-right:5px;animation:blink 1.8s infinite;}
-.sb-right{margin-left:auto;color:#2a4a5a;font-size:10px;}
+.sb-lbl{color:#4a6a5a;letter-spacing:1px;font-size:9px;}
+.sb-val{color:var(--text);font-size:12px;}
+.sb-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:5px;animation:blink 1.8s infinite;}
+.sb-right{margin-left:auto;color:#3a5a4a;font-size:10px;}
 
 #toast-wrap{position:fixed;bottom:55px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
-.toast{display:flex;align-items:center;gap:10px;background:rgba(8,14,28,.97);border:1px solid rgba(0,232,150,.2);border-radius:9px;padding:10px 14px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:#c8dde8;box-shadow:0 6px 24px rgba(0,0,0,.5);}
+.toast{display:flex;align-items:center;gap:10px;background:rgba(7,11,10,.97);border:1px solid rgba(99,215,155,.2);border-radius:9px;padding:10px 14px;min-width:220px;font-size:13px;font-family:'Rajdhani',sans-serif;color:var(--soft);box-shadow:0 6px 24px rgba(0,0,0,.5);}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
@@ -173,7 +216,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
 <div class="shell">
 
   <div class="topnav">
-    <a href="index.html" class="logo">QuantCraft</a>
+    <a href="index.html" class="logo">EcoRoute</a>
     <div class="tnav">
       <a class="tnav-item" href="index.html">Home</a>
       <a class="tnav-item" href="map.html">Map View</a>
@@ -193,59 +236,86 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
     </div>
   </div>
 
-  <div class="body">
-    <!-- ===== UNIFIED SIDEBAR ===== -->
-    <div class="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-name">QuantCraft</div>
-        <div class="logo-sub">MISSION CONTROL</div>
-      </div>
-      <div class="sidebar-nav">
-        <a class="nav-item" href="index.html">
-          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
-        </a>
-        <a class="nav-item" href="map.html">
-          <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map View
-        </a>
-        <a class="nav-item active" href="analytics.html">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
-        </a>
-        <a class="nav-item" href="truck.html">
-          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trucks
-        </a>
-        <a class="nav-item" href="reports.html">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports
-        </a>
-        <a class="nav-item" href="kabadiwala.html">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Kabadiwala
-        </a>
-        <a class="nav-item" href="admin.html">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin
-          <span class="nav-badge-violet">ROOT</span>
-        </a>
-      </div>
-      <div class="sidebar-mid">
-        <button class="gen-btn" onclick="location.href='reports.html'">Generate Report</button>
-      </div>
-      <div class="sidebar-stats">
-        <div class="stat-box"><div class="stat-val" id="sb-full" style="color:#ff6b6b">0</div><div class="stat-lbl">Full Bins</div></div>
-        <div class="stat-box"><div class="stat-val" id="sb-ok" style="color:#00e896">0</div><div class="stat-lbl">OK Bins</div></div>
-        <div class="stat-box"><div class="stat-val" style="color:#00c8ff">4</div><div class="stat-lbl">Routes</div></div>
-        <div class="stat-box"><div class="stat-val" id="sb-total" style="color:#c8dde8">16</div><div class="stat-lbl">Total Bins</div></div>
-      </div>
-      <div class="sidebar-footer">
-        <a class="footer-item" href="#" onclick="toast('Settings','info');return false;">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
-        </a>
-        <a class="footer-item" href="#" onclick="toast('All systems nominal','info');return false;">
-          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>System Status
-        </a>
-        <button class="footer-item red" onclick="toast('Logging out…','warning')">
-          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout
-        </button>
-      </div>
-    </div>
+  <!-- ===== SIDEBAR (identical to dashboard.html) ===== -->
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo">
+      <span class="leaf-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#04140c" stroke-width="2"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
+      </span>
+      <span class="nav-logo-text">
+        <b>Eco<span>Route</span></b>
+        <span class="nav-logo-tagline">Cleaner cities · Brighter tomorrows</span>
+      </span>
+    </a>
 
+    <ul class="nav-links">
+      <li>
+        <a href="index.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+          Home
+        </a>
+      </li>
+      <li>
+        <a href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="map.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6l6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
+          Live Map
+        </a>
+      </li>
+      <li>
+        <a href="analytics.html" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+          Analytics
+        </a>
+      </li>
+      <li>
+        <a href="reports.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+          Reports
+        </a>
+      </li>
+      <li>
+        <a href="kabadiwala.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M2 5h3l2.4 11.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+          Kabadiwala
+        </a>
+      </li>
+      <li>
+        <a href="admin.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4Z"/></svg>
+          Admin
+        </a>
+      </li>
+      <li>
+        <a href="about.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+          About
+        </a>
+      </li>
+      <li>
+        <a href="contact.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          Contact
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      Small
+      Steps
+      Big
+      Impact
+      <div class="rule"></div>
+      <svg class="foot-leaf" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
+    </div>
+  </nav>
+
+  <div class="body">
     <div class="main">
       <div class="page-header">
         <div>
@@ -267,7 +337,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
           <div class="kpi-card">
             <div class="kpi-top">
               <div class="kpi-icon ki-green">
-                <svg width="17" height="17" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 8 22 12 18 12"/><path d="M20.49 9A9 9 0 1 0 21 12"/></svg>
+                <svg width="17" height="17" fill="none" stroke="#63d79b" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 8 22 12 18 12"/><path d="M20.49 9A9 9 0 1 0 21 12"/></svg>
               </div>
               <span class="kpi-badge kb-green">+12 TODAY</span>
             </div>
@@ -277,17 +347,17 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
           <div class="kpi-card">
             <div class="kpi-top">
               <div class="kpi-icon ki-cyan">
-                <svg width="17" height="17" fill="none" stroke="#00c8ff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <svg width="17" height="17" fill="none" stroke="#5aa8e8" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               </div>
               <span class="kpi-badge kb-cyan">↗ HIGH</span>
             </div>
             <div class="kpi-lbl">CLEAN AREAS</div>
-            <div class="kpi-val"><span id="cv2">0</span><span style="font-size:16px;color:#5a7a8a">%</span><span class="kpi-val-sub">this week</span></div>
+            <div class="kpi-val"><span id="cv2">0</span><span style="font-size:16px;color:var(--muted)">%</span><span class="kpi-val-sub">this week</span></div>
           </div>
           <div class="kpi-card">
             <div class="kpi-top">
               <div class="kpi-icon ki-amber">
-                <svg width="17" height="17" fill="none" stroke="#ffaa40" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 0 0 5.414 17H17m0 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm-12 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0z"/></svg>
+                <svg width="17" height="17" fill="none" stroke="#d4aa58" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 0 0 5.414 17H17m0 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm-12 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0z"/></svg>
               </div>
               <span class="kpi-badge kb-amber">OPTIMIZED</span>
             </div>
@@ -297,7 +367,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
           <div class="kpi-card">
             <div class="kpi-top">
               <div class="kpi-icon ki-purple">
-                <svg width="17" height="17" fill="none" stroke="#b87fff" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+                <svg width="17" height="17" fill="none" stroke="#a78bfa" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
               </div>
               <span class="kpi-badge kb-purple">NET POS</span>
             </div>
@@ -335,9 +405,9 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
               </div>
             </div>
             <div class="donut-legend">
-              <div class="dl-row"><span class="dl-dot" style="background:#ff6b6b"></span>Full ≥ 80%<span class="dl-pct" style="color:#ff6b6b" id="dl-full">0</span></div>
-              <div class="dl-row"><span class="dl-dot" style="background:#ffaa40"></span>Half 40–79%<span class="dl-pct" style="color:#ffaa40" id="dl-warn">0</span></div>
-              <div class="dl-row"><span class="dl-dot" style="background:#00e896"></span>OK &lt; 40%<span class="dl-pct" style="color:#00e896" id="dl-ok">0</span></div>
+              <div class="dl-row"><span class="dl-dot" style="background:#e66b65"></span>Full ≥ 80%<span class="dl-pct" style="color:#e66b65" id="dl-full">0</span></div>
+              <div class="dl-row"><span class="dl-dot" style="background:#d4aa58"></span>Half 40–79%<span class="dl-pct" style="color:#d4aa58" id="dl-warn">0</span></div>
+              <div class="dl-row"><span class="dl-dot" style="background:#63d79b"></span>OK &lt; 40%<span class="dl-pct" style="color:#63d79b" id="dl-ok">0</span></div>
             </div>
           </div>
 
@@ -348,7 +418,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
             </div>
             <div class="impact-item">
               <div class="ii-icon">
-                <svg width="16" height="16" fill="none" stroke="#00e896" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 0 0 5.414 17H17m0 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm-12 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0z"/></svg>
+                <svg width="16" height="16" fill="none" stroke="#63d79b" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 0 0 5.414 17H17m0 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm-12 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0z"/></svg>
               </div>
               <div>
                 <div class="ii-label">Fuel Saved</div>
@@ -358,7 +428,7 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
             </div>
             <div class="impact-item">
               <div class="ii-icon">
-                <svg width="16" height="16" fill="none" stroke="#00c8ff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/></svg>
+                <svg width="16" height="16" fill="none" stroke="#5aa8e8" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/></svg>
               </div>
               <div>
                 <div class="ii-label">CO₂ Reduced</div>
@@ -368,11 +438,11 @@ html,body{height:100%;background:#080e1c;font-family:'Rajdhani',sans-serif;color
             </div>
             <div class="impact-item">
               <div class="ii-icon">
-                <svg width="16" height="16" fill="none" stroke="#ffaa40" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg width="16" height="16" fill="none" stroke="#d4aa58" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
               <div>
                 <div class="ii-label">Efficiency Score</div>
-                <div class="ii-val">94% <span class="ii-badge" style="background:rgba(255,170,64,.1);color:#ffaa40;">↑ HIGH</span></div>
+                <div class="ii-val">94% <span class="ii-badge" style="background:rgba(212,170,88,.1);color:#d4aa58;">↑ HIGH</span></div>
                 <div class="ii-desc">Fleet operating at peak performance this week.</div>
               </div>
             </div>
@@ -446,13 +516,13 @@ const LIVE_BINS = [
 function allBins(){ return [...LIVE_BINS, ...BINS]; }
 
 const TRUCKS = [
-  {id:'TRK-01', color:'#00e896'},
-  {id:'TRK-02', color:'#00c8ff'},
-  {id:'TRK-03', color:'#ffaa40'},
-  {id:'TRK-04', color:'#e86bff'},
+  {id:'TRK-01', color:'#63d79b'},
+  {id:'TRK-02', color:'#5aa8e8'},
+  {id:'TRK-03', color:'#d4aa58'},
+  {id:'TRK-04', color:'#c77cf0'},
 ];
 
-function binColor(f){ return f>=80?'#ff6b6b':f>=40?'#ffaa40':'#00e896'; }
+function binColor(f){ return f>=80?'#e66b65':f>=40?'#d4aa58':'#63d79b'; }
 function dist(a,b){ return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2); }
 
 function computeTrucks(){
@@ -493,20 +563,20 @@ new Chart(weekCtx,{
     labels:days,
     datasets:[{
       data:vals,
-      backgroundColor:vals.map((_,i)=>i===todayIdx?'rgba(0,232,150,.5)':'rgba(255,255,255,.06)'),
-      borderColor:vals.map((_,i)=>i===todayIdx?'#00e896':'rgba(255,255,255,.1)'),
+      backgroundColor:vals.map((_,i)=>i===todayIdx?'rgba(99,215,155,.5)':'rgba(255,255,255,.06)'),
+      borderColor:vals.map((_,i)=>i===todayIdx?'#63d79b':'rgba(255,255,255,.1)'),
       borderWidth:1,borderRadius:6,borderSkipped:false,
     }]
   },
   options:{
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{
-      backgroundColor:'rgba(8,14,28,.97)',borderColor:'rgba(0,232,150,.3)',borderWidth:1,
-      titleColor:'#00e896',bodyColor:'#c8dde8',
+      backgroundColor:'rgba(7,11,10,.97)',borderColor:'rgba(99,215,155,.3)',borderWidth:1,
+      titleColor:'#63d79b',bodyColor:'#b7c2bc',
       titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Rajdhani',size:13},
     }},
     scales:{
-      x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3a5a6a',font:{family:'Share Tech Mono',size:9},padding:6},border:{display:false}},
+      x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4a6a5a',font:{family:'Share Tech Mono',size:9},padding:6},border:{display:false}},
       y:{display:false,max:115},
     }
   }
@@ -530,16 +600,16 @@ function renderDonut(){
     data:{
       datasets:[{
         data:[full,warn,ok],
-        backgroundColor:['rgba(255,107,107,.7)','rgba(255,170,64,.6)','rgba(0,232,150,.5)'],
-        borderColor:['#ff6b6b','#ffaa40','#00e896'],
+        backgroundColor:['rgba(230,107,101,.7)','rgba(212,170,88,.6)','rgba(99,215,155,.5)'],
+        borderColor:['#e66b65','#d4aa58','#63d79b'],
         borderWidth:1.5,hoverOffset:4,
       }]
     },
     options:{
       responsive:true,maintainAspectRatio:true,cutout:'68%',
       plugins:{legend:{display:false},tooltip:{
-        backgroundColor:'rgba(8,14,28,.97)',borderColor:'rgba(0,232,150,.3)',borderWidth:1,
-        titleColor:'#00e896',bodyColor:'#c8dde8',
+        backgroundColor:'rgba(7,11,10,.97)',borderColor:'rgba(99,215,155,.3)',borderWidth:1,
+        titleColor:'#63d79b',bodyColor:'#b7c2bc',
         titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Rajdhani',size:13},
       }}
     }
@@ -556,7 +626,7 @@ function renderBinTable(){
     const c=binColor(b.fill);
     return `<div class="bin-row ${b.isLive?'live':''}">
       <span class="bin-dot" style="background:${c}"></span>
-      <span class="bin-name">${b.name}${b.isLive?' <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:#00e896;border:1px solid rgba(0,232,150,.3);background:rgba(0,232,150,.1);padding:1px 6px;border-radius:4px;margin-left:6px;letter-spacing:.5px;">LIVE</span>':''}</span>
+      <span class="bin-name">${b.name}${b.isLive?' <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:#63d79b;border:1px solid rgba(99,215,155,.3);background:rgba(99,215,155,.1);padding:1px 6px;border-radius:4px;margin-left:6px;letter-spacing:.5px;">LIVE</span>':''}</span>
       <span class="bin-area">${b.type}</span>
       <div class="bin-fill-bar"><div class="bin-fill-inner" style="width:${b.fill}%;background:${c}"></div></div>
       <span class="bin-pct" style="color:${c}">${b.fill}%</span>
@@ -576,12 +646,7 @@ function renderTruckTable(){
     </div>`).join('');
 }
 
-function updateSidebarStats(){
-  const all = allBins();
-  document.getElementById('sb-full').textContent=all.filter(b=>b.fill>=80).length;
-  document.getElementById('sb-ok').textContent=all.filter(b=>b.fill<40).length;
-  document.getElementById('sb-total').textContent=all.length;
-}
+function updateSidebarStats(){ /* sidebar no longer shows live counters — kept as no-op so nothing else changes */ }
 
 function animCount(id, target){
   const el=document.getElementById(id);
@@ -664,7 +729,7 @@ function buildReportCSV(){
   const routes = computeTrucks();
 
   const lines = [];
-  lines.push('QuantCraft Mission Intelligence Report');
+  lines.push('EcoRoute Mission Intelligence Report');
   lines.push(`Generated,${stamp}`);
   lines.push('Region,Pathankot Waste Operations');
   lines.push('');
@@ -705,7 +770,7 @@ function downloadReport(){
     const a = document.createElement('a');
     const stamp = new Date().toISOString().slice(0,10);
     a.href = url;
-    a.download = `quantcraft-report-${stamp}.csv`;
+    a.download = `ecoroute-report-${stamp}.csv`;
     document.body.appendChild(a);
     a.click();
     a.remove();
