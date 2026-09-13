@@ -37,6 +37,7 @@
       border-bottom:none !important;
       backdrop-filter:none !important;
       overflow-y:auto !important; overflow-x:hidden !important;
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
     }
 
     #navbar .nav-logo{
@@ -46,31 +47,31 @@
       margin-bottom:6px;
     }
     .nav-logo .leaf-mark{
-      width:34px; height:34px; border-radius:9px;
+      width:38px; height:38px; border-radius:9px;
       background:linear-gradient(150deg,var(--green),var(--green-dark));
       display:grid; place-items:center; flex:none;
     }
-    .nav-logo .leaf-mark svg{width:18px;height:18px;}
+    .nav-logo .leaf-mark svg{width:20px;height:20px;}
     .nav-logo-text{display:flex;flex-direction:column;line-height:1.15;}
-    .nav-logo-text b{font-size:17px !important;font-weight:700 !important;letter-spacing:.3px;}
+    .nav-logo-text b{font-size:19px !important;font-weight:700 !important;letter-spacing:.3px;}
     .nav-logo-text b span{color:var(--green) !important;}
     .nav-logo-tagline{
-      margin-top:2px; font-size:8px !important; letter-spacing:1.4px;
+      margin-top:2px; font-size:9px !important; letter-spacing:1.4px;
       color:var(--muted) !important; text-transform:uppercase;
     }
 
     #navbar .nav-links{
       display:flex !important; flex-direction:column !important; align-items:stretch !important; flex:1 !important;
-      gap:3px; justify-content:space-evenly !important;
+      gap:5px; justify-content:space-evenly !important;
       margin:26px 0 0 !important; padding:0 !important; list-style:none;
     }
     #navbar .nav-links a{
-      display:flex !important; align-items:center !important; gap:11px; flex:none !important;
+      display:flex !important; align-items:center !important; gap:13px; flex:none !important;
       text-decoration:none; color:#8b978f !important;
-      font-size:13px !important; font-weight:500;
-      padding:13px 14px !important; border-radius:9px; transition:.2s;
+      font-size:15px !important; font-weight:500;
+      padding:16px 16px !important; border-radius:9px; transition:.2s;
     }
-    .nav-links a svg{width:16px;height:16px;flex:none;opacity:.8;}
+    .nav-links a svg{width:19px;height:19px;flex:none;opacity:.8;}
     .nav-links a:hover{color:#edf5ef !important;background:rgba(99,215,155,.07);}
     .nav-links a.active{
       color:var(--bright) !important;
@@ -314,18 +315,6 @@
           Admin
         </a>
       </li>
-      <li>
-        <a href="about.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-          About
-        </a>
-      </li>
-      <li>
-        <a href="contact.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-          Contact
-        </a>
-      </li>
     </ul>
 
     <div class="sidebar-footer">
@@ -387,7 +376,7 @@
             </a>
           </div>
         </div>
-        <a class="hero-float" href="about.html">
+        <a class="hero-float" href="dashboard.html">
           <span class="leaf-mark">
             <svg viewBox="0 0 24 24" fill="none" stroke="#04140c" stroke-width="2"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
           </span>

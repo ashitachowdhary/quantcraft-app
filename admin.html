@@ -1,378 +1,1312 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>QuantCraft — Admin</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>EcoRoute — Admin</title>
+
+<link rel="stylesheet" href="style.css">
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;background:#0a0e18;font-family:'Rajdhani',sans-serif;color:#e5edf5;overflow:hidden;}
-.mono{font-family:'Share Tech Mono',monospace;}
 
-.shell{display:flex;height:100vh;}
+/* =========================================================
+   ECOROUTE — ADMIN PANEL (MATCHES DASHBOARD THEME)
+   Sidebar / color system copied from dashboard.html
+   All admin functionality below is untouched.
+   ========================================================= */
 
-/* ===== SIDEBAR ===== */
-.sidebar{width:260px;flex-shrink:0;background:#0d121f;border-right:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;padding:20px 0;}
-.brand{display:flex;align-items:center;gap:10px;padding:0 20px 20px;}
-.brand-icon{width:34px;height:34px;border-radius:9px;background:rgba(0,232,150,.12);border:1px solid rgba(0,232,150,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#00e896;}
-.brand-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;}
-.brand-text{display:flex;flex-direction:column;gap:1px;}
-.brand-name{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:700;color:#f2f6fa;}
-.brand-dot{width:6px;height:6px;border-radius:50%;background:#00e896;box-shadow:0 0 6px #00e896;}
-.brand-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#4a5a6a;letter-spacing:1.5px;}
+:root{
+  --bg:#070b0a;
+  --surface:#0d1412;
+  --surface2:#111a17;
+  --surface3:#16221e;
 
-.sidenav{flex:1;padding:6px 12px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
-.snav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;text-decoration:none;color:#8a97a8;font-size:14px;font-weight:600;transition:all .15s;}
-.snav-item:hover{color:#e5edf5;background:rgba(255,255,255,.03);}
-.snav-item.active{color:#eafff5;background:rgba(0,232,150,.12);}
-.snav-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
-.snav-item .lbl{flex:1;}
-.snav-badge{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;padding:2px 7px;border-radius:9px;letter-spacing:.4px;}
-.snav-badge.green{background:rgba(0,232,150,.15);color:#00e896;}
-.snav-badge.count{background:rgba(255,255,255,.06);color:#8a97a8;}
-.snav-item.active .snav-dot{width:6px;height:6px;border-radius:50%;background:#00e896;box-shadow:0 0 6px #00e896;}
+  --border:rgba(220,235,226,.10);
+  --border-hover:rgba(220,235,226,.20);
 
-.side-footer{padding:14px 20px 4px;border-top:1px solid rgba(255,255,255,.05);margin-top:8px;display:flex;flex-direction:column;gap:8px;}
-.sf-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;}
-.sf-lbl{color:#4a5a6a;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
-.sf-val{color:#c8d4e0;font-weight:600;}
-.sf-val.green{color:#00e896;}
-.sf-dot{width:6px;height:6px;border-radius:50%;background:#b06bff;box-shadow:0 0 5px #b06bff;}
-.sf-divider{border-top:1px solid rgba(255,255,255,.05);margin:4px 0;}
-.sf-ver{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a4656;padding-top:6px;}
+  --text:#f3f5f1;
+  --muted:#84938b;
+  --soft:#b7c2bc;
 
-/* ===== MAIN ===== */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 32px;flex-shrink:0;}
-.tb-left{display:flex;align-items:center;gap:10px;}
-.tb-title{font-size:19px;font-weight:700;color:#f2f6fa;letter-spacing:.3px;}
-.tb-dot{width:5px;height:5px;border-radius:50%;background:#4a5a6a;}
-.tb-sub{font-size:13px;color:#5a6a7a;}
-.conn-pill{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:20px;background:rgba(0,232,150,.08);border:1px solid rgba(0,232,150,.2);font-size:13px;color:#e5edf5;font-weight:600;}
-.conn-pill.err{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.2);}
-.conn-pill.pending{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
-.conn-pill-dot{width:7px;height:7px;border-radius:50%;background:#00e896;animation:pulse 1.6s infinite;}
-.conn-pill.err .conn-pill-dot{background:#ff6b6b;}
-.conn-pill.pending .conn-pill-dot{background:#5a6a7a;animation:none;}
+  --green:#63d79b;
+  --green-dark:#1d6748;
 
-.content{flex:1;overflow-y:auto;padding:0 32px 32px;display:flex;flex-direction:column;gap:16px;}
-::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:#1e2736;border-radius:3px;}
+  --gold:#c7a467;
+  --red:#e66b65;
+  --yellow:#d4aa58;
+  --blue:#5aa8e8;
 
-/* ===== KPI ROW ===== */
-.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;flex-shrink:0;}
-.kpi-card{background:#10151f;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:18px 20px;}
-.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
-.kpi-lbl{font-size:13px;color:#8a97a8;font-weight:600;}
-.kpi-icon{color:#4a5a6a;flex-shrink:0;}
-.kpi-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;}
-.kpi-num{font-size:34px;font-weight:700;color:#f2f6fa;line-height:1;margin-bottom:8px;}
-.kpi-status{font-size:13px;font-weight:600;}
-.kpi-status.red{color:#ff6b6b;}
-.kpi-status.amber{color:#ffb400;}
-.kpi-status.cyan{color:#00c8ff;}
-.kpi-status.green{color:#00e896;}
+  --sidebar-w:250px;
+}
 
-/* ===== SECTION CARDS ===== */
-.panel{background:#10151f;border:1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
-.panel-head{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.05);}
-.panel-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;}
-.panel-head-text{flex:1;min-width:0;}
-.panel-title{font-size:15px;font-weight:700;color:#f2f6fa;}
-.panel-sub{font-size:12px;color:#5a6a7a;margin-top:2px;}
-.panel-action{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:#8a97a8;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:6px 12px;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px;}
-.panel-action:hover{color:#e5edf5;border-color:rgba(255,255,255,.2);}
-.panel-body{flex:1;overflow-y:auto;min-height:0;}
 
-/* Notify Drivers */
-.notify-body{padding:20px 22px;display:flex;flex-direction:column;gap:12px;}
-.notify-row{display:flex;gap:10px;}
-.notify-select{flex:1;background:#0a0e18;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#e5edf5;font-family:'Rajdhani',sans-serif;font-size:14px;padding:11px 14px;}
-.notify-textarea{width:100%;resize:vertical;min-height:70px;background:#0a0e18;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#e5edf5;font-family:'Share Tech Mono',monospace;font-size:12px;padding:12px 14px;line-height:1.6;}
-.notify-textarea::placeholder{color:#3a4656;}
-.notify-send{align-self:flex-end;padding:11px 22px;background:#e5484d;border:none;border-radius:9px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
-.notify-send:hover{background:#f2545a;}
+/* ================= GLOBAL ================= */
 
-/* Two-column grid */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+*{
+  box-sizing:border-box;
+}
 
-/* List rows */
-.row{display:flex;align-items:center;gap:10px;padding:12px 22px;border-bottom:1px solid rgba(255,255,255,.04);}
-.row:last-child{border-bottom:none;}
-.row:hover{background:rgba(255,255,255,.015);}
-.row-main{font-size:13px;font-weight:600;color:#e5edf5;}
-.row-sub{font-size:11px;color:#5a6a7a;margin-top:2px;}
+body{
+  margin:0;
+  padding-top:0 !important;
 
-/* Request row (multiline for e-waste) */
-.req-row{padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);}
-.req-row:last-child{border-bottom:none;}
-.req-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
-.req-assign-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
-.req-select{flex:1;min-width:140px;background:#0a0e18;border:1px solid rgba(255,255,255,.08);border-radius:7px;color:#e5edf5;font-family:'Rajdhani',sans-serif;font-size:12px;padding:7px 10px;}
+  background:
+    radial-gradient(
+      circle at 75% -10%,
+      rgba(58,110,78,.13),
+      transparent 30%
+    ),
+    var(--bg) !important;
 
-/* Badges */
-.badge{display:inline-flex;align-items:center;font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 9px;border-radius:20px;border:1px solid;font-weight:700;letter-spacing:.4px;white-space:nowrap;flex-shrink:0;}
-.badge-pending{color:#ffb400;border-color:rgba(255,180,0,.3);background:rgba(255,180,0,.1);}
-.badge-verified{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
-.badge-rejected{color:#ff6b6b;border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1);}
-.badge-assigned{color:#00c8ff;border-color:rgba(0,200,255,.3);background:rgba(0,200,255,.1);}
-.badge-completed{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
-.badge-live{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
+  color:var(--text);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
 
-.pill{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid;white-space:nowrap;flex-shrink:0;}
-.pill-full{color:#ff6b6b;border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1);}
-.pill-half{color:#ffb400;border-color:rgba(255,180,0,.3);background:rgba(255,180,0,.1);}
-.pill-ok{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
-.pill-running{color:#00e896;border-color:rgba(0,232,150,.3);background:rgba(0,232,150,.1);}
-.pill-stuck{color:#ff6b6b;border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1);animation:pulse 1.2s infinite;}
-.pill-idle{color:#ffb400;border-color:rgba(255,180,0,.3);background:rgba(255,180,0,.1);}
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
 
-/* Action buttons */
-.btn-approve{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid rgba(0,232,150,.3);background:rgba(0,232,150,.1);color:#00e896;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.btn-approve:hover{background:rgba(0,232,150,.2);}
-.btn-reject{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid rgba(255,107,107,.3);background:rgba(255,107,107,.1);color:#ff6b6b;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.btn-reject:hover{background:rgba(255,107,107,.2);}
-.btn-reset{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:#5a6a7a;background:none;border:none;cursor:pointer;transition:color .15s;}
-.btn-reset:hover{color:#8a97a8;}
-.btn-assign{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid rgba(0,200,255,.3);background:rgba(0,200,255,.1);color:#00c8ff;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.btn-assign:hover{background:rgba(0,200,255,.2);}
-.btn-complete{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid rgba(0,232,150,.3);background:rgba(0,232,150,.1);color:#00e896;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.btn-complete:hover{background:rgba(0,232,150,.2);}
-.notify-bell{background:none;border:none;color:#4a5a6a;cursor:pointer;font-size:14px;transition:color .15s;flex-shrink:0;}
-.notify-bell:hover{color:#8a97a8;}
+a{
+  color:inherit;
+}
 
-.fill-bar-wrap{width:50px;height:4px;background:rgba(255,255,255,.06);border-radius:2px;flex-shrink:0;}
-.fill-bar{height:4px;border-radius:2px;}
+.container{
+  max-width:1400px;
+  margin:0 auto;
+  padding:0 32px;
+}
 
-/* Empty state */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;color:#3a4656;text-align:center;}
-.empty-state svg{width:38px;height:38px;stroke:#2a3444;fill:none;stroke-width:1.5;margin-bottom:14px;}
-.empty-state-text{font-size:14px;color:#5a6a7a;font-weight:600;}
+.mono{
+  font-family:"Share Tech Mono", monospace;
+}
 
-/* Toast */
-#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
-.toast{display:flex;align-items:center;gap:10px;background:#10151f;border:1px solid rgba(0,232,150,.2);border-radius:10px;padding:11px 16px;min-width:220px;font-size:13px;color:#e5edf5;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+::-webkit-scrollbar{
+  width:6px;
+}
+::-webkit-scrollbar-track{
+  background:transparent;
+}
+::-webkit-scrollbar-thumb{
+  background:var(--surface3);
+  border-radius:3px;
+}
+
+
+/* =========================================================
+   SIDEBAR (copied from dashboard.html)
+   ========================================================= */
+
+html body #navbar,
+html body nav#navbar{
+
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  bottom:0 !important;
+  right:auto !important;
+
+  width:var(--sidebar-w) !important;
+  min-width:var(--sidebar-w) !important;
+  max-width:var(--sidebar-w) !important;
+  height:100vh !important;
+
+  z-index:9999 !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:0 !important;
+
+  padding:26px 18px !important;
+
+  background:var(--surface) !important;
+
+  border-right:1px solid var(--border) !important;
+  border-bottom:none !important;
+
+  backdrop-filter:none !important;
+
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+
+/* LOGO */
+
+#navbar .nav-logo{
+
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:10px;
+
+  color:var(--text) !important;
+
+  text-decoration:none;
+
+  font-size:0 !important;
+  font-weight:400 !important;
+  letter-spacing:normal !important;
+  white-space:normal !important;
+
+  margin-bottom:6px;
+}
+
+.nav-logo .leaf-mark{
+
+  width:34px;
+  height:34px;
+
+  border-radius:9px;
+
+  background:
+    linear-gradient(150deg,var(--green),var(--green-dark));
+
+  display:grid;
+  place-items:center;
+
+  flex:none;
+}
+
+.nav-logo .leaf-mark svg{
+  width:18px;
+  height:18px;
+}
+
+.nav-logo-text{
+  display:flex;
+  flex-direction:column;
+  line-height:1.15;
+}
+
+.nav-logo-text b{
+  font-size:17px !important;
+  font-weight:700 !important;
+  letter-spacing:.3px;
+}
+
+.nav-logo-text b span{
+  color:var(--green) !important;
+}
+
+.nav-logo-tagline{
+  margin-top:2px;
+  font-size:8px !important;
+  letter-spacing:1.4px;
+  color:var(--muted) !important;
+  text-transform:uppercase;
+}
+
+
+/* NAV LINKS */
+
+#navbar .nav-links{
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  flex:1 !important;
+
+  gap:3px;
+  justify-content:space-evenly !important;
+
+  margin:26px 0 0 !important;
+  padding:0 !important;
+  list-style:none;
+}
+
+#navbar .nav-links a{
+
+  display:flex !important;
+  align-items:center !important;
+  gap:11px;
+  flex:none !important;
+
+  text-decoration:none;
+
+  color:#8b978f !important;
+
+  font-size:13px !important;
+  font-weight:500;
+
+  padding:13px 14px !important;
+
+  border-radius:9px;
+
+  transition:.2s;
+}
+
+.nav-links a svg{
+  width:16px;
+  height:16px;
+  flex:none;
+  opacity:.8;
+}
+
+.nav-links a:hover{
+
+  color:#edf5ef !important;
+
+  background:rgba(99,215,155,.07);
+}
+
+.nav-links a.active{
+
+  color:var(--text) !important;
+
+  background:rgba(99,215,155,.12) !important;
+
+  box-shadow:inset 2px 0 0 var(--green);
+}
+
+.nav-links a.active svg{
+  opacity:1;
+}
+
+
+/* SIDEBAR FOOTER */
+
+.sidebar-footer{
+
+  margin-top:auto;
+
+  padding-top:24px;
+
+  color:var(--soft);
+
+  font-size:20px;
+
+  font-weight:600;
+
+  line-height:1.25;
+
+  position:relative;
+
+  overflow:hidden;
+}
+
+.sidebar-footer .foot-leaf{
+
+  position:absolute;
+  right:-18px;
+  bottom:-10px;
+
+  width:110px;
+  height:110px;
+
+  opacity:.12;
+}
+
+.sidebar-footer .rule{
+
+  width:34px;
+  height:2px;
+  background:var(--green);
+
+  margin-top:12px;
+}
+
+
+/* MOBILE HAMBURGER */
+
+.hamburger{
+  display:none;
+  flex-direction:column;
+  gap:4px;
+  width:34px;
+  height:34px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#0b1210;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+.hamburger span{
+  width:16px;
+  height:1.5px;
+  background:#d0d8d3;
+}
+
+
+/* =========================================================
+   MAIN WRAPPER
+   ========================================================= */
+
+.main-wrap{
+  margin-left:var(--sidebar-w) !important;
+  width:calc(100% - var(--sidebar-w)) !important;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+
+/* =========================================================
+   TOP HEADER
+   ========================================================= */
+
+.top-header{
+
+  position:sticky !important;
+  top:0 !important;
+  z-index:900;
+
+  height:72px;
+  flex-shrink:0;
+
+  padding:0 32px !important;
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  background:rgba(7,11,10,.94) !important;
+
+  border-bottom:1px solid var(--border) !important;
+
+  backdrop-filter:blur(18px);
+}
+
+.page-title-block{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+}
+
+.page-title-block .pt-title{
+  font-size:18px;
+  font-weight:650;
+  color:var(--text);
+  letter-spacing:.2px;
+  white-space:nowrap;
+}
+
+.page-title-block .pt-sub{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.header-spacer{
+  flex:1;
+}
+
+.stat-chip{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  height:38px;
+  padding:0 13px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#0b1210;
+  color:var(--soft);
+  font-size:11.5px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+.stat-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 5px var(--gold);
+  flex-shrink:0;
+}
+
+
+/* CONNECTION PILL (Firebase status) */
+
+.conn-pill{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 14px;
+  height:38px;
+  border-radius:20px;
+  background:rgba(99,215,155,.08);
+  border:1px solid rgba(99,215,155,.25);
+  font-size:12.5px;
+  color:var(--text);
+  font-weight:600;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.conn-pill.err{
+  background:rgba(230,107,101,.08);
+  border-color:rgba(230,107,101,.25);
+}
+.conn-pill.pending{
+  background:#0c1411;
+  border-color:var(--border);
+}
+.conn-pill-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--green);
+  animation:pulse 1.6s infinite;
+}
+.conn-pill.err .conn-pill-dot{
+  background:var(--red);
+}
+.conn-pill.pending .conn-pill-dot{
+  background:var(--muted);
+  animation:none;
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.content-wrap{
+  flex:1;
+  overflow-y:auto;
+  padding:24px 32px 32px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+
+/* KPI ROW */
+
+.kpi-row{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  flex-shrink:0;
+}
+
+.kpi-card{
+  background:linear-gradient(145deg,#101814,#0a100e);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px 20px;
+}
+
+.kpi-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.kpi-lbl{
+  font-size:12.5px;
+  color:var(--muted);
+  font-weight:600;
+}
+
+.kpi-icon{
+  color:var(--muted);
+  flex-shrink:0;
+}
+.kpi-icon svg{
+  width:16px;
+  height:16px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:1.8;
+}
+
+.kpi-num{
+  font-size:32px;
+  font-weight:650;
+  color:var(--text);
+  line-height:1;
+  margin-bottom:8px;
+  letter-spacing:-.6px;
+}
+
+.kpi-status{
+  font-size:12.5px;
+  font-weight:600;
+}
+.kpi-status.red{ color:var(--red); }
+.kpi-status.amber{ color:var(--yellow); }
+.kpi-status.cyan{ color:var(--blue); }
+.kpi-status.green{ color:var(--green); }
+
+
+/* PANEL */
+
+.panel{
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:linear-gradient(180deg,#0d1613,#0a100e);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+.panel-head{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+
+.panel-icon{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  font-size:16px;
+}
+
+.panel-head-text{
+  flex:1;
+  min-width:0;
+}
+
+.panel-title{
+  font-size:15px;
+  font-weight:650;
+  color:var(--text);
+}
+
+.panel-sub{
+  font-size:11.5px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.panel-action{
+  font-family:inherit;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--soft);
+  background:#0c1411;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:7px 12px;
+  cursor:pointer;
+  transition:.15s;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.panel-action:hover{
+  color:var(--green);
+  border-color:var(--green);
+}
+
+.panel-body{
+  flex:1;
+  overflow-y:auto;
+  min-height:0;
+}
+
+
+/* NOTIFY DRIVERS - PERMANENT VISIBILITY FIX */
+
+.notify-body{
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  flex-shrink:0;
+  height:auto;
+  visibility:visible !important;
+  display:flex !important;
+}
+
+/* FIX: the panel wrapping Notify Drivers was being flex-shrunk (and
+   clipped, because .panel has overflow:hidden) whenever the viewport
+   didn't have enough vertical space in .content-wrap. That's why the
+   select/textarea/button were getting cut off or disappearing
+   entirely. Locking this panel's flex-shrink to 0 keeps its full
+   height always, so the whole Notify Drivers box (including the
+   textarea and Send button) is permanently visible, and the page
+   scrolls instead of squashing it. */
+.panel:has(.notify-body){
+  flex-shrink:0;
+}
+
+.notify-row{
+  display:flex !important;
+  gap:10px;
+  visibility:visible !important;
+}
+.notify-select{
+  flex:1;
+  background:#0c1411;
+  border:1px solid var(--border);
+  border-radius:9px;
+  color:var(--text);
+  font-family:inherit;
+  font-size:13.5px;
+  padding:10px 13px;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+.notify-textarea{
+  width:100%;
+  resize:vertical;
+  min-height:70px;
+  background:#0c1411;
+  border:1px solid var(--border);
+  border-radius:9px;
+  color:var(--text);
+  font-family:"Share Tech Mono",monospace;
+  font-size:12px;
+  padding:12px 14px;
+  line-height:1.6;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+.notify-textarea::placeholder{
+  color:var(--muted);
+}
+.notify-send{
+  align-self:flex-end;
+  padding:11px 22px;
+  background:var(--red);
+  border:none;
+  border-radius:9px;
+  color:#fff;
+  font-family:inherit;
+  font-size:13.5px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.15s;
+  letter-spacing:.3px;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+.notify-send:hover{
+  background:#ef8984;
+}
+
+
+/* TWO COLUMN */
+
+.two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+
+/* LIST ROWS */
+
+.row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 20px;
+  border-bottom:1px solid var(--border);
+}
+.row:last-child{ border-bottom:none; }
+.row:hover{ background:rgba(255,255,255,.02); }
+.row-main{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text);
+}
+.row-sub{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+
+/* REQUEST ROW (e-waste, multiline) */
+
+.req-row{
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+}
+.req-row:last-child{ border-bottom:none; }
+.req-top{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:8px;
+}
+.req-assign-row{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-top:8px;
+  flex-wrap:wrap;
+}
+.req-select{
+  flex:1;
+  min-width:140px;
+  background:#0c1411;
+  border:1px solid var(--border);
+  border-radius:7px;
+  color:var(--text);
+  font-family:inherit;
+  font-size:12px;
+  padding:7px 10px;
+}
+
+
+/* BADGES */
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  font-family:"Share Tech Mono",monospace;
+  font-size:9px;
+  padding:3px 9px;
+  border-radius:20px;
+  border:1px solid;
+  font-weight:700;
+  letter-spacing:.4px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.badge-pending{
+  color:var(--gold);
+  border-color:rgba(199,164,103,.35);
+  background:rgba(199,164,103,.1);
+}
+.badge-verified{
+  color:var(--green);
+  border-color:rgba(99,215,155,.3);
+  background:rgba(99,215,155,.1);
+}
+.badge-rejected{
+  color:var(--red);
+  border-color:rgba(230,107,101,.3);
+  background:rgba(230,107,101,.1);
+}
+.badge-assigned{
+  color:var(--blue);
+  border-color:rgba(90,168,232,.3);
+  background:rgba(90,168,232,.1);
+}
+.badge-completed{
+  color:var(--green);
+  border-color:rgba(99,215,155,.3);
+  background:rgba(99,215,155,.1);
+}
+.badge-live{
+  color:var(--green);
+  border-color:rgba(99,215,155,.3);
+  background:rgba(99,215,155,.1);
+}
+
+
+/* PILLS (bins/trucks) */
+
+.pill{
+  font-family:"Share Tech Mono",monospace;
+  font-size:9px;
+  font-weight:700;
+  padding:3px 9px;
+  border-radius:20px;
+  border:1px solid;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.pill-full{
+  color:var(--red);
+  border-color:rgba(230,107,101,.3);
+  background:rgba(230,107,101,.1);
+}
+.pill-half{
+  color:var(--gold);
+  border-color:rgba(199,164,103,.35);
+  background:rgba(199,164,103,.1);
+}
+.pill-ok{
+  color:var(--green);
+  border-color:rgba(99,215,155,.3);
+  background:rgba(99,215,155,.1);
+}
+.pill-running{
+  color:var(--green);
+  border-color:rgba(99,215,155,.3);
+  background:rgba(99,215,155,.1);
+}
+.pill-stuck{
+  color:var(--red);
+  border-color:rgba(230,107,101,.3);
+  background:rgba(230,107,101,.1);
+  animation:pulse 1.2s infinite;
+}
+.pill-idle{
+  color:var(--gold);
+  border-color:rgba(199,164,103,.35);
+  background:rgba(199,164,103,.1);
+}
+
+
+/* ACTION BUTTONS */
+
+.btn-approve{
+  font-family:inherit;
+  font-size:12px;
+  font-weight:700;
+  padding:7px 14px;
+  border-radius:8px;
+  border:1px solid rgba(99,215,155,.35);
+  background:rgba(99,215,155,.12);
+  color:var(--green);
+  cursor:pointer;
+  transition:.15s;
+  white-space:nowrap;
+}
+.btn-approve:hover{ background:rgba(99,215,155,.22); }
+
+.btn-reject{
+  font-family:inherit;
+  font-size:12px;
+  font-weight:700;
+  padding:7px 14px;
+  border-radius:8px;
+  border:1px solid rgba(230,107,101,.35);
+  background:rgba(230,107,101,.12);
+  color:var(--red);
+  cursor:pointer;
+  transition:.15s;
+  white-space:nowrap;
+}
+.btn-reject:hover{ background:rgba(230,107,101,.22); }
+
+.btn-reset{
+  font-family:inherit;
+  font-size:12px;
+  font-weight:600;
+  color:var(--muted);
+  background:none;
+  border:none;
+  cursor:pointer;
+  transition:color .15s;
+}
+.btn-reset:hover{ color:var(--soft); }
+
+.btn-assign{
+  font-family:inherit;
+  font-size:12px;
+  font-weight:700;
+  padding:7px 14px;
+  border-radius:8px;
+  border:1px solid rgba(90,168,232,.35);
+  background:rgba(90,168,232,.12);
+  color:var(--blue);
+  cursor:pointer;
+  transition:.15s;
+  white-space:nowrap;
+}
+.btn-assign:hover{ background:rgba(90,168,232,.22); }
+
+.btn-complete{
+  font-family:inherit;
+  font-size:12px;
+  font-weight:700;
+  padding:7px 14px;
+  border-radius:8px;
+  border:1px solid rgba(99,215,155,.35);
+  background:rgba(99,215,155,.12);
+  color:var(--green);
+  cursor:pointer;
+  transition:.15s;
+  white-space:nowrap;
+}
+.btn-complete:hover{ background:rgba(99,215,155,.22); }
+
+.notify-bell{
+  background:none;
+  border:none;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:14px;
+  transition:color .15s;
+  flex-shrink:0;
+}
+.notify-bell:hover{ color:var(--soft); }
+
+
+/* FILL BAR */
+
+.fill-bar-wrap{
+  width:50px;
+  height:4px;
+  background:rgba(255,255,255,.06);
+  border-radius:2px;
+  flex-shrink:0;
+}
+.fill-bar{
+  height:4px;
+  border-radius:2px;
+}
+
+
+/* EMPTY STATE */
+
+.empty-state{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:50px 20px;
+  color:#3a4038;
+  text-align:center;
+}
+.empty-state svg{
+  width:38px;
+  height:38px;
+  stroke:#26312b;
+  fill:none;
+  stroke-width:1.5;
+  margin-bottom:14px;
+}
+.empty-state-text{
+  font-size:14px;
+  color:var(--muted);
+  font-weight:600;
+}
+
+
+/* TOAST */
+
+#toast-wrap{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.toast{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:var(--surface2);
+  border:1px solid var(--border-hover);
+  border-radius:10px;
+  padding:11px 16px;
+  min-width:220px;
+  font-size:13px;
+  color:var(--text);
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
 
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:1100px){
+
+  #navbar{
+    transform:translateX(-100%);
+    transition:transform .25s ease;
+  }
+  #navbar.open{
+    transform:translateX(0);
+  }
+  .main-wrap{
+    margin-left:0;
+  }
+  .hamburger{
+    display:flex !important;
+  }
+  .top-header{
+    padding:0 16px !important;
+  }
+  .content-wrap{
+    padding:20px 16px 24px;
+  }
+  .kpi-row{
+    grid-template-columns:repeat(2,1fr);
+  }
+  .two-col{
+    grid-template-columns:1fr;
+  }
+  .stat-chip{
+    display:none;
+  }
+}
+
+@media(max-width:720px){
+  .kpi-row{
+    grid-template-columns:repeat(2,1fr);
+  }
+  .page-title-block .pt-sub{
+    display:none;
+  }
+}
+
 </style>
 </head>
 <body>
-<div class="shell">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.293 13.596 7.196 9.5 3.1 10.598"/><path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 12 3a1.784 1.784 0 0 1 1.545.888l3.943 6.843"/><path d="m13.378 9.633 4.096 1.098 1.097-4.096"/></svg>
-      </div>
-      <div class="brand-text">
-        <div class="brand-name">QuantCraft <span class="brand-dot"></span></div>
-        <div class="brand-sub">MISSION CONTROL</div>
-      </div>
-    </div>
+<!-- ======================================================
+     SIDEBAR NAVIGATION (same as dashboard.html)
+     ====================================================== -->
 
-    <div class="sidenav">
-      <a class="snav-item" href="index.html">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-        <span class="lbl">Home</span>
-      </a>
-      <a class="snav-item" href="map.html">
-        <svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-        <span class="lbl">Map View</span>
-      </a>
-      <a class="snav-item" href="analytics.html">
-        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-        <span class="lbl">Analytics</span>
-      </a>
-      <a class="snav-item" href="truck.html">
-        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-        <span class="lbl">Trucks</span>
-        <span class="snav-badge count">42</span>
-      </a>
-      <a class="snav-item" href="reports.html">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span class="lbl">Reports</span>
-      </a>
-      <a class="snav-item" href="kabadiwala.html">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        <span class="lbl">Kabadiwala</span>
-        <span class="snav-badge green">NEW</span>
-      </a>
-      <a class="snav-item active" href="admin.html">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span class="lbl">Admin</span>
-        <span class="snav-dot"></span>
-      </a>
-    </div>
+<nav id="navbar">
 
-    <div class="side-footer">
-      <div class="sf-row">
-        <span class="sf-lbl"><span class="sf-dot"></span>Root Admin</span>
-        <span class="sf-val green">Active</span>
-      </div>
-      <div class="sf-row">
-        <span class="sf-lbl">Last Sync</span>
-        <span class="sf-val mono" id="sb-time" style="font-size:11px;">--:--:-- UTC</span>
-      </div>
-      <div class="sf-row">
-        <span class="sf-lbl">Bins Online</span>
-        <span class="sf-val green" id="sb-online">16 / 16</span>
-      </div>
-      <div class="sf-divider"></div>
-      <div class="sf-ver">
-        <span>VER 4.2.0-STABLE</span>
-        <span>Pathankot</span>
-      </div>
-    </div>
+  <a href="index.html" class="nav-logo">
+    <span class="leaf-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#04140c" stroke-width="2"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
+    </span>
+    <span class="nav-logo-text">
+      <b>Eco<span>Route</span></b>
+      <span class="nav-logo-tagline">Cleaner cities · Brighter tomorrows</span>
+    </span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      Home
+    </a></li>
+    <li><a href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      Dashboard
+    </a></li>
+    <li><a href="map.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6l6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
+      Live Map
+    </a></li>
+    <li><a href="analytics.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+      Analytics
+    </a></li>
+    <li><a href="reports.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+      Reports
+    </a></li>
+    <li><a href="kabadiwala.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M2 5h3l2.4 11.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+      Kabadiwala
+    </a></li>
+    <li><a href="admin.html" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4Z"/></svg>
+      Admin
+    </a></li>
+    
+  </ul>
+
+  <div class="sidebar-footer">
+    Small
+    Steps
+    Big
+    Impact
+    <div class="rule"></div>
+    <svg class="foot-leaf" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M5 21c9 0 14-5 14-14V5h-2C8 5 5 10 5 19v2Z"/><path d="M5 21c0-6 3-10 7-12"/></svg>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <div class="tb-left">
-        <div class="tb-title">ADMIN PANEL</div>
-        <span class="tb-dot"></span>
-        <div class="tb-sub">Live data • Pathankot • syncs every 5s</div>
-      </div>
-      <span class="conn-pill pending" id="connStatus"><span class="conn-pill-dot"></span>Connecting to Firebase…</span>
+</nav>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">Home</a>
+  <a href="dashboard.html">Dashboard</a>
+  <a href="map.html">Map</a>
+  <a href="analytics.html">Analytics</a>
+  <a href="reports.html">Reports</a>
+  <a href="kabadiwala.html">Kabadiwala</a>
+  <a href="admin.html">Admin</a>
+</div>
+
+
+<div class="main-wrap">
+
+  <!-- ======================================================
+       TOP HEADER
+       ====================================================== -->
+
+  <div class="top-header">
+
+    <button class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="page-title-block">
+      <div class="pt-title">Admin Panel</div>
+      <div class="pt-sub">Live data · Pathankot · syncs every 5s</div>
     </div>
 
-    <div class="content">
+    <div class="header-spacer"></div>
 
-      <!-- KPI ROW -->
-      <div class="kpi-row">
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-lbl">Full Bins ≥80%</div>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
-          </div>
-          <div class="kpi-num" id="kpi-full">0</div>
-          <div class="kpi-status red">Critical</div>
+    <span class="stat-chip">
+      <span class="stat-dot" style="background:var(--green);box-shadow:0 0 5px var(--green);"></span>
+      Root Admin&nbsp;<b style="color:var(--green);">Active</b>
+    </span>
+
+    <span class="stat-chip mono">
+      Last Sync&nbsp;<span id="sb-time" style="color:var(--soft);">--:--:-- UTC</span>
+    </span>
+
+    <span class="stat-chip">
+      Bins Online&nbsp;<span id="sb-online" style="color:var(--green);font-weight:700;">16 / 16</span>
+    </span>
+
+    <span class="conn-pill pending" id="connStatus"><span class="conn-pill-dot"></span>Connecting to Firebase…</span>
+
+  </div>
+
+  <div class="content-wrap">
+
+    <!-- KPI ROW -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-lbl">Full Bins ≥80%</div>
+          <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-lbl">Half Bins 40–79%</div>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
-          </div>
-          <div class="kpi-num" id="kpi-half">0</div>
-          <div class="kpi-status amber">Elevated</div>
+        <div class="kpi-num" id="kpi-full">0</div>
+        <div class="kpi-status red">Critical</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-lbl">Half Bins 40–79%</div>
+          <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-lbl">Truck Issues</div>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/></svg></div>
-          </div>
-          <div class="kpi-num" id="kpi-stuck">0</div>
-          <div class="kpi-status cyan">Telemetry</div>
+        <div class="kpi-num" id="kpi-half">0</div>
+        <div class="kpi-status amber">Elevated</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-lbl">Truck Issues</div>
+          <div class="kpi-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/></svg></div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-lbl">Pending Kabadiwalas</div>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-          </div>
-          <div class="kpi-num" id="kpi-kabadiwala-pending">0</div>
-          <div class="kpi-status green">Clear</div>
+        <div class="kpi-num" id="kpi-stuck">0</div>
+        <div class="kpi-status cyan">Telemetry</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-lbl">Pending Kabadiwalas</div>
+          <div class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-lbl">Pending E-Waste</div>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
-          </div>
-          <div class="kpi-num" id="kpi-ewaste-pending">0</div>
-          <div class="kpi-status green">Clear</div>
+        <div class="kpi-num" id="kpi-kabadiwala-pending">0</div>
+        <div class="kpi-status green">Clear</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-lbl">Pending E-Waste</div>
+          <div class="kpi-icon"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+        </div>
+        <div class="kpi-num" id="kpi-ewaste-pending">0</div>
+        <div class="kpi-status green">Clear</div>
+      </div>
+    </div>
+
+    <!-- NOTIFY DRIVERS - FIXED WITH PROPER FLEX SIZING -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-icon" style="background:rgba(230,107,101,.12);">📢</div>
+        <div class="panel-head-text">
+          <div class="panel-title">Notify Drivers</div>
+          <div class="panel-sub">Reaches truck panel in real time</div>
         </div>
       </div>
+      <div class="notify-body">
+        <div class="notify-row">
+          <select class="notify-select" id="notifyTarget">
+            <option value="ALL">All Trucks</option>
+            <option value="TRK-001">TRK-001 · Amarjit Singh</option>
+            <option value="TRK-002">TRK-002 · Gurpreet Kaur</option>
+            <option value="TRK-003">TRK-003 · Rajinder Pal</option>
+            <option value="TRK-004">TRK-004 · Mandeep Bajwa</option>
+          </select>
+          <select class="notify-select" id="notifyPrio" style="flex:0 0 140px;">
+            <option value="info">ℹ️ Info</option>
+            <option value="warn">⚠️ Warning</option>
+            <option value="alert">🚨 Alert</option>
+          </select>
+        </div>
+        <textarea class="notify-textarea" id="notifyMsg" rows="2" placeholder="e.g. BIN-006 is 91% full — take Route RT-01 (Depot → BIN-003 → BIN-001 → BIN-006 → BIN-010)"></textarea>
+        <button class="notify-send" onclick="sendNotification()">SEND TO DRIVERS</button>
+      </div>
+    </div>
 
-      <!-- NOTIFY DRIVERS -->
+    <!-- TWO COLUMN: KABADIWALA + E-WASTE -->
+    <div class="two-col">
+
+      <div class="panel" style="max-height:420px;">
+        <div class="panel-head">
+          <div class="panel-icon" style="background:rgba(99,215,155,.12);">♻️</div>
+          <div class="panel-head-text">
+            <div class="panel-title">Kabadiwala Approvals</div>
+            <div class="panel-sub" id="kabadiwala-sub">0 pending · 0 total registrations</div>
+          </div>
+          <button class="panel-action" onclick="pollKabadiwalas()">↻ Refresh</button>
+        </div>
+        <div class="panel-body" id="kabadiwala-list"></div>
+      </div>
+
+      <div class="panel" style="max-height:420px;">
+        <div class="panel-head">
+          <div class="panel-icon" style="background:rgba(90,168,232,.12);">📦</div>
+          <div class="panel-head-text">
+            <div class="panel-title">E-Waste Pickup Requests</div>
+            <div class="panel-sub" id="ewaste-sub">0 pending · 0 total requests</div>
+          </div>
+          <button class="panel-action" onclick="pollEwasteRequests()">↻ Refresh</button>
+        </div>
+        <div class="panel-body" id="ewaste-list"></div>
+      </div>
+
+    </div>
+
+    <!-- TWO COLUMN: BINS + TRUCKS -->
+    <div class="two-col" style="flex:1;min-height:0;">
+
       <div class="panel">
         <div class="panel-head">
-          <div class="panel-icon" style="background:rgba(255,107,107,.1);">📢</div>
+          <div class="panel-icon" style="background:rgba(199,164,103,.12);">🗑️</div>
           <div class="panel-head-text">
-            <div class="panel-title">Notify Drivers</div>
-            <div class="panel-sub">Reaches truck panel in real time</div>
+            <div class="panel-title">Problematic Bins</div>
+            <div class="panel-sub" id="bin-sub">Live · Pathankot</div>
           </div>
+          <button class="panel-action" onclick="window.location.href='map.html'">Map →</button>
         </div>
-        <div class="notify-body">
-          <div class="notify-row">
-            <select class="notify-select" id="notifyTarget">
-              <option value="ALL">All Trucks</option>
-              <option value="TRK-001">TRK-001 · Amarjit Singh</option>
-              <option value="TRK-002">TRK-002 · Gurpreet Kaur</option>
-              <option value="TRK-003">TRK-003 · Rajinder Pal</option>
-              <option value="TRK-004">TRK-004 · Mandeep Bajwa</option>
-            </select>
-            <select class="notify-select" id="notifyPrio" style="flex:0 0 140px;">
-              <option value="info">ℹ️ Info</option>
-              <option value="warn">⚠️ Warning</option>
-              <option value="alert">🚨 Alert</option>
-            </select>
-          </div>
-          <textarea class="notify-textarea" id="notifyMsg" rows="2" placeholder="e.g. BIN-006 is 91% full — take Route RT-01 (Depot → BIN-003 → BIN-001 → BIN-006 → BIN-010)"></textarea>
-          <button class="notify-send" onclick="sendNotification()">SEND TO DRIVERS</button>
-        </div>
+        <div class="panel-body" id="bin-list"></div>
       </div>
 
-      <!-- TWO COLUMN: KABADIWALA + E-WASTE -->
-      <div class="two-col">
-
-        <div class="panel" style="max-height:420px;">
-          <div class="panel-head">
-            <div class="panel-icon" style="background:rgba(0,232,150,.1);">♻️</div>
-            <div class="panel-head-text">
-              <div class="panel-title">Kabadiwala Approvals</div>
-              <div class="panel-sub" id="kabadiwala-sub">0 pending · 0 total registrations</div>
-            </div>
-            <button class="panel-action" onclick="pollKabadiwalas()">↻ Refresh</button>
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-icon" style="background:rgba(90,168,232,.12);">🚛</div>
+          <div class="panel-head-text">
+            <div class="panel-title">Trucks Running?</div>
+            <div class="panel-sub">4 routes · Pathankot</div>
           </div>
-          <div class="panel-body" id="kabadiwala-list"></div>
+          <button class="panel-action" onclick="window.location.href='truck.html'">Details →</button>
         </div>
-
-        <div class="panel" style="max-height:420px;">
-          <div class="panel-head">
-            <div class="panel-icon" style="background:rgba(0,200,255,.1);">📦</div>
-            <div class="panel-head-text">
-              <div class="panel-title">E-Waste Pickup Requests</div>
-              <div class="panel-sub" id="ewaste-sub">0 pending · 0 total requests</div>
-            </div>
-            <button class="panel-action" onclick="pollEwasteRequests()">↻ Refresh</button>
-          </div>
-          <div class="panel-body" id="ewaste-list"></div>
-        </div>
-
+        <div class="panel-body" id="truck-list"></div>
       </div>
 
-      <!-- TWO COLUMN: BINS + TRUCKS -->
-      <div class="two-col" style="flex:1;min-height:0;">
-
-        <div class="panel">
-          <div class="panel-head">
-            <div class="panel-icon" style="background:rgba(255,180,0,.1);">🗑️</div>
-            <div class="panel-head-text">
-              <div class="panel-title">Problematic Bins</div>
-              <div class="panel-sub" id="bin-sub">Live · Pathankot</div>
-            </div>
-            <button class="panel-action" onclick="window.location.href='map.html'">Map →</button>
-          </div>
-          <div class="panel-body" id="bin-list"></div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <div class="panel-icon" style="background:rgba(0,200,255,.1);">🚛</div>
-            <div class="panel-head-text">
-              <div class="panel-title">Trucks Running?</div>
-              <div class="panel-sub">4 routes · Pathankot</div>
-            </div>
-            <button class="panel-action" onclick="window.location.href='truck.html'">Details →</button>
-          </div>
-          <div class="panel-body" id="truck-list"></div>
-        </div>
-
-      </div>
     </div>
+
   </div>
+
 </div>
 
 <div id="toast-wrap"></div>
@@ -873,6 +1807,15 @@ pollEwasteRequests();
 setInterval(pollEwasteRequests, 5000);
 checkEscalations();
 setInterval(checkEscalations, 15000);
+
+/* Mobile sidebar toggle — needed since the new sidebar hides off-canvas below 1100px */
+const hamburgerBtn = document.getElementById('hamburger');
+if(hamburgerBtn && !hamburgerBtn.dataset.bound){
+  hamburgerBtn.dataset.bound = '1';
+  hamburgerBtn.addEventListener('click', () => {
+    document.getElementById('navbar').classList.toggle('open');
+  });
+}
 </script>
 </body>
 </html>
