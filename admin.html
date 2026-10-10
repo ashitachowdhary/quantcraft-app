@@ -634,14 +634,6 @@ html body nav#navbar{
   display:flex !important;
 }
 
-/* FIX: the panel wrapping Notify Drivers was being flex-shrunk (and
-   clipped, because .panel has overflow:hidden) whenever the viewport
-   didn't have enough vertical space in .content-wrap. That's why the
-   select/textarea/button were getting cut off or disappearing
-   entirely. Locking this panel's flex-shrink to 0 keeps its full
-   height always, so the whole Notify Drivers box (including the
-   textarea and Send button) is permanently visible, and the page
-   scrolls instead of squashing it. */
 .panel:has(.notify-body){
   flex-shrink:0;
 }
@@ -1276,6 +1268,19 @@ html body nav#navbar{
 
     </div>
 
+   <!-- CITIZEN PICKUP REQUESTS (NEW — assign to driver) -->
+<div class="panel" style="max-height:460px;flex-shrink:0;">
+      <div class="panel-head">
+        <div class="panel-icon" style="background:rgba(230,107,101,.12);">🚛</div>
+        <div class="panel-head-text">
+          <div class="panel-title">Citizen Pickup Requests</div>
+          <div class="panel-sub" id="pickup-sub">0 pending · 0 total requests</div>
+        </div>
+        <button class="panel-action" onclick="pollPickupRequests()">↻ Refresh</button>
+      </div>
+      <div class="panel-body" id="pickup-list"></div>
+    </div>
+
     <!-- TWO COLUMN: BINS + TRUCKS -->
     <div class="two-col" style="flex:1;min-height:0;">
 
@@ -1598,6 +1603,118 @@ async function completeEwasteRequest(requestId){
   }
 }
 
+/* ===== CITIZEN PICKUP REQUESTS (NEW — admin assigns a driver) ===== */
+let pickupEntries = [];
+
+async function pollPickupRequests(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/pickup_requests.json`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json() || {};
+
+    pickupEntries = Object.entries(data)
+      .map(([id, r]) => ({ id, ...r }))
+      .filter(r => r.status !== 'cancelled');
+
+    pickupEntries.sort((a,b) => {
+      const order = { pending:0, assigned:1, on_way:2, picked_up:3, completed:4 };
+      const ao = order[a.status] ?? 9, bo = order[b.status] ?? 9;
+      if(ao !== bo) return ao - bo;
+      return String(b.requestedAt || '').localeCompare(String(a.requestedAt || ''));
+    });
+
+    const pendingCount = pickupEntries.filter(e => !e.status || e.status === 'pending').length;
+    document.getElementById('pickup-sub').textContent =
+      `${pendingCount} pending · ${pickupEntries.length} total requests`;
+
+    renderPickupList();
+  } catch(err){
+    document.getElementById('pickup-list').innerHTML = `<div class="empty-state"><div class="empty-state-text" style="color:#ff6b6b;">Couldn't load pickup requests</div></div>`;
+  }
+}
+
+function pickupStatusBadge(status){
+  const map = {
+    pending:   `<span class="badge badge-pending">⏳ PENDING</span>`,
+    assigned:  `<span class="badge badge-assigned">🚛 ASSIGNED</span>`,
+    on_way:    `<span class="badge badge-assigned">🛣️ ON THE WAY</span>`,
+    picked_up: `<span class="badge badge-assigned">📦 PICKED UP</span>`,
+    completed: `<span class="badge badge-completed">✓ COMPLETED</span>`
+  };
+  return map[status] || map.pending;
+}
+
+function renderPickupList(){
+  const box = document.getElementById('pickup-list');
+  if(!pickupEntries.length){
+    box.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/></svg><div class="empty-state-text">No citizen pickup requests yet</div></div>`;
+    return;
+  }
+
+  box.innerHTML = pickupEntries.map(r => {
+    const status = r.status || 'pending';
+    const badge = pickupStatusBadge(status);
+
+    let actionHtml = '';
+
+    if(status === 'pending'){
+      const options = TRUCKS.map(t => `<option value="${t.id}" data-name="${t.driver}">${t.id} · ${t.driver}</option>`).join('');
+      actionHtml = `
+        <div class="req-assign-row">
+          <select class="req-select" id="pickup-assign-${r.id}">
+            <option value="">Select driver…</option>
+            ${options}
+          </select>
+          <button class="btn-assign" onclick="assignDriverToPickup('${r.id}')">Assign</button>
+        </div>`;
+    } else if(status === 'assigned' || status === 'on_way' || status === 'picked_up'){
+      actionHtml = `<div class="req-assign-row">
+        <span style="font-size:11px;color:#00c8ff;">Driver: ${r.assignedDriverName || r.assignedDriver || '—'}</span>
+      </div>`;
+    } else if(status === 'completed'){
+      actionHtml = `<div class="req-assign-row"><span style="font-size:11px;color:#00e896;">Completed by: ${r.assignedDriverName || r.assignedDriver || '—'}</span></div>`;
+    }
+
+    return `<div class="req-row">
+      <div class="req-top">
+        <div style="flex:1;min-width:0;">
+          <div class="row-main">${r.wasteType || 'General Waste'} · ${r.id}</div>
+          <div class="row-sub">${r.area || '—'} · ${r.phone || '—'}${r.description ? ' · '+r.description : ''}</div>
+        </div>
+        ${badge}
+      </div>
+      ${actionHtml}
+    </div>`;
+  }).join('');
+}
+
+async function assignDriverToPickup(requestId){
+  const select = document.getElementById(`pickup-assign-${requestId}`);
+  const driverId = select ? select.value : '';
+  if(!driverId){ toast('Select a driver first', 'warning'); return; }
+
+  const opt = select.options[select.selectedIndex];
+  const driverName = opt ? opt.dataset.name : driverId;
+
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/pickup_requests/${requestId}.json`, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        status: 'assigned',
+        assignedDriver: driverId,
+        assignedDriverName: driverName,
+        assignedAt: new Date().toISOString()
+      })
+    });
+    if(!res.ok) throw new Error('failed');
+    toast(`Assigned to ${driverName}`, 'success');
+    pollPickupRequests();
+  } catch(err){
+    toast('Could not assign — check connection', 'error');
+  }
+}
+
 setInterval(()=>{
   BINS.forEach(b=>{
     if(Math.random()>.7){
@@ -1805,6 +1922,8 @@ pollKabadiwalas();
 setInterval(pollKabadiwalas, 5000);
 pollEwasteRequests();
 setInterval(pollEwasteRequests, 5000);
+pollPickupRequests();
+setInterval(pollPickupRequests, 5000);
 checkEscalations();
 setInterval(checkEscalations, 15000);
 

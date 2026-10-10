@@ -2,6 +2,14 @@
   "projects": {
     "default": "ecoroute-a871a"
   },
-  "targets": {},
+  "targets": {
+    "ecoroute-a871a": {
+      "hosting": {
+        "main": [
+          "ecoroute-a871a"
+        ]
+      }
+    }
+  },
   "etags": {}
 }
